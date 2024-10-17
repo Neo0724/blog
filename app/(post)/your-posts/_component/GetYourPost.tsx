@@ -5,18 +5,18 @@ import { useLocalStorage, useScript } from "@uidotdev/usehooks";
 import axios from "axios";
 import EachPostPage from "./EachPostPage";
 
-type UserType = {
+export type UserType = {
+  user_id: string,
   name: string;
 };
+
 
 type PostType = {
   title: string;
   content: string;
   created_at: Date;
-  updated_at?: Date;
-  post_id?: string;
-  user_id?: string;
-  user: UserType;
+  post_id: string;
+  User: UserType;
 };
 
 export default function GetYourPost() {
@@ -33,7 +33,9 @@ export default function GetYourPost() {
           },
         });
 
-        setYourPosts(response.data);
+        if(response.status === 200) {
+          setYourPosts(response.data);
+        }
       };
 
       getPosts(userId);
@@ -51,7 +53,7 @@ export default function GetYourPost() {
               title={post.title}
               content={post.content}
               createdAt={post.created_at}
-              author={post.user.name}
+              author={post.User.name}
               postId={post.post_id ? post.post_id : ""}
             />
           </div>

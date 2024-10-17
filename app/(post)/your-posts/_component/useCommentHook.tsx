@@ -1,25 +1,19 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-
-type User = {
-  name: string;
-};
+import { UserType } from "./GetYourPost";
 
 export type GetBackCommentType = {
   comment_id: string;
   content: string;
   created_at: Date;
-  updated_at: Date;
-  post_id: string;
-  user: User;
-  user_id: string;
+  User: UserType;
 };
 
 export default function useComment(post_id: string) {
-  const [getComments, setGetComments] = useState<GetBackCommentType[]>([]);
+  const [comments, setComments] = useState<GetBackCommentType[]>([]);
 
   useEffect(() => {
-    const getComment = async (): Promise<void> => {
+    const getComment = async () => {
       try {
         const response = await axios.get("/api/get-comment", {
           params: {
@@ -27,9 +21,9 @@ export default function useComment(post_id: string) {
           },
         });
 
-        const commentsData: GetBackCommentType[] = response.data;
-
-        setGetComments(commentsData);
+        if(response.status === 200) {
+          setComments(response.data);
+        }
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -38,5 +32,5 @@ export default function useComment(post_id: string) {
     getComment();
   }, [post_id]);
 
-  return [getComments, setGetComments];
+  return { comments, setComments };
 }

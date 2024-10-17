@@ -9,16 +9,21 @@ export const GET = async (req: NextRequest) => {
   try {
     const userPosts = await prisma.post.findMany({
       where: {
-        user_id: user_id ? user_id : "",
+          User_user_id: user_id as string
       },
-
-      include: {
-        user: {
-          select: {
-            name: true,
-          }
-        },
-      },
+        
+      select: {
+          title: true,
+          content: true,
+          createdAt: true,
+          post_id: true,
+          User: {
+              select: {
+                  user_id: true,
+                  name: true
+              }
+          },
+      }
     });
 
     return NextResponse.json(userPosts, { status: 200 });

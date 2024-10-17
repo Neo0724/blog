@@ -3,12 +3,11 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreatePostSchema } from "@/app/api/create-post/route";
+import { CreatePostSchema, CreatePostFormSchema } from "@/app/api/create-post/route";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,40 +22,47 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 
-type CreateType = z.infer<typeof CreatePostSchema>;
+type CreatePostFormType = z.infer<typeof CreatePostFormSchema>
 
 export default function CreatePostPage() {
   const [error, setError] = useState("");
   const [userId, _] = useLocalStorage("test-userId");
   const { toast } = useToast();
 
-  const form = useForm<CreateType>({
-    resolver: zodResolver(CreatePostSchema),
+  const form = useForm<CreatePostFormType>({
+    resolver: zodResolver(CreatePostFormSchema),
   });
 
-  const handleSubmit = form.handleSubmit(async (formData) => {
-    const newFormData = { ...formData, user_id: userId };
+  const onSubmit = async (formData: CreatePostFormType) => {
+    const formDataWithUserId = { ...formData, user_id: userId };
     try {
-      const res = await axios.post("/api/create-post", newFormData);
-      toast({
-        title: "Success!",
-        description: "Post is successfully created!",
-      });
+      const res = await axios.post("/api/create-post", formDataWithUserId);
+
+      if (res.status === 200) {
+        toast({
+          title: "Success!",
+          description: "Post is successfully created!",
+        });
+      }
     } catch (error) {
       setError("An unexpected error occur");
       setTimeout(() => {
         setError("");
       }, 3000);
     }
-  });
+  };
+
+  const onInvalid = () => {
+    console.log("Invalid")
+  }
 
   return (
-    <div className="flex items-center justify-center flex-col space-y-8 p-5 border-2 rounded-md">
+    <div className="flex items-center max-w-[70%]  mb-[15px] sm:mb-0 mx-auto justify-center flex-col space-y-8 py-5 border-2 rounded-md">
       Creata a post
       <Form {...form}>
         <form
-          onSubmit={handleSubmit}
-          className="flex flex-col min-w-[25%] space-y-4"
+          onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+          className="flex flex-col min-w-[25%] w-[85%] max-w-[700px] space-y-4"
         >
           <FormField
             control={form.control}
@@ -78,7 +84,11 @@ export default function CreatePostPage() {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Enter title..." {...field} />
+                  <Textarea
+                    className="min-h-[150px] max-h-[250px] h-[50vh]"
+                    placeholder="Enter content..."
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

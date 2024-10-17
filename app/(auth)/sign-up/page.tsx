@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,6 +19,7 @@ import axios from "axios";
 import { useState } from "react";
 import { SignUpSchema } from "@/app/api/sign-up/route";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type SignUpType = z.infer<typeof SignUpSchema>;
 
@@ -28,19 +28,27 @@ const SignUpPage = () => {
     resolver: zodResolver(SignUpSchema),
   });
 
-  const [error, setError] = useState("");
+  const [toastMessage, setToastMessage] = useState({msg: "", error: false});
+  const router = useRouter();
+    
+  const waitClearToast = new Promise((resolve, reject) => {
+      setTimeout(() => {
+          setToastMessage({ msg: "", error: false });
+          resolve(true);
+      }, 5000);
+  })
 
   const handleSubmit = form.handleSubmit(async (formData) => {
-    try {
-      const res = await axios.post("api/sign-up", formData);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-      setError("Unexpected Occur");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-    }
+      try {
+          await axios.post("api/sign-up", formData);
+          setToastMessage({ msg: "Sign up successful!" , error: false });
+          await waitClearToast;
+          router.push("/sign-in");
+      } catch (error: any) {
+          console.log(error);
+          setToastMessage({ msg: error.response.data.error, error: true });
+          await waitClearToast;
+      }
   });
 
   return (
@@ -53,6 +61,7 @@ const SignUpPage = () => {
           <FormField
             control={form.control}
             name="name"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username:</FormLabel>
@@ -66,6 +75,7 @@ const SignUpPage = () => {
           <FormField
             control={form.control}
             name="email"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email:</FormLabel>
@@ -79,6 +89,7 @@ const SignUpPage = () => {
           <FormField
             control={form.control}
             name="password"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password:</FormLabel>
@@ -97,10 +108,16 @@ const SignUpPage = () => {
             Submit
           </Button>
         </form>
-        {error && (
+        {toastMessage.error && toastMessage.msg.length > 0 && (
           <Alert variant="destructive" className="w-auto">
             <AlertTitle>Error!</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{toastMessage.msg}</AlertDescription>
+          </Alert>
+        )}
+        {!toastMessage.error && toastMessage.msg.length > 0 && (
+          <Alert variant="default" className="w-auto">
+            <AlertTitle>Success!</AlertTitle>
+            <AlertDescription>{toastMessage.msg}</AlertDescription>
           </Alert>
         )}
       </Form>

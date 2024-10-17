@@ -1,5 +1,3 @@
-import React, { Dispatch, SetStateAction } from "react";
-
 import {
   Dialog,
   DialogContent,
@@ -12,35 +10,56 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { GetBackCommentType } from "./useCommentHook";
+import { CommentSchema } from "@/app/api/create-comment/route";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import axios from "axios";
+import useComment, { GetBackCommentType } from "./useCommentHook";
+import EachCommentPage from "./EachCommentPage";
+
+type CommentType = z.infer<typeof CommentSchema>;
 
 export default function CommentPage({
-  form,
-  handleSubmit,
   postId,
-  comment,
-  handleSetcomment,
 }: {
-  form: any;
-  handleSubmit: () => void;
   postId: string;
-  comment: GetBackCommentType[];
-  handleSetcomment: () => void;
 }) {
+  const [userId, _] = useLocalStorage<string>("test-userId");
 
-  const correctComment = comment?.filter(item => {
-    return item.post_id === postId
-  })
+  const { comments, setComments } = useComment(postId);
 
+  const form = useForm<CommentType>({
+    resolver: zodResolver(CommentSchema),
+    defaultValues: {
+      content: "",
+      user_id: userId,
+      post_id: postId,
+    },
+  });
+
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      const response = await axios.post("/api/create-comment", data);
+
+      if(response.status === 200) {
+        const newComment = response.data;
+  
+        setComments((prev: GetBackCommentType[]) => {
+          return [...prev, newComment];
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
   return (
     <>
       <Dialog>
@@ -48,6 +67,22 @@ export default function CommentPage({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Comments</DialogTitle>
+            <div className="overflow-y-scroll border-solid border-2 border-black-500 p-3 rounded-lg h-[60vh]">
+            {
+               comments && comments.length > 0 && (
+                    comments.map(c => {
+                        return <EachCommentPage key={c.comment_id} comment_id={c.comment_id} user={c.User} content={c.content} />
+                    })
+               ) 
+            }
+            {
+                comments.length === 0 && (
+                    <div>No comments yet...</div>
+                )
+
+            }
+
+            </div>
             <DialogDescription>
               <Form {...form}>
                 <form className="flex items-center mt-3">
@@ -58,7 +93,7 @@ export default function CommentPage({
                       <FormItem className="w-full">
                         <FormControl>
                           <Textarea
-                            placeholder="Type something..."
+                            placeholder="Write a comment ......"
                             {...field}
                             className="w-[90%] mx-auto"
                           />
@@ -71,13 +106,6 @@ export default function CommentPage({
                   </Button>
                 </form>
               </Form>
-              {
-                correctComment?.map(comment => {
-                  return (
-                    <div key={comment.comment_id}>{comment.content}</div>
-                  )
-                })
-              }
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

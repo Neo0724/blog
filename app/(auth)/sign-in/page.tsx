@@ -8,7 +8,6 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,27 +26,34 @@ import { useRouter } from "next/navigation";
 const SignInPage = () => {
   type SignInType = z.infer<typeof SignInSchema>;
   
-  const [userId, saveUserId] = useLocalStorage("test-userId", null);
+  const [_, saveUserId] = useLocalStorage("test-userId", null);
   const router = useRouter();
 
   const form = useForm<SignInType>({
     resolver: zodResolver(SignInSchema),
   });
 
-  const [error, setError] = useState("");
+  const [toastMessage, setToastMessage] = useState({msg: "", error: false});
+
+  const waitClearToast = new Promise((resolve, reject) => {
+      setTimeout(() => {
+          setToastMessage({ msg: "", error: false });
+          resolve(true);
+      }, 5000);
+  })
 
   const handleSubmit = form.handleSubmit(async (formData) => {
-    try {
-      const res = await axios.post("api/sign-in", formData);
-      saveUserId(res.data.user_id);
-      return router.push("/");
-    } catch (error) {
-      console.log(error);
-      setError("An unexpected error occur");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-    }
+      try {
+          const res = await axios.post("api/sign-in", formData);
+          saveUserId(res.data.user_id);
+          setToastMessage({ msg: "Sign in successful!", error: false });
+          await waitClearToast;
+          router.push("/");
+      } catch (error: any) {
+          console.log(error);
+          setToastMessage({ msg: error.response.data.error, error: true });
+          await waitClearToast;
+      }
   });
 
   return (
@@ -60,6 +66,7 @@ const SignInPage = () => {
           <FormField
             control={form.control}
             name="email"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email:</FormLabel>
@@ -73,6 +80,7 @@ const SignInPage = () => {
           <FormField
             control={form.control}
             name="password"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password:</FormLabel>
@@ -91,10 +99,16 @@ const SignInPage = () => {
             Submit
           </Button>
         </form>
-        {error && (
+        {toastMessage.error && toastMessage.msg.length > 0 && (
           <Alert variant="destructive" className="w-auto">
             <AlertTitle>Error!</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{toastMessage.msg}</AlertDescription>
+          </Alert>
+        )}
+        {!toastMessage.error && toastMessage.msg.length > 0 && (
+          <Alert variant="default" className="w-auto">
+            <AlertTitle>Success!</AlertTitle>
+            <AlertDescription>{toastMessage.msg}</AlertDescription>
           </Alert>
         )}
       </Form>

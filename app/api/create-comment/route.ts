@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -9,38 +9,41 @@ export const CommentSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-
-  const validation = CommentSchema.safeParse(body);
-
-  if (!validation.success) {
-    return NextResponse.json(validation.error, {
-      status: 400,
-    });
-  }
-
-  const prisma = new PrismaClient();
-
-  const comment = await prisma.comment.create({
-    data: {
+  try {
+    const body = await request.json();
+  
+    const validation = CommentSchema.safeParse(body);
+  
+    if (!validation.success) {
+      return NextResponse.json(validation.error, {
+        status: 400,
+      });
+    }
+  
+    const prisma = new PrismaClient();
+  
+    const newComment: Prisma.CommentCreateInput = {
       content: body.content,
-      user_id: body.user_id,
-      post_id: body.post_id,
-    },
-  });
-
-  const returnComment = await prisma.comment.findFirst({
-    where: {
-      comment_id: comment.comment_id,
-    },
-    include: {
-      user: {
-        select: {
-          name: true,
-        },
+      User: {
+          connect: {
+              user_id: body.user_id
+          }
       },
-    },
-  });
-
-  return NextResponse.json(returnComment, { status: 200 });
+      Post: {
+          connect: {
+              post_id: body.post_id
+          }
+      }
+    }
+  
+    const returnedComment = await prisma.comment.create({ data: newComment });
+  
+    return NextResponse.json(returnedComment, { status: 200 });
+  } catch(err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "Unexpected error occured" },
+      { status: 400 }
+    );
+  }
 }

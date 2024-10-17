@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
@@ -14,7 +15,7 @@ export default function Navitem({ name, href, active, icon }: NavItemsType) {
 
   return (
     <>
-    <div className="bg-white w-[1px] h-10"></div>
+      <div className="bg-white w-[1px] h-10"></div>
       <Button
         variant="outline"
         asChild

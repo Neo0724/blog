@@ -1,42 +1,110 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  user_id  String    @id @default(uuid())
-  name     String
-  email    String    @unique
-  password String
-  posts    Post[] // A user can have multiple posts
-  comments Comment[] // A user can have multiple comments
+    user_id            String          @id @default(uuid())
+    name               String
+    email              String          @unique
+    password           String
+    created_post       Post[]
+    favourited_post    FavouritePost[]
+    liked_post         LikedPost[]
+    commented_post     Comment[]
+    liked_comment      LikedComment[]
+    CommentReplyOwner  CommentReply[]  @relation(name: "owner")
+    CommentReplyTarget CommentReply[]  @relation(name: "target")
 }
 
 model Post {
-  post_id    String    @id @default(uuid())
-  title      String
-  content    String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  user       User      @relation(fields: [user_id], references: [user_id])
-  user_id    String // Foreign key referencing User
-  comments   Comment[] // A post can have multiple comments
+    post_id   String   @id @default(uuid())
+    title     String
+    content   String
+    createdAt DateTime @default(now())
+
+    User                  User            @relation(fields: [User_user_id], references: [user_id])
+    User_user_id          String
+    being_favourited_post FavouritePost[]
+    being_liked_post      LikedPost[]
+    being_commented_post  Comment[]
+    being_liked_comment   LikedComment[]
+}
+
+model FavouritePost {
+    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User_user_id String
+
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post_post_id String
+
+    createdAt DateTime @default(now())
+
+    @@id([User_user_id, Post_post_id])
+}
+
+model LikedPost {
+    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User_user_id String
+
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post_post_id String
+
+    createdAt DateTime @default(now())
+
+    @@id([User_user_id, Post_post_id])
 }
 
 model Comment {
-  comment_id String   @id @default(uuid())
-  content    String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  post       Post     @relation(fields: [post_id], references: [post_id])
-  post_id    String // Foreign key referencing Post
-  user       User     @relation(fields: [user_id], references: [user_id])
-  user_id    String // Foreign key referencing User
+    comment_id String @id @default(uuid())
+
+    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User_user_id String
+
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post_post_id String
+
+    createdAt DateTime @default(now())
+    content   String
+
+    being_replied_comment CommentReply[]
 }
+
+model LikedComment {
+    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User_user_id String
+
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post_post_id String
+
+    createdAt DateTime @default(now())
+
+    @@id([User_user_id, Post_post_id])
+}
+
+model CommentReply {
+    comment_reply_id String @id @default(uuid())
+
+    User         User   @relation(name: "owner", fields: [User_user_id], references: [user_id])
+    User_user_id String
+
+    Comment            Comment @relation(fields: [Comment_comment_id], references: [comment_id])
+    Comment_comment_id String
+
+    Target_user    User   @relation(name: "target", fields: [Target_user_id], references: [user_id])
+    Target_user_id String
+
+    createdAt DateTime @default(now())
+    content   String
+}
+

@@ -1,16 +1,18 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { UserType } from "./GetYourPost";
+import { UserType } from "./GetPost";
 
 export type GetBackReplyCommentType = {
-  comment_reply_id: string,
-  content: string,
-  User: UserType,
-  Target_user: UserType
-}
+  comment_reply_id: string;
+  content: string;
+  User: UserType;
+  Target_user: UserType;
+};
 
 export default function useReplyComment(comment_id: string) {
-  const [replyComments, setReplyComments] = useState<GetBackReplyCommentType[]>([]);
+  const [replyComments, setReplyComments] = useState<GetBackReplyCommentType[]>(
+    []
+  );
 
   useEffect(() => {
     const getReplyComment = async () => {
@@ -21,7 +23,7 @@ export default function useReplyComment(comment_id: string) {
           },
         });
 
-        if(response.status === 200) {
+        if (response.status === 200) {
           setReplyComments(response.data);
         }
       } catch (error) {

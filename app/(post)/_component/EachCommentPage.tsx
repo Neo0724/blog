@@ -1,29 +1,34 @@
 "use client";
 
-import { UserType } from "./GetYourPost";
+import { UserType } from "./GetPost";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useReplyComment from "./useReplyComment";
 import EachCommentReplyPage from "./EachCommentReplyPage";
 import { cn } from "@/lib/utils";
+import useLikedComment from "./useLikedCommentHook";
 
 export default function EachCommentPage({
   comment_id,
   user,
   content,
+  post_id
 }: {
   comment_id: string;
   user: UserType;
   content: string;
+  post_id: string;
 }) {
-  const [user_id, _] = useLocalStorage("test-userId", null);
+  const [user_id, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, setReplyComments } = useReplyComment(comment_id);
+  const { likedComment, setLikedComment } = useLikedComment(user_id, post_id)
+  const [ isLiked, setIsLiked ] = useState<boolean>()
 
   const handleOpenReply = () => {
     setOpenReply((prev) => !prev);
@@ -56,24 +61,70 @@ export default function EachCommentPage({
   };
 
   const handleViewReply = () => {
-    setViewReplies(prev => !prev)
+    setViewReplies((prev) => !prev);
+  };
+
+  const handleLike = async () => {
+    if(isLiked) {
+      try {
+        const res = await axios.delete("/api/delete-like-comment", {
+          params: {
+            user_id: user_id,
+            comment_id: comment_id
+          }
+        })
+        
+        if(res.status === 200) {
+          console.log("Deleted successfully")
+          setIsLiked(prev => !prev)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    } else {
+      try {
+        const res = await axios.post("/api/add-like-comment", {
+          user_id: user_id,
+          comment_id: comment_id
+        })
+        
+        if(res.status === 200) {
+          console.log("Added successfully")
+          setIsLiked(prev => !prev)
+
+        }
+      } catch (error) {
+        console.error(error)
+      }
+
+    }
   }
 
+  useEffect(() => {
+    if(likedComment !== null) {
+      const userLiked = likedComment.find((item) => item.Comment_comment_id === comment_id) ? true : false
+      setIsLiked(userLiked)
+    }
+  }, [likedComment])
+  
   return (
     <div className="flex flex-col">
       <h2 className="font-bold">{user.name}</h2>
       <div>{content}</div>
       {/* Like and reply button */}
       <div className="flex space-x-3 mt-[-5px]">
-        <Button variant="link" className="px-0">
-          Like
+        <Button variant="link" className="px-0" onClick={handleLike}>
+          {isLiked ? "Liked" : "Like"}
         </Button>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
       </div>
       {/* View reply bar */}
-      <button className="inline-flex items-center justify-center w-full mb-[15px] relative" onClick={handleViewReply}>
+      <button
+        className="inline-flex items-center justify-center w-full mb-[15px] relative"
+        onClick={handleViewReply}
+      >
         <hr className="w-64 h-px bg-gray-200 border-0 dark:bg-gray-700" />
         <span className="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">
           {viewReplies ? "Hide replies" : "View replies"}
@@ -100,9 +151,12 @@ export default function EachCommentPage({
           </div>
         )}
         {/* All the comments' replies */}
-        <div className ={cn("min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
-          !viewReplies && "hidden"
-        )}>
+        <div
+          className={cn(
+            "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
+            !viewReplies && "hidden"
+          )}
+        >
           {replyComments &&
             replyComments.length > 0 &&
             viewReplies &&

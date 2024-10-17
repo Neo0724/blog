@@ -71,7 +71,7 @@ export default function CommentPage({
             {
                comments && comments.length > 0 && (
                     comments.map(c => {
-                        return <EachCommentPage key={c.comment_id} comment_id={c.comment_id} user={c.User} content={c.content} />
+                        return <EachCommentPage key={c.comment_id} comment_id={c.comment_id} user={c.User} content={c.content} post_id={postId}/>
                     })
                ) 
             }

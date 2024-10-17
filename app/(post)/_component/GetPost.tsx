@@ -6,10 +6,9 @@ import axios from "axios";
 import EachPostPage from "./EachPostPage";
 
 export type UserType = {
-  user_id: string,
+  user_id: string;
   name: string;
 };
-
 
 type PostType = {
   title: string;
@@ -19,42 +18,58 @@ type PostType = {
   User: UserType;
 };
 
-export default function GetYourPost() {
+export default function GetPost({ ownPost }: { ownPost: boolean }) {
   const [userId, _] = useLocalStorage<string>("test-userId");
 
   const [yourPosts, setYourPosts] = useState<PostType[] | []>();
 
   useEffect(() => {
-    try {
-      const getPosts = async (userId: string) => {
+    const getOwnPosts = async (userId: string) => {
+      try {
         const response = await axios.get("/api/get-own-post", {
           params: {
             user_id: userId,
           },
         });
 
-        if(response.status === 200) {
+        if (response.status === 200) {
           setYourPosts(response.data);
         }
-      };
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-      getPosts(userId);
-    } catch (error) {
-      console.log(error);
+    const getAllPosts = async () => {
+      try {
+        const response = await axios.get("/api/get-all-post");
+
+        if (response.status === 200) {
+          setYourPosts(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (ownPost) {
+      getOwnPosts(userId);
+    } else {
+      getAllPosts();
     }
-  }, [userId]);
+  }, []);
 
   return (
     <>
       {yourPosts?.map((post: PostType) => {
         return (
-          <div key={post.post_id}> 
+          <div key={post.post_id}>
             <EachPostPage
               title={post.title}
               content={post.content}
               createdAt={post.created_at}
               author={post.User.name}
-              postId={post.post_id ? post.post_id : ""}
+              postId={post.post_id}
             />
           </div>
         );

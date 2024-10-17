@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { UserType } from "./GetYourPost";
+import { UserType } from "./GetPost";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -21,7 +21,7 @@ export default function useComment(post_id: string) {
           },
         });
 
-        if(response.status === 200) {
+        if (response.status === 200) {
           setComments(response.data);
         }
       } catch (error) {

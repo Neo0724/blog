@@ -1,9 +1,9 @@
-import GetYourPost from "./_component/GetYourPost";
+import GetPost from "../_component/GetPost";
 
 export default function YourPostsPage() {
   return (
     <>
-      <GetYourPost />
+      <GetPost ownPost={true}/>
     </>
   );
 }

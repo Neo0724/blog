@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
           }
       });
 
-      return NextResponse.json(comments?.being_commented_post, { status: 200 });
+      return NextResponse.json(comments?.being_commented_post ?? [], { status: 200 });
   } catch (error) {
       return NextResponse.json(
           { error: "An unexpected error occur!" },

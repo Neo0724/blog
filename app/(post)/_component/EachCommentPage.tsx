@@ -27,7 +27,7 @@ export default function EachCommentPage({
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, setReplyComments } = useReplyComment(comment_id);
-  const { likedComment, setLikedComment } = useLikedComment(user_id, post_id)
+  const { likedComment } = useLikedComment(user_id, post_id)
   const [ isLiked, setIsLiked ] = useState<boolean>()
 
   const handleOpenReply = () => {
@@ -96,12 +96,11 @@ export default function EachCommentPage({
       } catch (error) {
         console.error(error)
       }
-
     }
   }
 
   useEffect(() => {
-    if(likedComment !== null) {
+    if(likedComment && likedComment.length > 0) {
       const userLiked = likedComment.find((item) => item.Comment_comment_id === comment_id) ? true : false
       setIsLiked(userLiked)
     }
@@ -113,8 +112,8 @@ export default function EachCommentPage({
       <div>{content}</div>
       {/* Like and reply button */}
       <div className="flex space-x-3 mt-[-5px]">
-        <Button variant="link" className="px-0" onClick={handleLike}>
-          {isLiked ? "Liked" : "Like"}
+        <Button variant="link" className={cn("px-0", isLiked ? "text-red-500" : "")} onClick={handleLike}>
+          {isLiked ? "Dislike" : "Like"}
         </Button>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
@@ -164,6 +163,7 @@ export default function EachCommentPage({
               return (
                 <EachCommentReplyPage
                   comment_id={comment_id}
+                  comment_reply_id={c.comment_reply_id}
                   user={c.User}
                   target_user={c.Target_user}
                   content={c.content}

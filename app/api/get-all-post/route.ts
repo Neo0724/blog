@@ -20,7 +20,6 @@ export const GET = async (req: NextRequest) => {
       },
     });
 
-    console.log(allPosts)
     return NextResponse.json(allPosts, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Internal Error" }, { status: 400 });

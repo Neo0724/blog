@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
               }
           },
       });
-      return NextResponse.json(replyComments?.being_replied_comment, { status: 200 });
+      return NextResponse.json(replyComments?.being_replied_comment ?? [], { status: 200 });
   } catch (error) {
       return NextResponse.json(
           { error: "An unexpected error occur!" },

@@ -10,6 +10,9 @@ import useReplyComment from "./useReplyComment";
 import EachCommentReplyPage from "./EachCommentReplyPage";
 import { cn } from "@/lib/utils";
 import useLikedComment from "./useLikedCommentHook";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 
 export default function EachCommentPage({
   comment_id,
@@ -22,6 +25,8 @@ export default function EachCommentPage({
   content: string;
   post_id: string;
 }) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [user_id, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
@@ -31,7 +36,17 @@ export default function EachCommentPage({
   const [ isLiked, setIsLiked ] = useState<boolean>()
 
   const handleOpenReply = () => {
-    setOpenReply((prev) => !prev);
+      if(!user_id) {
+          toast({
+              title: "Error",
+              description: "Please sign in to reply",
+              action: (
+                  <ToastAction altText="Sign in now" onClick={() => router.push('sign-in')}>Sign in</ToastAction>
+              ),
+          })
+      } else {
+          setOpenReply((prev) => !prev);
+      }
   };
 
   const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -65,38 +80,49 @@ export default function EachCommentPage({
   };
 
   const handleLike = async () => {
-    if(isLiked) {
-      try {
-        const res = await axios.delete("/api/delete-like-comment", {
-          params: {
-            user_id: user_id,
-            comment_id: comment_id
-          }
-        })
-        
-        if(res.status === 200) {
-          console.log("Deleted successfully")
-          setIsLiked(prev => !prev)
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    } else {
-      try {
-        const res = await axios.post("/api/add-like-comment", {
-          user_id: user_id,
-          comment_id: comment_id
-        })
-        
-        if(res.status === 200) {
-          console.log("Added successfully")
-          setIsLiked(prev => !prev)
+      if(!user_id) {
+          toast({
+              title: "Error",
+              description: "Please sign in to like",
+              action: (
+                  <ToastAction altText="Sign in now" onClick={() => router.push('sign-in')}>Sign in</ToastAction>
+              ),
+          })
 
-        }
-      } catch (error) {
-        console.error(error)
+      } else {
+          if(isLiked) {
+              try {
+                  const res = await axios.delete("/api/delete-like-comment", {
+                      params: {
+                          user_id: user_id,
+                          comment_id: comment_id
+                      }
+                  })
+
+                  if(res.status === 200) {
+                      console.log("Deleted successfully")
+                      setIsLiked(prev => !prev)
+                  }
+              } catch (error) {
+                  console.error(error)
+              }
+          } else {
+              try {
+                  const res = await axios.post("/api/add-like-comment", {
+                      user_id: user_id,
+                      comment_id: comment_id
+                  })
+
+                  if(res.status === 200) {
+                      console.log("Added successfully")
+                      setIsLiked(prev => !prev)
+
+                  }
+              } catch (error) {
+                  console.error(error)
+              }
+          }
       }
-    }
   }
 
   useEffect(() => {
@@ -107,7 +133,7 @@ export default function EachCommentPage({
   }, [likedComment])
   
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col ml-[7px]">
       <h2 className="font-bold">{user.name}</h2>
       <div>{content}</div>
       {/* Like and reply button */}

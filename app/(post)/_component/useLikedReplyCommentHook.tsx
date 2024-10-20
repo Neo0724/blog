@@ -2,11 +2,15 @@ import axios from "axios";
 import useSwr from "swr";
 
 export type GetBackLikedReplyCommentType = {
-  CommentReply_comment_reply_id: string;
+ CommentReply_comment_reply_id: string 
 };
 
+// Get all replied comment for a single comment
 export default function useLikedReplyComment(user_id: string, comment_id: string) {
-    const fetchData = async (user_id: string, comment_id: string) => {
+    const fetchLikedReplyComment = async (url: string | null, user_id: string, comment_id: string) => {
+        if(!url || !user_id) {
+            return [];
+        }
         try {
             const response = await axios.get("/api/get-liked-replycomment", {
                 params: {
@@ -17,6 +21,7 @@ export default function useLikedReplyComment(user_id: string, comment_id: string
 
             if (response.status === 200) {
                 return response.data;
+
             } else {
                 return [];
             }
@@ -27,8 +32,8 @@ export default function useLikedReplyComment(user_id: string, comment_id: string
         }
     }
 
-  const { data, error, isLoading } = useSwr(["/api/get-liked-replycomment", user_id, comment_id], ([url, user_id, comment_id]) => fetchData(user_id, comment_id))
+  const { data, error, isLoading } = useSwr([user_id ? "/api/get-liked-replycomment" : null, user_id, comment_id], 
+                                            ([url, user_id, comment_id]) => fetchLikedReplyComment(url, user_id, comment_id))
 
-    console.log(data)
-  return {likedReplyComment: data as GetBackLikedReplyCommentType[] | [], error};
+  return { likedReply : data as GetBackLikedReplyCommentType[], error};
 }

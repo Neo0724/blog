@@ -3,14 +3,11 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { NavItemsType } from "./Navbar";
 
 export default function Navitem({ name, href, active, icon }: NavItemsType) {
-  const path = usePathname();
-  const includePathName = path === href;
   const [userId, _] = useLocalStorage<string>("test-userId");
 
   return (

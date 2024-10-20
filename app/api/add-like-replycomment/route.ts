@@ -20,17 +20,11 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    const [ returnedLikedCommentReply, totalLikedCommentReplyCount ]= await prisma.$transaction([
+    const [ returnedLikedCommentReply ]= await prisma.$transaction([
         prisma.likedCommentReply.create({ data: likedCommentReply }),
-        prisma.likedCommentReply.count({
-            where: {
-                CommentReply_comment_reply_id: body.comment_reply_id as string
-            }
-        })
-
     ])
 
-    return NextResponse.json({ totalLikedCommentReplyCount: totalLikedCommentReplyCount }, { status: 200 });
+    return NextResponse.json({ likedCommentReply: returnedLikedCommentReply }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

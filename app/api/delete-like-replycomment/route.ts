@@ -5,6 +5,7 @@ export async function DELETE(request: NextRequest) {
   const user_id = request.nextUrl.searchParams.get("user_id");
   const comment_reply_id = request.nextUrl.searchParams.get("comment_reply_id");
 
+  console.log(user_id + " " + comment_reply_id)
   const prisma = new PrismaClient();
   try {
       const [ deletedLikedComment, totalReplyCommentLikeCount ] = await prisma.$transaction([

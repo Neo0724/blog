@@ -1,12 +1,12 @@
 import axios from "axios";
 import useSWR from "swr";
 
-export type GetBackLikedCommentType = {
-  Comment_comment_id: string;
+export type GetBackLikedPostType = {
+  Post_comment_id: string;
 };
 
-export default function useLikedComment(user_id: string, post_id: string) {
-    const fetchData = async (url: string, user_id: string, post_id: string) => {
+export default function useLikedPost(user_id: string) {
+    const fetchData = async (url: string, user_id: string) => {
         if(!url) {
             return [];
         }
@@ -14,7 +14,6 @@ export default function useLikedComment(user_id: string, post_id: string) {
         try {
             const response = await axios.get(url, {
                 params: {
-                    post_id: post_id,
                     user_id: user_id,
                 },
             });
@@ -31,7 +30,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
         }
     };
 
-  const { data, error, isLoading } = useSWR([user_id ? "/api/get-liked-comment" : null, user_id, post_id], ([url, user_id, post_id]) => fetchData(url, user_id, post_id))
+  const { data, error, isLoading } = useSWR([user_id ? "/api/get-like-post" : null, user_id], ([url, user_id]) => fetchData(url, user_id, post_id))
 
-  return { likedComment: data as GetBackLikedCommentType[] | [], error };
+  return { likedPost: data as GetBackLikedPostType[] | [], error };
 }

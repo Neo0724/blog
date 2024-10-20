@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
     
     Example output, returned output is an array of all liked reply comment id within a post
     */
-    console.log(allLikedComment)
     return NextResponse.json(allLikedComment?.LikedCommentReply ?? [], { status: 200 })
   } catch (error) {
       console.log(error)

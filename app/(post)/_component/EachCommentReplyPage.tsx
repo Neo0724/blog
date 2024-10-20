@@ -9,6 +9,9 @@ import { GetBackReplyCommentType } from "./useReplyComment";
 import axios from "axios";
 import useLikedReplyComment from "./useLikedReplyCommentHook";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 
 export default function EachCommentReplyPage({
   content,
@@ -25,14 +28,48 @@ export default function EachCommentReplyPage({
   target_user: UserType;
   setReplyComments: Dispatch<SetStateAction<GetBackReplyCommentType[]>>;
 }) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [user_id, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { likedReplyComment } = useLikedReplyComment(user_id, comment_id)
-  const [ isLiked, setIsLiked ] = useState<boolean>()
+  const { likedReply } = useLikedReplyComment(user_id, comment_id);
+  const [ isLiked, setIsLiked ] = useState<boolean>();
+  const [ totalLike, setTotalLike ] = useState(0);
 
+  const fetchTotalLike = async () => {
+      try {
+          const response = await axios.get("/api/count-like-replycomment", {
+              params: {
+                  comment_reply_id: comment_reply_id
+              },
+          });
+
+          if (response.status === 200) {
+              return response.data
+
+          } else {
+              return 0;
+          }
+
+      } catch(err) {
+          console.log(err);
+          return 0;
+      }
+  }
   const handleOpenReply = () => {
-    setOpenReply((prev) => !prev);
+      if(!user_id) {
+          toast({
+              title: "Error",
+              description: "Please sign in to reply",
+              action: (
+                  <ToastAction altText="Sign in now" onClick={() => router.push('sign-in')}>Sign in</ToastAction>
+              ),
+          })
+
+      } else {
+          setOpenReply((prev) => !prev);
+      }
   };
 
   const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -62,59 +99,80 @@ export default function EachCommentReplyPage({
   };
 
   const handleLike = async () => {
-    if(isLiked) {
-        try {
-            const res = await axios.delete("/api/delete-like-replycomment", {
-                params: {
-                    user_id: user_id,
-                    comment_reply_id: comment_reply_id
-                }
-            })
-        
-            if(res.status === 200) {
-                console.log("Deleted successfully")
-                setIsLiked(prev => !prev)
-            }
-        } catch(err) {
-            console.log(err)
-        }
-    } else {
-      try {
-        const res = await axios.post("/api/add-like-replycomment", {
-          user_id: user_id,
-          comment_reply_id: comment_reply_id
-        })
-        
-        if(res.status === 200) {
-          console.log("Added successfully")
-          setIsLiked(prev => !prev)
+      if(!user_id) {
+          toast({
+              title: "Error",
+              description: "Please sign in to like",
+              action: (
+                  <ToastAction altText="Sign in now" onClick={() => router.push('sign-in')}>Sign in</ToastAction>
+              ),
+          })
 
-        }
-      } catch (error) {
-        console.error(error)
+      } else {
+          if(isLiked) {
+              try {
+                  const res = await axios.delete("/api/delete-like-replycomment", {
+                      params: {
+                          user_id: user_id,
+                          comment_reply_id: comment_reply_id
+                      }
+                  })
+
+                  if(res.status === 200) {
+                      console.log("Deleted successfully")
+                      setIsLiked(prev => !prev);
+                      // setTotalLike(prev => prev - 1);
+                      setTotalLike(await fetchTotalLike());
+                  }
+              } catch(err) {
+                  console.log(err)
+              }
+          } else {
+              try {
+                  const res = await axios.post("/api/add-like-replycomment", {
+                      user_id: user_id,
+                      comment_reply_id: comment_reply_id
+                  })
+
+                  if(res.status === 200) {
+                      console.log("Added successfully")
+                      setIsLiked(prev => !prev)
+                      // setTotalLike(prev => prev = 1);
+                      setTotalLike(await fetchTotalLike());
+                  }
+              } catch (error) {
+                  console.error(error)
+              }
+          }
       }
-    }
   }
 
   useEffect(() => {
-    if(likedReplyComment && likedReplyComment.length > 0) {
-      const userLiked = likedReplyComment.find((item) => item.CommentReply_comment_reply_id === comment_reply_id) ? true : false
+    if(likedReply && likedReply.length > 0) {
+      const userLiked = likedReply.find((item) => item.CommentReply_comment_reply_id === comment_reply_id) ? true : false
       setIsLiked(userLiked)
     }
-  }, [likedReplyComment])
+
+    const initalizeTotalLike = async () => {
+        setTotalLike(await fetchTotalLike());
+    }
+
+    initalizeTotalLike();
+  }, [likedReply])
 
   return (
-    <div>
+    <div className="ml-[3px]">
       <hr className="h-px mb-[5px] bg-gray-200 border-0 dark:bg-gray-700" />
       <span className="font-bold">{user.name}</span>
       <div>
         <span className="text-blue-500 font-bold">@{target_user.name} </span>
         {content}
       </div>
-      <div className="flex space-x-3 mt-[-5px]">
+      <div className="flex space-x-3 mt-[-5px] items-center">
         <Button variant="link" className={cn("px-0", isLiked ? "text-red-500" : "")} onClick={handleLike}>
         {isLiked ? "Dislike" : "Like"}
         </Button>
+        <span className="ml-[5px]">{totalLike}</span>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>

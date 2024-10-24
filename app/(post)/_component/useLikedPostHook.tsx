@@ -2,12 +2,12 @@ import axios from "axios";
 import useSWR from "swr";
 
 export type GetBackLikedPostType = {
-  Post_comment_id: string;
+  Post_post_id: string;
 };
 
-export default function useLikedPost(user_id: string) {
-    const fetchData = async (url: string, user_id: string) => {
-        if(!url) {
+export default function useLikedPost(user_id: string | null) {
+    const fetchData = async (url: string | null, user_id: string | null) => {
+        if(!url || !user_id) {
             return [];
         }
 
@@ -30,7 +30,7 @@ export default function useLikedPost(user_id: string) {
         }
     };
 
-  const { data, error, isLoading } = useSWR([user_id ? "/api/get-like-post" : null, user_id], ([url, user_id]) => fetchData(url, user_id, post_id))
+  const { data, error, isLoading } = useSWR([user_id ? "/api/get-like-post" : null, user_id], ([url, user_id]) => fetchData(url, user_id))
 
-  return { likedPost: data as GetBackLikedPostType[] | [], error };
+  return { likedPost: data as GetBackLikedPostType[] | [], likedPostError: error, likedPostLoading: isLoading };
 }

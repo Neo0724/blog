@@ -32,8 +32,30 @@ export default function EachCommentPage({
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, setReplyComments } = useReplyComment(comment_id);
-  const { likedComment } = useLikedComment(user_id, post_id)
-  const [ isLiked, setIsLiked ] = useState<boolean>()
+  const { likedComment } = useLikedComment(user_id, post_id);
+  const [ isLiked, setIsLiked ] = useState<boolean>();
+  const [ totalLike, setTotalLike ] = useState(0);
+
+  const fetchTotalLike = async () => {
+      try {
+          const response = await axios.get("/api/count-like-comment", {
+              params: {
+                  comment_id: comment_id
+              },
+          });
+
+          if (response.status === 200) {
+              return response.data
+
+          } else {
+              return 0;
+          }
+
+      } catch(err) {
+          console.log(err);
+          return 0;
+      }
+  }
 
   const handleOpenReply = () => {
       if(!user_id) {
@@ -65,13 +87,16 @@ export default function EachCommentPage({
       const res = await axios.post("/api/create-reply-comment", replyData);
 
       if (res.status === 200) {
-        setReplyComments((prev) => [...prev, res.data]);
+          setReplyComments((prev) => [...prev, res.data]);
       }
     } catch (err) {
-      // TODO
+        toast({
+            title: "Error",
+            description: "An error occured when replying. Please try again later",
+        })
     } finally {
-      setReplyContent("");
-      setOpenReply(false);
+        setReplyContent("");
+        setOpenReply(false);
     }
   };
 
@@ -102,9 +127,14 @@ export default function EachCommentPage({
                   if(res.status === 200) {
                       console.log("Deleted successfully")
                       setIsLiked(prev => !prev)
+                      setTotalLike(prev => prev - 1);
                   }
               } catch (error) {
                   console.error(error)
+                  toast({
+                      title: "Error",
+                      description: "An error occured when removing like from the comment. Please try again later",
+                  })
               }
           } else {
               try {
@@ -116,10 +146,15 @@ export default function EachCommentPage({
                   if(res.status === 200) {
                       console.log("Added successfully")
                       setIsLiked(prev => !prev)
+                      setTotalLike(prev => prev + 1);
 
                   }
               } catch (error) {
                   console.error(error)
+                  toast({
+                      title: "Error",
+                      description: "An error occured when liking the comment. Please try again later",
+                  })
               }
           }
       }
@@ -130,6 +165,12 @@ export default function EachCommentPage({
       const userLiked = likedComment.find((item) => item.Comment_comment_id === comment_id) ? true : false
       setIsLiked(userLiked)
     }
+
+    const initializeLikeCount = async () => {
+        setTotalLike(await fetchTotalLike())
+    }
+
+    initializeLikeCount();
   }, [likedComment])
   
   return (
@@ -140,6 +181,7 @@ export default function EachCommentPage({
       <div className="flex space-x-3 mt-[-5px]">
         <Button variant="link" className={cn("px-0", isLiked ? "text-red-500" : "")} onClick={handleLike}>
           {isLiked ? "Dislike" : "Like"}
+          {"  " + totalLike}
         </Button>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
@@ -158,7 +200,7 @@ export default function EachCommentPage({
       {/* Reply textarea for user to enter */}
       <div className="ml-8">
         {openReply && (
-          <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2">
+          <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">
             <span className="opacity-70">Replying to {user.name} :</span>
             <div className="flex gap-3 justify-center items-center">
               <Textarea

@@ -24,6 +24,9 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import axios from "axios";
 import useComment, { GetBackCommentType } from "./useCommentHook";
 import EachCommentPage from "./EachCommentPage";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { ToastAction } from "@/components/ui/toast";
 
 type CommentType = z.infer<typeof CommentSchema>;
 
@@ -32,6 +35,8 @@ export default function CommentPage({
 }: {
   postId: string;
 }) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
 
   const { comments, setComments } = useComment(postId);
@@ -40,26 +45,37 @@ export default function CommentPage({
     resolver: zodResolver(CommentSchema),
     defaultValues: {
       content: "",
-      user_id: userId,
+      user_id: userId ?? "",
       post_id: postId,
     },
   });
 
-  const handleSubmit = form.handleSubmit(async (data) => {
-    try {
-      const response = await axios.post("/api/create-comment", data);
 
-      if(response.status === 200) {
-        const newComment = response.data;
-  
-        setComments((prev: GetBackCommentType[]) => {
-          return [...prev, newComment];
-        });
-      }
-    } catch (error) {
-      console.log(error);
+  const onSubmit = async (data: CommentType) => {
+    if(!userId) {
+          toast({
+              title: "Error",
+              description: "Please sign in to comment",
+              action: (
+                  <ToastAction altText="Sign in now" onClick={() => router.push('sign-in')}>Sign in</ToastAction>
+              ),
+          })
+    } else {
+        try {
+            const response = await axios.post("/api/create-comment", data);
+
+            if(response.status === 200) {
+                const newComment = response.data;
+
+                setComments((prev: GetBackCommentType[]) => {
+                    return [...prev, newComment];
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
-  });
+  };
   return (
     <>
       <Dialog>
@@ -85,7 +101,7 @@ export default function CommentPage({
             </div>
             <DialogDescription>
               <Form {...form}>
-                <form className="flex items-center mt-3">
+                <form className="flex items-center mt-3" onSubmit={form.handleSubmit(onSubmit)}>
                   <FormField
                     control={form.control}
                     name="content"
@@ -101,7 +117,7 @@ export default function CommentPage({
                       </FormItem>
                     )}
                   />
-                  <Button className="ml-auto" onClick={handleSubmit}>
+                  <Button className="ml-auto" type="submit">
                     Submit
                   </Button>
                 </form>

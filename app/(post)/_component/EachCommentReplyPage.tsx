@@ -91,7 +91,10 @@ export default function EachCommentReplyPage({
         setReplyComments((prev) => [...prev, res.data]);
       }
     } catch (err) {
-      // TODO
+        toast({
+            title: "Error",
+            description: "An error occured when replying. Please try again later",
+        })
     } finally {
       setReplyContent("");
       setOpenReply(false);
@@ -121,11 +124,14 @@ export default function EachCommentReplyPage({
                   if(res.status === 200) {
                       console.log("Deleted successfully")
                       setIsLiked(prev => !prev);
-                      // setTotalLike(prev => prev - 1);
-                      setTotalLike(await fetchTotalLike());
+                      setTotalLike(prev => prev - 1);
                   }
               } catch(err) {
                   console.log(err)
+                  toast({
+                      title: "Error",
+                      description: "An error occured when removing like from the comment. Please try again later",
+                  })
               }
           } else {
               try {
@@ -137,11 +143,14 @@ export default function EachCommentReplyPage({
                   if(res.status === 200) {
                       console.log("Added successfully")
                       setIsLiked(prev => !prev)
-                      // setTotalLike(prev => prev = 1);
-                      setTotalLike(await fetchTotalLike());
+                      setTotalLike(prev => prev + 1);
                   }
               } catch (error) {
                   console.error(error)
+                  toast({
+                      title: "Error",
+                      description: "An error occured when liking the comment. Please try again later",
+                  })
               }
           }
       }
@@ -171,14 +180,14 @@ export default function EachCommentReplyPage({
       <div className="flex space-x-3 mt-[-5px] items-center">
         <Button variant="link" className={cn("px-0", isLiked ? "text-red-500" : "")} onClick={handleLike}>
         {isLiked ? "Dislike" : "Like"}
+        {"  " + totalLike}
         </Button>
-        <span className="ml-[5px]">{totalLike}</span>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
       </div>
       {openReply && (
-        <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2">
+        <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">
           <span className="opacity-70">Replying to {user.name} :</span>
           <div className="flex gap-3 justify-center items-center">
             <Textarea

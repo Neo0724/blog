@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
         
       return NextResponse.json({ likedPost: returnedLikedPost }, { status: 200 });
   } catch (error) {
+      console.log(error);
       return NextResponse.json(
           { error: "An unexpected error occur!" },
           { status: 400 }

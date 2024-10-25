@@ -7,18 +7,17 @@ export async function GET(request: NextRequest) {
   const prisma = new PrismaClient();
 
   try {
-      const totalLikedComment = await prisma.likedComment.count({
-          where: {
-              Comment_comment_id: comment_id as string
-          }
-      }) 
+    const totalLikedComment = await prisma.likedComment.count({
+      where: {
+        Comment_comment_id: comment_id as string,
+      },
+    });
 
-
-      return NextResponse.json(totalLikedComment, { status: 200 });
+    return NextResponse.json(totalLikedComment, { status: 200 });
   } catch (error) {
-      return NextResponse.json(
-          { error: "An unexpected error occur!" },
-          { status: 400 }
-      );
+    return NextResponse.json(
+      { error: "An unexpected error occur!" },
+      { status: 400 },
+    );
   }
 }

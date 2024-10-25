@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useLocalStorage, useScript } from "@uidotdev/usehooks";
 import axios from "axios";
 import EachPostPage from "./EachPostPage";
+import { SearchPostType } from "./Enum";
 
 export type UserType = {
   user_id: string;
@@ -18,14 +19,22 @@ type PostType = {
   User: UserType;
 };
 
-export default function GetPost({ ownPost }: { ownPost: boolean }) {
-  const [userId, _] = useLocalStorage<string>("test-userId");
+type GetPostProps =
+  | {
+    searchPostType: SearchPostType.ALL_POST | SearchPostType.OWN_POST;
+    searchText?: string;
+  }
+  | { searchPostType: SearchPostType.SEARCH_POST; searchText: string };
 
-  const [yourPosts, setYourPosts] = useState<PostType[] | []>();
+export default function GetPost({ searchPostType, searchText }: GetPostProps) {
+  const [userId, _] = useLocalStorage<string>("test-userId");
+  const [isLoading, setIsLoading] = useState(false);
+  const [yourPosts, setYourPosts] = useState<PostType[] | []>([]);
 
   useEffect(() => {
     const getOwnPosts = async (userId: string) => {
       try {
+        setIsLoading(true);
         const response = await axios.get("/api/get-own-post", {
           params: {
             user_id: userId,
@@ -37,11 +46,15 @@ export default function GetPost({ ownPost }: { ownPost: boolean }) {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     const getAllPosts = async () => {
       try {
+        setIsLoading(true);
+
         const response = await axios.get("/api/get-all-post");
 
         if (response.status === 200) {
@@ -49,31 +62,59 @@ export default function GetPost({ ownPost }: { ownPost: boolean }) {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (ownPost) {
+    const getSearchPost = async () => {
+      try {
+        setIsLoading(true);
+        const res = await axios.get("/api/get-search-post", {
+          params: {
+            searchText: searchText,
+          },
+        });
+
+        if (res.status === 200) {
+          setYourPosts(res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (searchPostType === 1) {
       getOwnPosts(userId);
-    } else {
+    } else if (searchPostType === 2) {
       getAllPosts();
+    } else if (searchPostType === 3) {
+      getSearchPost();
     }
   }, []);
 
   return (
     <>
-      {yourPosts?.map((post: PostType) => {
-        return (
-          <div key={post.post_id}>
-            <EachPostPage
-              title={post.title}
-              content={post.content}
-              createdAt={post.created_at}
-              author={post.User.name}
-              postId={post.post_id}
-            />
-          </div>
-        );
-      })}
+      {isLoading && <div>Contents are loading...</div>}
+      {!isLoading &&
+        yourPosts &&
+        yourPosts.length > 0 &&
+        yourPosts.map((post: PostType) => {
+          return (
+            <div key={post.post_id}>
+              <EachPostPage
+                title={post.title}
+                content={post.content}
+                createdAt={post.created_at}
+                author={post.User.name}
+                postId={post.post_id}
+              />
+            </div>
+          );
+        })}
+      {!isLoading && yourPosts.length === 0 && <div>No posts found...</div>}
     </>
   );
 }

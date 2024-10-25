@@ -3,7 +3,10 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreatePostSchema, CreatePostFormSchema } from "@/app/api/create-post/route";
+import {
+  CreatePostSchema,
+  CreatePostFormSchema,
+} from "@/app/api/create-post/route";
 
 import {
   Form,
@@ -22,7 +25,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 
-type CreatePostFormType = z.infer<typeof CreatePostFormSchema>
+type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 
 export default function CreatePostPage() {
   const [error, setError] = useState("");
@@ -53,8 +56,8 @@ export default function CreatePostPage() {
   };
 
   const onInvalid = () => {
-    console.log("Invalid")
-  }
+    console.log("Invalid");
+  };
 
   return (
     <div className="flex items-center max-w-[70%]  mb-[15px] sm:mb-0 mx-auto justify-center flex-col space-y-8 py-5 border-2 rounded-md">

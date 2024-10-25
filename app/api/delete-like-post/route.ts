@@ -7,29 +7,34 @@ export async function DELETE(request: NextRequest) {
 
   const prisma = new PrismaClient();
   try {
-      const [ deletedLikedComment, totalPostLikeCount ] = await prisma.$transaction([
-          prisma.likedPost.delete({
-              where: {
-                  User_user_id_Post_post_id: {
-                      Post_post_id:  post_id as string,
-                      User_user_id: user_id as string
-                  }
-              }
-          }),
+    const [deletedLikedComment, totalPostLikeCount] = await prisma.$transaction(
+      [
+        prisma.likedPost.delete({
+          where: {
+            User_user_id_Post_post_id: {
+              Post_post_id: post_id as string,
+              User_user_id: user_id as string,
+            },
+          },
+        }),
 
-          prisma.likedPost.count({
-            where: {
-                Post_post_id: post_id as string
-            }
-          })
-      ])
+        prisma.likedPost.count({
+          where: {
+            Post_post_id: post_id as string,
+          },
+        }),
+      ],
+    );
 
-    return NextResponse.json({ totalPostLikeCount: totalPostLikeCount }, { status: 200 });
+    return NextResponse.json(
+      { totalPostLikeCount: totalPostLikeCount },
+      { status: 200 },
+    );
   } catch (error) {
-      console.log(error)
+    console.log(error);
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

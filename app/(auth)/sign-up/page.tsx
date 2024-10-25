@@ -28,27 +28,27 @@ const SignUpPage = () => {
     resolver: zodResolver(SignUpSchema),
   });
 
-  const [toastMessage, setToastMessage] = useState({msg: "", error: false});
+  const [toastMessage, setToastMessage] = useState({ msg: "", error: false });
   const router = useRouter();
-    
+
   const waitClearToast = new Promise((resolve, reject) => {
-      setTimeout(() => {
-          setToastMessage({ msg: "", error: false });
-          resolve(true);
-      }, 5000);
-  })
+    setTimeout(() => {
+      setToastMessage({ msg: "", error: false });
+      resolve(true);
+    }, 5000);
+  });
 
   const handleSubmit = form.handleSubmit(async (formData) => {
-      try {
-          await axios.post("api/sign-up", formData);
-          setToastMessage({ msg: "Sign up successful!" , error: false });
-          await waitClearToast;
-          router.push("/sign-in");
-      } catch (error: any) {
-          console.log(error);
-          setToastMessage({ msg: error.response.data.error, error: true });
-          await waitClearToast;
-      }
+    try {
+      await axios.post("api/sign-up", formData);
+      setToastMessage({ msg: "Sign up successful!", error: false });
+      await waitClearToast;
+      router.push("/sign-in");
+    } catch (error: any) {
+      console.log(error);
+      setToastMessage({ msg: error.response.data.error, error: true });
+      await waitClearToast;
+    }
   });
 
   return (
@@ -121,7 +121,12 @@ const SignUpPage = () => {
           </Alert>
         )}
       </Form>
-      <p>Already have an account? <Link className="underline" href="/sign-in">Sign In</Link></p>
+      <p>
+        Already have an account?{" "}
+        <Link className="underline" href="/sign-in">
+          Sign In
+        </Link>
+      </p>
     </div>
   );
 };

@@ -7,21 +7,21 @@ export async function DELETE(request: NextRequest) {
 
   const prisma = new PrismaClient();
   try {
-      const deletedFavouritedPost = await prisma.favouritePost.delete({
-        where: {
-            User_user_id_Post_post_id: {
-                User_user_id: user_id as string,
-                Post_post_id: post_id as string
-            }
-        }
-      })
+    const deletedFavouritedPost = await prisma.favouritePost.delete({
+      where: {
+        User_user_id_Post_post_id: {
+          User_user_id: user_id as string,
+          Post_post_id: post_id as string,
+        },
+      },
+    });
 
     return NextResponse.json({ deletedFavouritedPost }, { status: 200 });
   } catch (error) {
-      console.log(error)
+    console.log(error);
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

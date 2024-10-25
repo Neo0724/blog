@@ -11,7 +11,7 @@ export type GetBackReplyCommentType = {
 
 export default function useReplyComment(comment_id: string) {
   const [replyComments, setReplyComments] = useState<GetBackReplyCommentType[]>(
-    []
+    [],
   );
 
   useEffect(() => {

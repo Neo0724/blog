@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log(body)
+    console.log(body);
 
     const prisma = new PrismaClient();
 
@@ -55,16 +55,16 @@ export async function POST(request: NextRequest) {
         User: {
           select: {
             name: true,
-            user_id: true
-          }
+            user_id: true,
+          },
         },
         Target_user: {
           select: {
             name: true,
-            user_id: true
-          }
-        }
-      }
+            user_id: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(returnedCommentReply, { status: 200 });
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     console.error(err);
     return NextResponse.json(
       { error: "Unexpected error occured" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

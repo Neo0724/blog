@@ -21,41 +21,41 @@ import { useState } from "react";
 import { SignInSchema } from "@/app/api/sign-in/route";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import useCookie from 'react-use-cookie';
+import useCookie from "react-use-cookie";
 
 const SignInPage = () => {
   type SignInType = z.infer<typeof SignInSchema>;
-  
+
   const [_, saveUserId] = useLocalStorage("test-userId", null);
-  const [userToken, setUserToken, __] = useCookie('userId', undefined);
+  const [userToken, setUserToken, __] = useCookie("userId", undefined);
   const router = useRouter();
 
   const form = useForm<SignInType>({
     resolver: zodResolver(SignInSchema),
   });
 
-  const [toastMessage, setToastMessage] = useState({msg: "", error: false});
+  const [toastMessage, setToastMessage] = useState({ msg: "", error: false });
 
   const waitClearToast = new Promise((resolve, reject) => {
-      setTimeout(() => {
-          setToastMessage({ msg: "", error: false });
-          resolve(true);
-      }, 5000);
-  })
+    setTimeout(() => {
+      setToastMessage({ msg: "", error: false });
+      resolve(true);
+    }, 5000);
+  });
 
   const handleSubmit = form.handleSubmit(async (formData) => {
-      try {
-          const res = await axios.post("api/sign-in", formData);
-          saveUserId(res.data.user_id);
-          setUserToken(res.data.user_id);
-          setToastMessage({ msg: "Sign in successful!", error: false });
-          await waitClearToast;
-          router.push("/");
-      } catch (error: any) {
-          console.log(error);
-          setToastMessage({ msg: error.response.data.error, error: true });
-          await waitClearToast;
-      }
+    try {
+      const res = await axios.post("api/sign-in", formData);
+      saveUserId(res.data.user_id);
+      setUserToken(res.data.user_id);
+      setToastMessage({ msg: "Sign in successful!", error: false });
+      await waitClearToast;
+      router.push("/");
+    } catch (error: any) {
+      console.log(error);
+      setToastMessage({ msg: error.response.data.error, error: true });
+      await waitClearToast;
+    }
   });
 
   return (

@@ -1,13 +1,14 @@
-import React from 'react'
+import React from "react";
+import { NavItemsType } from "./Navbar";
+import Navitem from "./Navitem";
+import SignOut from "../(auth)/sign-in/_components/SignOut";
+import SearchBar from "./searchBar";
 
-import { NavItemsType } from './Navbar'
-import Navitem from './Navitem';
-import SignOut from '../(auth)/sign-in/_components/SignOut';
-
-export default function NavDesktop({ navItems } : { navItems: NavItemsType[]}) {
+export default function NavDesktop({ navItems }: { navItems: NavItemsType[] }) {
   return (
-    <div className="hidden md:flex fixed top-0 left-0 right-0 items-center justify-between p-5 shadow-md bg-zinc-500">
-      <div className='mr-5 text-white'>Blog</div>
+    <div className="overflow-scroll hidden md:flex fixed top-0 left-0 right-0 items-center justify-between p-5 shadow-md bg-zinc-500">
+      <div className="mr-5 text-white">Blog</div>
+      <SearchBar />
       <div className="flex items-center justify-betweem gap-3">
         {navItems.map((navItem) => {
           return (
@@ -23,5 +24,5 @@ export default function NavDesktop({ navItems } : { navItems: NavItemsType[]}) {
         <SignOut />
       </div>
     </div>
-  )
+  );
 }

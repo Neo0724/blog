@@ -36,7 +36,7 @@ export default function EachPostPage({
   const [totalLike, setTotalLike] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const { likedPost, likedPostLoading } = useLikedPost(userId);
-  const { favouritedPost, favouritePostLoading } = useFavourite(userId)
+  const { favouritedPost, favouritePostLoading } = useFavourite(userId);
   const [isFavourited, setIsFavourited] = useState(false);
 
   const handleLike = async () => {
@@ -69,10 +69,11 @@ export default function EachPostPage({
           }
         } catch (err) {
           console.log(err);
-            toast({
-                title: "Error",
-                description: "An error occured when removing like from the post. Please try again later",
-            });
+          toast({
+            title: "Error",
+            description:
+              "An error occured when removing like from the post. Please try again later",
+          });
         }
       } else {
         try {
@@ -82,15 +83,16 @@ export default function EachPostPage({
           });
 
           if (res.status === 200) {
-              setTotalLike((prev) => prev + 1);
-              setIsLiked(true);
+            setTotalLike((prev) => prev + 1);
+            setIsLiked(true);
           }
         } catch (err) {
-            console.log(err);
-            toast({
-                title: "Error",
-                description: "An error occured when liking the post. Please try again later",
-            });
+          console.log(err);
+          toast({
+            title: "Error",
+            description:
+              "An error occured when liking the post. Please try again later",
+          });
         }
       }
     }
@@ -128,67 +130,69 @@ export default function EachPostPage({
         ),
       });
     } else {
-        if(isFavourited) {
-            try {
-                const res = await axios.delete("/api/delete-favourite-post", {
-                    params: {
-                        user_id: userId,
-                        post_id: postId
-                    }
-                })
+      if (isFavourited) {
+        try {
+          const res = await axios.delete("/api/delete-favourite-post", {
+            params: {
+              user_id: userId,
+              post_id: postId,
+            },
+          });
 
-                if(res.status === 200) {
-                    setIsFavourited(false)
-                }
-
-            } catch(err) {
-                console.log(err)
-                toast({
-                    title: "Error",
-                    description: "An error occured when removing from favourite. Please try again later",
-                });
-            }
-        } else {
-            try {
-                const res = await axios.post("/api/add-favourite-post", {
-                    user_id: userId,
-                    post_id: postId
-                })
-
-                if(res.status === 200) {
-                    setIsFavourited(true)
-                }
-
-            } catch(err) {
-                console.log(err)
-                toast({
-                    title: "Error",
-                    description: "An error occured when adding to favourite. Please try again later",
-                });
-            }
+          if (res.status === 200) {
+            setIsFavourited(false);
+          }
+        } catch (err) {
+          console.log(err);
+          toast({
+            title: "Error",
+            description:
+              "An error occured when removing from favourite. Please try again later",
+          });
         }
+      } else {
+        try {
+          const res = await axios.post("/api/add-favourite-post", {
+            user_id: userId,
+            post_id: postId,
+          });
+
+          if (res.status === 200) {
+            setIsFavourited(true);
+          }
+        } catch (err) {
+          console.log(err);
+          toast({
+            title: "Error",
+            description:
+              "An error occured when adding to favourite. Please try again later",
+          });
+        }
+      }
     }
-  }
+  };
   useEffect(() => {
-      if (!likedPostLoading && likedPost && likedPost.length > 0) {
-          const liked = likedPost.find((item) => item.Post_post_id === postId)
-              ? true
-              : false;
-              setIsLiked(liked);
-      }
+    if (!likedPostLoading && likedPost && likedPost.length > 0) {
+      const liked = likedPost.find((item) => item.Post_post_id === postId)
+        ? true
+        : false;
+      setIsLiked(liked);
+    }
 
-      if (!favouritePostLoading && favouritedPost && favouritedPost.length > 0) {
-          const favourited = favouritedPost.find((item) => item.Post_post_id === postId)
-              ? true
-              : false;
-              setIsFavourited(favourited);
-      }
+    if (!favouritePostLoading && favouritedPost && favouritedPost.length > 0) {
+      const favourited = favouritedPost.find(
+        (item) => item.Post_post_id === postId,
+      )
+        ? true
+        : false;
+      setIsFavourited(favourited);
+    }
 
-      const initializeTotalLike = async () => {
-          setTotalLike(await fetchTotalLike());
-      };
+    const initializeTotalLike = async () => {
+      setTotalLike(await fetchTotalLike());
+    };
 
-      initializeTotalLike();
+    initializeTotalLike();
   }, [likedPost, favouritedPost]);
   return (
     <div className="flex max-h[70%] flex-col gap-4 border-2 p-5 rounded-md mb-5">
@@ -213,7 +217,10 @@ export default function EachPostPage({
           <BiComment />
           <CommentPage postId={postId} />
         </Button>
-        <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleFavourite}>
+        <Button
+          className="flex gap-2 flex-1 min-w-fit"
+          onClick={handleFavourite}
+        >
           <IoIosHeartEmpty />
           {isFavourited ? "Remove from favourite" : "Add to favourite"}
         </Button>

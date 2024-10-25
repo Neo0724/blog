@@ -7,40 +7,41 @@ export async function GET(request: NextRequest) {
   const prisma = new PrismaClient();
 
   try {
-      const replyComments = await prisma.comment.findUnique({
-          where: {
-              comment_id: comment_id as string,
-          },
+    const replyComments = await prisma.comment.findUnique({
+      where: {
+        comment_id: comment_id as string,
+      },
+      select: {
+        being_replied_comment: {
           select: {
-              being_replied_comment: {
-                  select: {
-                      comment_reply_id: true,
-                      content: true,
-                      User: {
-                          select: {
-                              name: true,
-                              user_id: true
-                          }
-                      },
-                      Target_user: {
-                          select: {
-                              name: true,
-                              user_id: true
-                          }
-                      },
-                      
-                  },
-                  orderBy: {
-                    createdAt: "asc"
-                  }
-              }
+            comment_reply_id: true,
+            content: true,
+            User: {
+              select: {
+                name: true,
+                user_id: true,
+              },
+            },
+            Target_user: {
+              select: {
+                name: true,
+                user_id: true,
+              },
+            },
           },
-      });
-      return NextResponse.json(replyComments?.being_replied_comment ?? [], { status: 200 });
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+    });
+    return NextResponse.json(replyComments?.being_replied_comment ?? [], {
+      status: 200,
+    });
   } catch (error) {
-      return NextResponse.json(
-          { error: "An unexpected error occur!" },
-          { status: 400 }
-      );
+    return NextResponse.json(
+      { error: "An unexpected error occur!" },
+      { status: 400 },
+    );
   }
 }

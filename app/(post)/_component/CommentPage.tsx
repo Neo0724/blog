@@ -22,15 +22,39 @@ import EachCommentPage from "./EachCommentPage";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
+import { BiLike } from "react-icons/bi";
+import { IoIosHeartEmpty } from "react-icons/io";
+import { useSWRConfig } from "swr";
+import { BiComment } from "react-icons/bi";
 
 type CommentType = z.infer<typeof CommentSchema>;
 
-export default function CommentPage({ postId }: { postId: string }) {
+export default function CommentPage({
+  postId,
+  title,
+  content,
+  author,
+  handleLike,
+  isLiked,
+  totalLike,
+  handleFavourite,
+  isFavourited,
+}: {
+  postId: string;
+  title: string;
+  content: string;
+  author: string;
+  handleLike: () => void;
+  isLiked: boolean;
+  totalLike: number;
+  handleFavourite: () => void;
+  isFavourited: boolean;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
-
-  const { comments, setComments } = useComment(postId);
+  const { mutate } = useSWRConfig();
+  const { comments, isLoading } = useComment(postId);
 
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
@@ -60,11 +84,7 @@ export default function CommentPage({ postId }: { postId: string }) {
         const response = await axios.post("/api/create-comment", data);
 
         if (response.status === 200) {
-          const newComment = response.data;
-
-          setComments((prev: GetBackCommentType[]) => {
-            return [...prev, newComment];
-          });
+          mutate(["/api/get-comment", postId]);
         }
       } catch (error) {
         console.log(error);
@@ -74,12 +94,40 @@ export default function CommentPage({ postId }: { postId: string }) {
   return (
     <>
       <Dialog>
-        <DialogTrigger>Comments</DialogTrigger>
+        <DialogTrigger asChild>
+          <Button className="flex gap-2 flex-1 min-w-fit">
+            <BiComment />
+            Comments {comments ? comments.length.toString() : ""}{" "}
+          </Button>
+        </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Comments</DialogTitle>
+            <DialogTitle>{author}'s post</DialogTitle>
+            <div className="flex flex-col">
+              <div className="flex">
+                <span className="font-bold">{author} &nbsp;</span>
+                <span>{title}</span>
+              </div>
+              <span>{content}</span>
+            </div>
+            <div className="flex gap-5">
+              {/* Like button  */}
+              <Button className="flex gap-2 flex-1" onClick={handleLike}>
+                <BiLike />
+                {isLiked ? "Dislike" : "Like"}
+                {"  " + totalLike}
+              </Button>
+              {/* Favourite button  */}
+
+              <Button className="flex gap-2 flex-1" onClick={handleFavourite}>
+                <IoIosHeartEmpty />
+                {isFavourited ? "Remove from favourite" : "Add to favourite"}
+              </Button>
+            </div>
             <div className="overflow-y-scroll border-solid border-2 border-black-500 p-3 rounded-lg h-[60vh]">
-              {comments &&
+              {isLoading && <div>Comments are loading...</div>}
+              {!isLoading &&
+                comments &&
                 comments.length > 0 &&
                 comments.map((c) => {
                   return (
@@ -92,35 +140,35 @@ export default function CommentPage({ postId }: { postId: string }) {
                     />
                   );
                 })}
-              {comments.length === 0 && <div>No comments yet...</div>}
+              {!isLoading && comments?.length === 0 && (
+                <div>No comments yet...</div>
+              )}
             </div>
-            <DialogDescription>
-              <Form {...form}>
-                <form
-                  className="flex items-center mt-3"
-                  onSubmit={form.handleSubmit(onSubmit)}
-                >
-                  <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormControl>
-                          <Textarea
-                            placeholder="Write a comment ......"
-                            {...field}
-                            className="w-[90%] mx-auto"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <Button className="ml-auto" type="submit">
-                    Submit
-                  </Button>
-                </form>
-              </Form>
-            </DialogDescription>
+            <Form {...form}>
+              <form
+                className="flex items-center mt-3"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField
+                  control={form.control}
+                  name="content"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <Textarea
+                          placeholder="Write a comment ......"
+                          {...field}
+                          className="w-[90%] mx-auto"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button className="ml-auto" type="submit">
+                  Submit
+                </Button>
+              </form>
+            </Form>
           </DialogHeader>
         </DialogContent>
       </Dialog>

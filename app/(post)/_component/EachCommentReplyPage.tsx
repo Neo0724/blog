@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
+import { useSWRConfig } from "swr";
 
 export default function EachCommentReplyPage({
   content,
@@ -19,14 +20,12 @@ export default function EachCommentReplyPage({
   comment_id,
   user,
   target_user,
-  setReplyComments,
 }: {
   content: string;
   comment_reply_id: string;
   comment_id: string;
   user: UserType;
   target_user: UserType;
-  setReplyComments: Dispatch<SetStateAction<GetBackReplyCommentType[]>>;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -36,6 +35,7 @@ export default function EachCommentReplyPage({
   const { likedReply } = useLikedReplyComment(user_id, comment_id);
   const [isLiked, setIsLiked] = useState<boolean>();
   const [totalLike, setTotalLike] = useState(0);
+  const { mutate } = useSWRConfig();
 
   const fetchTotalLike = async () => {
     try {
@@ -90,7 +90,12 @@ export default function EachCommentReplyPage({
       const res = await axios.post("/api/create-reply-comment", replyData);
 
       if (res.status === 200) {
-        setReplyComments((prev) => [...prev, res.data]);
+        mutate(["/api/get-reply-comment", comment_id]);
+      } else {
+        toast({
+          title: "Error",
+          description: "An error occured when replying. Please try again later",
+        });
       }
     } catch (err) {
       toast({

@@ -7,10 +7,9 @@ export async function GET(request: NextRequest) {
   try {
     const allFavouritedPost = await prisma.favouritePost.findMany({
       where: {
-        User: {
-          user_id: user_id as string,
-        },
+        User_user_id: user_id as string,
       },
+
       select: {
         Post: {
           select: {
@@ -20,8 +19,8 @@ export async function GET(request: NextRequest) {
             post_id: true,
             User: {
               select: {
-                user_id: true,
                 name: true,
+                user_id: true,
               },
             },
           },
@@ -30,15 +29,22 @@ export async function GET(request: NextRequest) {
     });
 
     /* 
-    [
-      {
-          "Post_post_id": "707e91c1-f8e8-4fe5-8d50-b0a6a07468bf"
-      }
-    ]
-    
-    Example output, returned output is an array of all liked comment id within a post
+   [
+    {
+        "Post": {
+            "title": "Coding help",
+            "content": "Can someone help me in next js?",
+            "createdAt": "2024-10-17T10:16:52.627Z",
+            "post_id": "20ee24c5-9d2f-440e-aab6-da49de8bc92e",
+            "User": {
+                "name": "Alan",
+                "user_id": "3b043e4d-3d8d-414d-8dd8-b2ce0be44c25"
+            }
+        }
+    }
+] 
+    Example output, returned output is an array of all favourited post 
     */
-    console.log(allFavouritedPost);
     return NextResponse.json(allFavouritedPost ?? [], { status: 200 });
   } catch (error) {
     return NextResponse.json(

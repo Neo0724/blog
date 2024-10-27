@@ -5,13 +5,14 @@ import { useLocalStorage, useScript } from "@uidotdev/usehooks";
 import axios from "axios";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
+import { GetBackFavouritePost } from "./useFavouriteHook";
 
 export type UserType = {
   user_id: string;
   name: string;
 };
 
-type PostType = {
+export type PostType = {
   title: string;
   content: string;
   created_at: Date;
@@ -21,7 +22,10 @@ type PostType = {
 
 type GetPostProps =
   | {
-    searchPostType: SearchPostType.ALL_POST | SearchPostType.OWN_POST;
+    searchPostType:
+    | SearchPostType.ALL_POST
+    | SearchPostType.OWN_POST
+    | SearchPostType.FAVOURITE_POST;
     searchText?: string;
   }
   | { searchPostType: SearchPostType.SEARCH_POST; searchText: string };
@@ -86,12 +90,39 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
       }
     };
 
+    const getFavouritePost = async () => {
+      try {
+        setIsLoading(true);
+        const res = await axios.get("/api/get-favourite-post", {
+          params: {
+            user_id: userId,
+          },
+        });
+
+        if (res.status === 200) {
+          const favouritePost: PostType[] = res.data.map(
+            (item: GetBackFavouritePost) => {
+              return item.Post;
+            },
+          );
+
+          setYourPosts(favouritePost);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (searchPostType === 1) {
       getOwnPosts(userId);
     } else if (searchPostType === 2) {
       getAllPosts();
     } else if (searchPostType === 3) {
       getSearchPost();
+    } else if (searchPostType === 4) {
+      getFavouritePost();
     }
   }, []);
 

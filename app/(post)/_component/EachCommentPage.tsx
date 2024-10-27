@@ -13,6 +13,12 @@ import useLikedComment from "./useLikedCommentHook";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
+import { useSWRConfig } from "swr";
+
+/*
+ * The page when the user click "Comment" button on the post
+ *
+ * */
 
 export default function EachCommentPage({
   comment_id,
@@ -31,10 +37,11 @@ export default function EachCommentPage({
   const [openReply, setOpenReply] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { replyComments, setReplyComments } = useReplyComment(comment_id);
+  const { replyComments, isLoading } = useReplyComment(comment_id);
   const { likedComment } = useLikedComment(user_id, post_id);
   const [isLiked, setIsLiked] = useState<boolean>();
   const [totalLike, setTotalLike] = useState(0);
+  const { mutate } = useSWRConfig();
 
   const fetchTotalLike = async () => {
     try {
@@ -90,7 +97,7 @@ export default function EachCommentPage({
       const res = await axios.post("/api/create-reply-comment", replyData);
 
       if (res.status === 200) {
-        setReplyComments((prev) => [...prev, res.data]);
+        mutate(["/api/get-reply-comment", comment_id]);
         setViewReplies(true);
       }
     } catch (err) {
@@ -101,11 +108,14 @@ export default function EachCommentPage({
     } finally {
       setReplyContent("");
       setOpenReply(false);
+      console.log(replyComments);
     }
   };
 
   const handleViewReply = () => {
-    setViewReplies((prev) => !prev);
+    if (replyComments && replyComments.length > 0) {
+      setViewReplies((prev) => !prev);
+    }
   };
 
   const handleLike = async () => {
@@ -211,11 +221,13 @@ export default function EachCommentPage({
       >
         <hr className="w-64 h-px bg-gray-200 border-0 dark:bg-gray-700" />
         <span className="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">
-          {replyComments && replyComments.length > 0
-            ? viewReplies
-              ? "Hide replies"
-              : "View replies"
-            : "No replies"}
+          {isLoading
+            ? "Loading..."
+            : replyComments && replyComments.length > 0
+              ? viewReplies
+                ? "Hide replies"
+                : "View replies (" + replyComments.length.toString() + ")"
+              : "No replies"}
         </span>
       </button>
       {/* Reply textarea for user to enter */}
@@ -256,7 +268,6 @@ export default function EachCommentPage({
                   user={c.User}
                   target_user={c.Target_user}
                   content={c.content}
-                  setReplyComments={setReplyComments}
                   key={c.comment_reply_id}
                 />
               );

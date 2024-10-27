@@ -1,8 +1,9 @@
 import useSWR from "swr";
 import axios from "axios";
+import { PostType } from "./GetPost";
 
 export type GetBackFavouritePost = {
-  Post_post_id: string;
+  Post: PostType;
 };
 
 export default function useFavourite(userId: string | null) {
@@ -15,7 +16,9 @@ export default function useFavourite(userId: string | null) {
       const res = await axios.get(url, { params: { user_id: userId } });
 
       if (res.status === 200) {
-        return res.data;
+        return res.data.map((item: GetBackFavouritePost) => {
+          return item.Post;
+        });
       } else {
         return [];
       }
@@ -30,7 +33,7 @@ export default function useFavourite(userId: string | null) {
   );
 
   return {
-    favouritedPost: data as GetBackFavouritePost[] | [],
+    favouritedPost: data as PostType[] | [],
     favouriteError: error,
     favouritePostLoading: isLoading,
   };

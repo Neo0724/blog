@@ -180,9 +180,7 @@ export default function EachPostPage({
     }
 
     if (!favouritePostLoading && favouritedPost && favouritedPost.length > 0) {
-      const favourited = favouritedPost.find(
-        (item) => item.Post_post_id === postId,
-      )
+      const favourited = favouritedPost.find((item) => item.post_id === postId)
         ? true
         : false;
       setIsFavourited(favourited);
@@ -208,15 +206,24 @@ export default function EachPostPage({
         <h2 className="pb-5">{author}</h2>
       </div>
       <div className="flex items-center justify-center flex-wrap gap-2 max-w-[30rem] w-full m-auto">
+        {/* Like button  */}
         <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleLike}>
           <BiLike />
           {isLiked ? "Dislike" : "Like"}
           {"  " + totalLike}
         </Button>
-        <Button className="flex gap-2 flex-1 min-w-fit">
-          <BiComment />
-          <CommentPage postId={postId} />
-        </Button>
+        <CommentPage
+          postId={postId}
+          title={title}
+          content={content}
+          author={author}
+          handleLike={handleLike}
+          isLiked={isLiked}
+          totalLike={totalLike}
+          handleFavourite={handleFavourite}
+          isFavourited={isFavourited}
+        />
+        {/* Favourite button  */}
         <Button
           className="flex gap-2 flex-1 min-w-fit"
           onClick={handleFavourite}

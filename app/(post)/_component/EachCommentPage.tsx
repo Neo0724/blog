@@ -91,6 +91,7 @@ export default function EachCommentPage({
 
       if (res.status === 200) {
         setReplyComments((prev) => [...prev, res.data]);
+        setViewReplies(true);
       }
     } catch (err) {
       toast({
@@ -187,7 +188,7 @@ export default function EachCommentPage({
 
   return (
     <div className="flex flex-col ml-[7px]">
-      <h2 className="font-bold">{user.name}</h2>
+      <h2 className="font-bold">{user?.name}</h2>
       <div>{content}</div>
       {/* Like and reply button */}
       <div className="flex space-x-3 mt-[-5px]">
@@ -210,7 +211,11 @@ export default function EachCommentPage({
       >
         <hr className="w-64 h-px bg-gray-200 border-0 dark:bg-gray-700" />
         <span className="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">
-          {viewReplies ? "Hide replies" : "View replies"}
+          {replyComments && replyComments.length > 0
+            ? viewReplies
+              ? "Hide replies"
+              : "View replies"
+            : "No replies"}
         </span>
       </button>
       {/* Reply textarea for user to enter */}

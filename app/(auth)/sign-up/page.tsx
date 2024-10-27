@@ -108,7 +108,7 @@ const SignUpPage = () => {
             Submit
           </Button>
         </form>
-        {toastMessage.error && toastMessage.msg.length > 0 && (
+        {toastMessage?.error && toastMessage?.msg?.length > 0 && (
           <Alert variant="destructive" className="w-auto">
             <AlertTitle>Error!</AlertTitle>
             <AlertDescription>{toastMessage.msg}</AlertDescription>

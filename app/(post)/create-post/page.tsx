@@ -34,6 +34,10 @@ export default function CreatePostPage() {
 
   const form = useForm<CreatePostFormType>({
     resolver: zodResolver(CreatePostFormSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+    },
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
@@ -45,6 +49,10 @@ export default function CreatePostPage() {
         toast({
           title: "Success!",
           description: "Post is successfully created!",
+        });
+        form.reset({
+          title: "",
+          content: "",
         });
       }
     } catch (error) {

@@ -10,5 +10,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/your-posts", "/create-post"],
+  matcher: ["/favourite-post", "/your-posts", "/create-post"],
 };

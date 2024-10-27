@@ -12,7 +12,20 @@ export async function GET(request: NextRequest) {
         },
       },
       select: {
-        Post_post_id: true,
+        Post: {
+          select: {
+            title: true,
+            content: true,
+            createdAt: true,
+            post_id: true,
+            User: {
+              select: {
+                user_id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 

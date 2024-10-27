@@ -5,6 +5,7 @@ import { IoCreate } from "react-icons/io5";
 import { AiFillEdit } from "react-icons/ai";
 import { TbPinnedFilled } from "react-icons/tb";
 import { FaUser } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa6";
 
 export type NavItemsType = {
   name: string;
@@ -32,6 +33,12 @@ export default function Navbar() {
       href: "/all-posts",
       active: false,
       icon: <IoCreate />,
+    },
+    {
+      name: "Favourite post",
+      href: "/favourite-post",
+      active: false,
+      icon: <FaHeart />,
     },
     {
       name: "Create post",

@@ -20,19 +20,23 @@ export default function EachCommentReplyPage({
   comment_id,
   user,
   target_user,
+  authorId,
+  handleDeleteCommentReply,
 }: {
   content: string;
   comment_reply_id: string;
   comment_id: string;
   user: UserType;
   target_user: UserType;
+  authorId: string;
+  handleDeleteCommentReply: (comment_reply_id: string) => void;
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const [user_id, _] = useLocalStorage("test-userId", "");
+  const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { likedReply } = useLikedReplyComment(user_id, comment_id);
+  const { likedReply } = useLikedReplyComment(userId, comment_id);
   const [isLiked, setIsLiked] = useState<boolean>();
   const [totalLike, setTotalLike] = useState(0);
   const { mutate } = useSWRConfig();
@@ -56,7 +60,7 @@ export default function EachCommentReplyPage({
     }
   };
   const handleOpenReply = () => {
-    if (!user_id) {
+    if (!userId) {
       toast({
         title: "Error",
         description: "Please sign in to reply",
@@ -82,7 +86,7 @@ export default function EachCommentReplyPage({
     try {
       const replyData = {
         content: replyContent,
-        user_id: user_id,
+        user_id: userId,
         target_user_id: user.user_id,
         comment_id: comment_id,
       };
@@ -109,7 +113,7 @@ export default function EachCommentReplyPage({
   };
 
   const handleLike = async () => {
-    if (!user_id) {
+    if (!userId) {
       toast({
         title: "Error",
         description: "Please sign in to like",
@@ -127,7 +131,7 @@ export default function EachCommentReplyPage({
         try {
           const res = await axios.delete("/api/delete-like-replycomment", {
             params: {
-              user_id: user_id,
+              user_id: userId,
               comment_reply_id: comment_reply_id,
             },
           });
@@ -148,7 +152,7 @@ export default function EachCommentReplyPage({
       } else {
         try {
           const res = await axios.post("/api/add-like-replycomment", {
-            user_id: user_id,
+            user_id: userId,
             comment_reply_id: comment_reply_id,
           });
 
@@ -189,12 +193,28 @@ export default function EachCommentReplyPage({
   return (
     <div className="ml-[3px]">
       <hr className="h-px mb-[5px] bg-gray-200 border-0 dark:bg-gray-700" />
-      <span className="font-bold">{user.name}</span>
+      <span className="font-bold">
+        {user.name}
+
+        {/* The comment is created by the logged in user */}
+        {user?.user_id === userId && (
+          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+            ( Self )
+          </span>
+        )}
+        {/* The comment is created by the author */}
+        {user?.user_id !== userId && user?.user_id === authorId && (
+          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+            ( Author )
+          </span>
+        )}
+      </span>
       <div>
         <span className="text-blue-500 font-bold">@{target_user.name} </span>
         {content}
       </div>
       <div className="flex space-x-3 mt-[-5px] items-center">
+        {/* Like and reply button */}
         <Button
           variant="link"
           className={cn("px-0", isLiked ? "text-red-500" : "")}
@@ -206,6 +226,16 @@ export default function EachCommentReplyPage({
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
+        {/* Delete comment reply button */}
+        {userId === user?.user_id && (
+          <Button
+            variant="link"
+            className="px-0"
+            onClick={() => handleDeleteCommentReply(comment_reply_id)}
+          >
+            Delete
+          </Button>
+        )}
       </div>
       {openReply && (
         <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">

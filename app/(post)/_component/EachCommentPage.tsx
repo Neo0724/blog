@@ -1,5 +1,3 @@
-"use client";
-
 import { UserType } from "./GetPost";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,20 +23,24 @@ export default function EachCommentPage({
   user,
   content,
   post_id,
+  authorId,
+  handleDeleteComment,
 }: {
   comment_id: string;
   user: UserType;
   content: string;
   post_id: string;
+  authorId: string;
+  handleDeleteComment: (comment_id: string) => void;
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const [user_id, _] = useLocalStorage("test-userId", "");
+  const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, isLoading } = useReplyComment(comment_id);
-  const { likedComment } = useLikedComment(user_id, post_id);
+  const { likedComment } = useLikedComment(userId, post_id);
   const [isLiked, setIsLiked] = useState<boolean>();
   const [totalLike, setTotalLike] = useState(0);
   const { mutate } = useSWRConfig();
@@ -63,7 +65,7 @@ export default function EachCommentPage({
   };
 
   const handleOpenReply = () => {
-    if (!user_id) {
+    if (!userId) {
       toast({
         title: "Error",
         description: "Please sign in to reply",
@@ -89,7 +91,7 @@ export default function EachCommentPage({
     try {
       const replyData = {
         content: replyContent,
-        user_id: user_id,
+        user_id: userId,
         target_user_id: user.user_id,
         comment_id: comment_id,
       };
@@ -119,7 +121,7 @@ export default function EachCommentPage({
   };
 
   const handleLike = async () => {
-    if (!user_id) {
+    if (!userId) {
       toast({
         title: "Error",
         description: "Please sign in to like",
@@ -137,7 +139,7 @@ export default function EachCommentPage({
         try {
           const res = await axios.delete("/api/delete-like-comment", {
             params: {
-              user_id: user_id,
+              user_id: userId,
               comment_id: comment_id,
             },
           });
@@ -158,7 +160,7 @@ export default function EachCommentPage({
       } else {
         try {
           const res = await axios.post("/api/add-like-comment", {
-            user_id: user_id,
+            user_id: userId,
             comment_id: comment_id,
           });
 
@@ -176,6 +178,31 @@ export default function EachCommentPage({
           });
         }
       }
+    }
+  };
+
+  const handleDeleteCommentReply = async (comment_reply_id: string) => {
+    try {
+      const res = await axios.delete("/api/delete-reply-comment", {
+        params: {
+          comment_reply_id: comment_reply_id,
+        },
+      });
+
+      if (res.status === 200) {
+        mutate(["/api/get-reply-comment", comment_id]);
+      } else {
+        toast({
+          title: "Error",
+          description: "Unexpected error occured. Please try deleting it later",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error",
+        description: "Unexpected error occured. Please try deleting it later",
+      });
     }
   };
 
@@ -198,7 +225,21 @@ export default function EachCommentPage({
 
   return (
     <div className="flex flex-col ml-[7px]">
-      <h2 className="font-bold">{user?.name}</h2>
+      <h2 className="font-bold">
+        {user?.name}
+        {/* The comment is created by the logged in user */}
+        {user?.user_id === userId && (
+          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+            ( Self )
+          </span>
+        )}
+        {/* The comment is created by the author */}
+        {user?.user_id !== userId && user?.user_id === authorId && (
+          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+            ( Author )
+          </span>
+        )}
+      </h2>
       <div>{content}</div>
       {/* Like and reply button */}
       <div className="flex space-x-3 mt-[-5px]">
@@ -213,6 +254,16 @@ export default function EachCommentPage({
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
+        {/* Delete comment button */}
+        {userId === user?.user_id && (
+          <Button
+            variant="link"
+            className="px-0"
+            onClick={() => handleDeleteComment(comment_id)}
+          >
+            Delete
+          </Button>
+        )}
       </div>
       {/* View reply bar */}
       <button
@@ -269,6 +320,8 @@ export default function EachCommentPage({
                   target_user={c.Target_user}
                   content={c.content}
                   key={c.comment_reply_id}
+                  authorId={authorId}
+                  handleDeleteCommentReply={handleDeleteCommentReply}
                 />
               );
             })}

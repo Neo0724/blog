@@ -34,6 +34,7 @@ export default function CommentPage({
   title,
   content,
   author,
+  authorId,
   handleLike,
   isLiked,
   totalLike,
@@ -44,6 +45,7 @@ export default function CommentPage({
   title: string;
   content: string;
   author: string;
+  authorId: string;
   handleLike: () => void;
   isLiked: boolean;
   totalLike: number;
@@ -54,7 +56,7 @@ export default function CommentPage({
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
   const { mutate } = useSWRConfig();
-  const { comments, isLoading } = useComment(postId);
+  const { comments, isLoading } = useComment(postId, userId ?? null);
 
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
@@ -89,6 +91,31 @@ export default function CommentPage({
       } catch (error) {
         console.log(error);
       }
+    }
+  };
+
+  const handleDeleteComment = async (comment_id: string) => {
+    try {
+      const res = await axios.delete("/api/delete-comment", {
+        params: {
+          comment_id: comment_id,
+        },
+      });
+
+      if (res.status === 200) {
+        mutate(["/api/get-comment", postId]);
+      } else {
+        toast({
+          title: "Error",
+          description: "Unexpected error occured. Please try deleting it later",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error",
+        description: "Unexpected error occured. Please try deleting it later",
+      });
     }
   };
   return (
@@ -137,6 +164,8 @@ export default function CommentPage({
                       user={c.User}
                       content={c.content}
                       post_id={postId}
+                      authorId={authorId}
+                      handleDeleteComment={handleDeleteComment}
                     />
                   );
                 })}

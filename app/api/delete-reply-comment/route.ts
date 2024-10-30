@@ -6,11 +6,12 @@ export async function DELETE(request: NextRequest) {
 
   const prisma = new PrismaClient();
   try {
-    const deletedCommentReply = prisma.commentReply.delete({
+    const deletedCommentReply = await prisma.commentReply.delete({
       where: {
         comment_reply_id: comment_reply_id as string,
       },
     });
+
     return NextResponse.json(
       { deletedCommentReply: deletedCommentReply },
       { status: 200 },

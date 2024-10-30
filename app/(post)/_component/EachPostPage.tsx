@@ -5,6 +5,8 @@ import CommentPage from "./CommentPage";
 import { BiSolidLike } from "react-icons/bi";
 import { BiLike } from "react-icons/bi";
 import { BiSolidDislike } from "react-icons/bi";
+import { MdDeleteForever } from "react-icons/md";
+import { BiDislike } from "react-icons/bi";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -15,12 +17,14 @@ import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./useFavouriteHook";
 
-type EachPostType = {
+type EachPostProps = {
   title: string;
   content: string;
   createdAt: Date;
   author: string;
+  authorId: string;
   postId: string;
+  handleDelete: (postId: string) => void;
 };
 
 export default function EachPostPage({
@@ -29,7 +33,9 @@ export default function EachPostPage({
   createdAt,
   author,
   postId,
-}: EachPostType) {
+  authorId,
+  handleDelete,
+}: EachPostProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", null);
@@ -208,12 +214,14 @@ export default function EachPostPage({
       <div className="flex items-center justify-center flex-wrap gap-2 max-w-[30rem] w-full m-auto">
         {/* Like button  */}
         <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleLike}>
-          <BiLike />
+          {isLiked ? <BiDislike /> : <BiLike />}
           {isLiked ? "Dislike" : "Like"}
           {"  " + totalLike}
         </Button>
+        {/* Comment button */}
         <CommentPage
           postId={postId}
+          authorId={authorId}
           title={title}
           content={content}
           author={author}
@@ -231,6 +239,16 @@ export default function EachPostPage({
           <IoIosHeartEmpty />
           {isFavourited ? "Remove from favourite" : "Add to favourite"}
         </Button>
+        {/* Delete post button */}
+        {userId === authorId && (
+          <Button
+            className="flex gap-2 flex-1 min-w-fit"
+            onClick={() => handleDelete(postId)}
+          >
+            <MdDeleteForever />
+            Delete
+          </Button>
+        )}
       </div>
     </div>
   );

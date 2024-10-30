@@ -6,6 +6,7 @@ import axios from "axios";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
 import { GetBackFavouritePost } from "./useFavouriteHook";
+import { useToast } from "@/components/ui/use-toast";
 
 export type UserType = {
   user_id: string;
@@ -34,6 +35,7 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
   const [userId, _] = useLocalStorage<string>("test-userId");
   const [isLoading, setIsLoading] = useState(false);
   const [yourPosts, setYourPosts] = useState<PostType[] | []>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const getOwnPosts = async (userId: string) => {
@@ -126,6 +128,35 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
     }
   }, []);
 
+  const handleDelete = async (postId: string) => {
+    try {
+      const res = await axios.delete("/api/delete-post", {
+        params: {
+          post_id: postId,
+        },
+      });
+
+      if (res.status === 200) {
+        const filteredPost = yourPosts.filter((post) => {
+          return post.post_id !== postId;
+        });
+
+        setYourPosts(filteredPost);
+      } else {
+        toast({
+          title: "Error",
+          description: "Unexpected error occured. Please try deleting it later",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error",
+        description: "Unexpected error occured. Please try deleting it later",
+      });
+    }
+  };
+
   return (
     <>
       {isLoading && <div>Contents are loading...</div>}
@@ -141,6 +172,8 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
                 createdAt={post.created_at}
                 author={post.User.name}
                 postId={post.post_id}
+                authorId={post.User.user_id}
+                handleDelete={handleDelete}
               />
             </div>
           );

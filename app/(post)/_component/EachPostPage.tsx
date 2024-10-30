@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./useFavouriteHook";
+import { MdOutlineHeartBroken } from "react-icons/md";
 
 type EachPostProps = {
   title: string;
@@ -177,6 +178,7 @@ export default function EachPostPage({
       }
     }
   };
+
   useEffect(() => {
     if (!likedPostLoading && likedPost && likedPost.length > 0) {
       const liked = likedPost.find((item) => item.Post_post_id === postId)
@@ -211,7 +213,7 @@ export default function EachPostPage({
         By:
         <h2 className="pb-5">{author}</h2>
       </div>
-      <div className="flex items-center justify-center flex-wrap gap-2 max-w-[30rem] w-full m-auto">
+      <div className="flex items-center justify-center flex-wrap gap-2 max-w-[40rem] w-full m-auto">
         {/* Like button  */}
         <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleLike}>
           {isLiked ? <BiDislike /> : <BiLike />}
@@ -236,7 +238,7 @@ export default function EachPostPage({
           className="flex gap-2 flex-1 min-w-fit"
           onClick={handleFavourite}
         >
-          <IoIosHeartEmpty />
+          {isFavourited ? <MdOutlineHeartBroken /> : <IoIosHeartEmpty />}
           {isFavourited ? "Remove from favourite" : "Add to favourite"}
         </Button>
         {/* Delete post button */}

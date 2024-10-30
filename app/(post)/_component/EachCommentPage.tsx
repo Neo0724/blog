@@ -229,13 +229,13 @@ export default function EachCommentPage({
         {user?.name}
         {/* The comment is created by the logged in user */}
         {user?.user_id === userId && (
-          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+          <span className="ml-1 text-black opacity-70 font-normal">
             ( Self )
           </span>
         )}
         {/* The comment is created by the author */}
         {user?.user_id !== userId && user?.user_id === authorId && (
-          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+          <span className="ml-1 text-black opacity-70 font-normal">
             ( Author )
           </span>
         )}
@@ -267,7 +267,7 @@ export default function EachCommentPage({
       </div>
       {/* View reply bar */}
       <button
-        className="inline-flex items-center justify-center w-full mb-[15px] relative"
+        className="inline-flex items-center justify-center w-full mb-[15px] relative mt-[15px]"
         onClick={handleViewReply}
       >
         <hr className="w-64 h-px bg-gray-200 border-0 dark:bg-gray-700" />

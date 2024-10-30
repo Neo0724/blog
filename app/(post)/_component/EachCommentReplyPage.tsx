@@ -198,13 +198,13 @@ export default function EachCommentReplyPage({
 
         {/* The comment is created by the logged in user */}
         {user?.user_id === userId && (
-          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+          <span className="ml-1 text-black opacity-50 font-normal">
             ( Self )
           </span>
         )}
         {/* The comment is created by the author */}
         {user?.user_id !== userId && user?.user_id === authorId && (
-          <span className="ml-1 text-gray-100 opacity-70 font-normal">
+          <span className="ml-1 text-black opacity-50 font-normal">
             ( Author )
           </span>
         )}

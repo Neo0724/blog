@@ -67,7 +67,7 @@ export default function CommentPage({
     },
   });
 
-  const onSubmit = async (data: CommentType) => {
+  const submitComment = async (data: CommentType) => {
     if (!userId) {
       toast({
         title: "Error",
@@ -86,7 +86,8 @@ export default function CommentPage({
         const response = await axios.post("/api/create-comment", data);
 
         if (response.status === 200) {
-          mutate(["/api/get-comment", postId]);
+          mutate(["/api/get-comment", postId, userId]);
+          form.reset({ ...data, content: "" });
         }
       } catch (error) {
         console.log(error);
@@ -103,7 +104,7 @@ export default function CommentPage({
       });
 
       if (res.status === 200) {
-        mutate(["/api/get-comment", postId]);
+        mutate(["/api/get-comment", postId, userId]);
       } else {
         toast({
           title: "Error",
@@ -176,7 +177,7 @@ export default function CommentPage({
             <Form {...form}>
               <form
                 className="flex items-center mt-3"
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(submitComment)}
               >
                 <FormField
                   control={form.control}

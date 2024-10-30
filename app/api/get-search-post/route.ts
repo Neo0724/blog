@@ -11,6 +11,7 @@ export const GET = async (req: NextRequest) => {
         OR: [
           { title: { contains: searchText as string } },
           { content: { contains: searchText as string } },
+          { User: { name: { contains: searchText as string } } },
         ],
       },
       select: {

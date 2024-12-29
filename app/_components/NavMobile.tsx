@@ -21,7 +21,7 @@ export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
       <div
         className={cn(
           sidebarOpen &&
-          "fixed top-0 right-0 left-0 bottom-0 backdrop-blur z-10",
+          "fixed top-0 right-0 left-0 bottom-0 backdrop-blur z-[100]",
         )}
       ></div>
       <div className="overflow-scroll md:hidden flex fixed top-0 left-0 right-0 items-center justify-between p-5 shadow-md bg-zinc-500">
@@ -38,7 +38,7 @@ export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
       {/* Sidebar */}
       <div
         className={cn(
-          "z-10 md:hidden fixed shadow-2xl overflow-y-scroll flex flex-col gap-5 top-0 right-0 bg-zinc-500 h-full w-[30%] transition-transform duration-300 ease-in-out",
+          "z-[100] md:hidden fixed shadow-2xl overflow-y-scroll flex flex-col gap-5 top-0 right-0 bg-zinc-500 h-full w-[30%] transition-transform duration-300 ease-in-out",
           sidebarOpen ? "translate-x-0" : "translate-x-full",
         )}
       >

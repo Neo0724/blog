@@ -6,6 +6,8 @@ export type GetBackReplyCommentType = {
   comment_reply_id: string;
   content: string;
   User: UserType;
+  createdAt: Date;
+  dateDifferent: string;
   Target_user: UserType;
 };
 

@@ -5,6 +5,7 @@ import CommentPage from "./CommentPage";
 import { BiSolidLike } from "react-icons/bi";
 import { BiLike } from "react-icons/bi";
 import { BiSolidDislike } from "react-icons/bi";
+import { BsThreeDots } from "react-icons/bs";
 import { MdDeleteForever } from "react-icons/md";
 import { BiDislike } from "react-icons/bi";
 import { useLocalStorage } from "@uidotdev/usehooks";
@@ -17,6 +18,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./useFavouriteHook";
 import { MdOutlineHeartBroken } from "react-icons/md";
+import { cn } from "@/lib/utils";
 
 type EachPostProps = {
   title: string;
@@ -25,6 +27,7 @@ type EachPostProps = {
   author: string;
   authorId: string;
   postId: string;
+  dateDifferent: string;
   handleDelete: (postId: string) => void;
 };
 
@@ -32,6 +35,7 @@ export default function EachPostPage({
   title,
   content,
   createdAt,
+  dateDifferent,
   author,
   postId,
   authorId,
@@ -200,8 +204,49 @@ export default function EachPostPage({
 
     initializeTotalLike();
   }, [likedPost, favouritedPost]);
+
+  const [toolbar, setToolbar] = useState(false);
+
+  const handleOpenToolbar = () => {
+    setToolbar((prev) => !prev);
+    console.log(toolbar);
+  };
   return (
-    <div className="flex max-h[70%] flex-col gap-4 border-2 p-5 rounded-md mb-5">
+    <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5">
+      <div className="flex z-10 flex-col items-end absolute right-5">
+        <button
+          className="hover:bg-gray-500 border-gray-300 rounded-full w-7 h-7 flex items-center justify-center transition-colors duration-150"
+          onClick={handleOpenToolbar}
+        >
+          <BsThreeDots />
+        </button>
+        {/* TODO: Add a confirmation for deletion */}
+        {/* Delete post button */}
+        {userId === authorId ? (
+          <button
+            className={cn(
+              "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
+              toolbar ? "scale-100" : "scale-0",
+            )}
+            onClick={() => handleDelete(postId)}
+          >
+            <span className="flex gap-3 items-center justify-center">
+              <MdDeleteForever />
+              <span>Delete</span>
+            </span>
+          </button>
+        ) : (
+          // To be continue ...
+          <button
+            className={cn(
+              "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
+              toolbar ? "scale-100" : "scale-0",
+            )}
+          >
+            Empty...
+          </button>
+        )}
+      </div>
       <div className="flex flex-row gap-4 border-b-2">
         Title:
         <h1 className="pb-5">{title}</h1>
@@ -211,7 +256,9 @@ export default function EachPostPage({
       </div>
       <div className="flex flex-row gap-4 border-b-2">
         By:
-        <h2 className="pb-5">{author}</h2>
+        <h2 className="pb-5">
+          {author}, {dateDifferent}
+        </h2>
       </div>
       <div className="flex items-center justify-center flex-wrap gap-2 max-w-[40rem] w-full m-auto">
         {/* Like button  */}
@@ -232,6 +279,7 @@ export default function EachPostPage({
           totalLike={totalLike}
           handleFavourite={handleFavourite}
           isFavourited={isFavourited}
+          dateDifferent={dateDifferent}
         />
         {/* Favourite button  */}
         <Button
@@ -241,16 +289,6 @@ export default function EachPostPage({
           {isFavourited ? <MdOutlineHeartBroken /> : <IoIosHeartEmpty />}
           {isFavourited ? "Remove from favourite" : "Add to favourite"}
         </Button>
-        {/* Delete post button */}
-        {userId === authorId && (
-          <Button
-            className="flex gap-2 flex-1 min-w-fit"
-            onClick={() => handleDelete(postId)}
-          >
-            <MdDeleteForever />
-            Delete
-          </Button>
-        )}
       </div>
     </div>
   );

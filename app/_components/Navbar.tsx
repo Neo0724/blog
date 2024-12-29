@@ -54,7 +54,7 @@ export default function Navbar() {
     },
   ];
   return (
-    <div>
+    <div className="z-50">
       <NavDesktop navItems={navItems} />
       <NavMobile navItems={navItems} />
     </div>

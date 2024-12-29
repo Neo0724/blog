@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { getDateDifference } from "@/app/(util)/getDateDifference";
 
 export async function GET(request: NextRequest) {
   const post_id = request.nextUrl.searchParams.get("post_id");
@@ -63,7 +64,14 @@ export async function GET(request: NextRequest) {
       ...(remainingComments?.being_commented_post ?? []),
     ];
 
-    return NextResponse.json(comments ?? [], {
+    let commentsWithDateDifferent = comments?.map((comment) => {
+      return {
+        ...comment,
+        dateDifferent: getDateDifference(comment.createdAt),
+      };
+    });
+
+    return NextResponse.json(commentsWithDateDifferent ?? [], {
       status: 200,
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { getDateDifference } from "@/app/(util)/getDateDifference";
 
 export const GET = async (req: NextRequest) => {
   const prisma = new PrismaClient();
@@ -28,7 +29,13 @@ export const GET = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json(allPosts, { status: 200 });
+    let allPostsWithDateDiff = allPosts?.map((post) => {
+      let dateDiff = getDateDifference(post.createdAt);
+
+      return { ...post, dateDifferent: dateDiff };
+    });
+
+    return NextResponse.json(allPostsWithDateDiff ?? [], { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Internal Error" }, { status: 400 });
   }

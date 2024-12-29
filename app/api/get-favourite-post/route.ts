@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { getDateDifference } from "@/app/(util)/getDateDifference";
+
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
@@ -26,8 +28,16 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
+    let allPostsWithDateDiff = allFavouritedPost?.map((curPost) => {
+      let dateDiff = getDateDifference(curPost.Post.createdAt);
+
+      return { Post: { ...curPost.Post, dateDifferent: dateDiff } };
+    });
     /* 
    [
     {
@@ -45,7 +55,7 @@ export async function GET(request: NextRequest) {
 ] 
     Example output, returned output is an array of all favourited post 
     */
-    return NextResponse.json(allFavouritedPost ?? [], { status: 200 });
+    return NextResponse.json(allPostsWithDateDiff ?? [], { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

@@ -21,6 +21,7 @@ export default function EachCommentReplyPage({
   user,
   target_user,
   authorId,
+  dateDifferent,
   handleDeleteCommentReply,
 }: {
   content: string;
@@ -29,6 +30,7 @@ export default function EachCommentReplyPage({
   user: UserType;
   target_user: UserType;
   authorId: string;
+  dateDifferent: string;
   handleDeleteCommentReply: (comment_reply_id: string) => void;
 }) {
   const router = useRouter();
@@ -213,6 +215,9 @@ export default function EachCommentReplyPage({
         <span className="text-blue-500 font-bold">@{target_user.name} </span>
         {content}
       </div>
+      <span className="text-sm text-black opacity-70 font-normal">
+        {dateDifferent}
+      </span>
       <div className="flex space-x-3 mt-[-5px] items-center">
         {/* Like and reply button */}
         <Button

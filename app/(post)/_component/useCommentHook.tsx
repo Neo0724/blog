@@ -6,6 +6,7 @@ export type GetBackCommentType = {
   comment_id: string;
   content: string;
   created_at: Date;
+  dateDifferent: string;
   User: UserType;
 };
 

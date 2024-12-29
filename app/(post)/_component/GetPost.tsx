@@ -18,6 +18,7 @@ export type PostType = {
   content: string;
   created_at: Date;
   post_id: string;
+  dateDifferent: string;
   User: UserType;
 };
 
@@ -140,7 +141,10 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
         const filteredPost = yourPosts.filter((post) => {
           return post.post_id !== postId;
         });
-
+        toast({
+          title: "Success",
+          description: "Post has deleted successfully",
+        });
         setYourPosts(filteredPost);
       } else {
         toast({
@@ -173,6 +177,7 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
                 author={post.User.name}
                 postId={post.post_id}
                 authorId={post.User.user_id}
+                dateDifferent={post.dateDifferent}
                 handleDelete={handleDelete}
               />
             </div>

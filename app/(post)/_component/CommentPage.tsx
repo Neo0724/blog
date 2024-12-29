@@ -40,6 +40,7 @@ export default function CommentPage({
   totalLike,
   handleFavourite,
   isFavourited,
+  dateDifferent,
 }: {
   postId: string;
   title: string;
@@ -51,6 +52,7 @@ export default function CommentPage({
   totalLike: number;
   handleFavourite: () => void;
   isFavourited: boolean;
+  dateDifferent: string;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -133,10 +135,12 @@ export default function CommentPage({
             <DialogTitle>{author}'s post</DialogTitle>
             <div className="flex flex-col">
               <div className="flex">
-                <span className="font-bold">{author} &nbsp;</span>
                 <span>{title}</span>
               </div>
               <span>{content}</span>
+              <span className="text-sm text-black opacity-70 font-normal">
+                {dateDifferent}
+              </span>
             </div>
             <div className="flex gap-5">
               {/* Like button  */}
@@ -166,6 +170,7 @@ export default function CommentPage({
                       content={c.content}
                       post_id={postId}
                       authorId={authorId}
+                      dateDifferent={c.dateDifferent}
                       handleDeleteComment={handleDeleteComment}
                     />
                   );

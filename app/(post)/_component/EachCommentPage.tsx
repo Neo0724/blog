@@ -24,6 +24,7 @@ export default function EachCommentPage({
   content,
   post_id,
   authorId,
+  dateDifferent,
   handleDeleteComment,
 }: {
   comment_id: string;
@@ -31,6 +32,7 @@ export default function EachCommentPage({
   content: string;
   post_id: string;
   authorId: string;
+  dateDifferent: string;
   handleDeleteComment: (comment_id: string) => void;
 }) {
   const router = useRouter();
@@ -241,6 +243,9 @@ export default function EachCommentPage({
         )}
       </h2>
       <div>{content}</div>
+      <span className="mt-[5px] text-sm text-black opacity-70 font-normal">
+        {dateDifferent}
+      </span>
       {/* Like and reply button */}
       <div className="flex space-x-3 mt-[-5px]">
         <Button
@@ -321,6 +326,7 @@ export default function EachCommentPage({
                   content={c.content}
                   key={c.comment_reply_id}
                   authorId={authorId}
+                  dateDifferent={c.dateDifferent}
                   handleDeleteCommentReply={handleDeleteCommentReply}
                 />
               );

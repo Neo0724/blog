@@ -5,8 +5,7 @@ import CommentPage from "./CommentPage";
 import { BiSolidLike } from "react-icons/bi";
 import { BiLike } from "react-icons/bi";
 import { BiSolidDislike } from "react-icons/bi";
-import { BsThreeDots } from "react-icons/bs";
-import { MdDeleteForever } from "react-icons/md";
+import PostOptionComponent from "./PostOptionComponent";
 import { BiDislike } from "react-icons/bi";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useState, useEffect } from "react";
@@ -18,7 +17,6 @@ import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./useFavouriteHook";
 import { MdOutlineHeartBroken } from "react-icons/md";
-import { cn } from "@/lib/utils";
 
 type EachPostProps = {
   title: string;
@@ -205,48 +203,14 @@ export default function EachPostPage({
     initializeTotalLike();
   }, [likedPost, favouritedPost]);
 
-  const [toolbar, setToolbar] = useState(false);
-
-  const handleOpenToolbar = () => {
-    setToolbar((prev) => !prev);
-    console.log(toolbar);
-  };
   return (
     <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5">
-      <div className="flex z-10 flex-col items-end absolute right-5">
-        <button
-          className="hover:bg-gray-500 border-gray-300 rounded-full w-7 h-7 flex items-center justify-center transition-colors duration-150"
-          onClick={handleOpenToolbar}
-        >
-          <BsThreeDots />
-        </button>
-        {/* TODO: Add a confirmation for deletion */}
-        {/* Delete post button */}
-        {userId === authorId ? (
-          <button
-            className={cn(
-              "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
-              toolbar ? "scale-100" : "scale-0",
-            )}
-            onClick={() => handleDelete(postId)}
-          >
-            <span className="flex gap-3 items-center justify-center">
-              <MdDeleteForever />
-              <span>Delete</span>
-            </span>
-          </button>
-        ) : (
-          // To be continue ...
-          <button
-            className={cn(
-              "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
-              toolbar ? "scale-100" : "scale-0",
-            )}
-          >
-            Empty...
-          </button>
-        )}
-      </div>
+      <PostOptionComponent
+        userId={userId ?? ""}
+        authorId={authorId}
+        postId={postId}
+        handleDelete={handleDelete}
+      />
       <div className="flex flex-row gap-4 border-b-2">
         Title:
         <h1 className="pb-5">{title}</h1>

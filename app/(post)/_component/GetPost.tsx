@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { CreatePostFormType } from "../create-post/page";
 import { useLocalStorage, useScript } from "@uidotdev/usehooks";
 import axios from "axios";
 import EachPostPage from "./EachPostPage";
@@ -129,6 +130,46 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
     }
   }, []);
 
+  const handleEdit = async (
+    postId: string,
+    newFormData: CreatePostFormType,
+  ) => {
+    try {
+      // TODO Add edit post API
+      const res = await axios.put("/api/edit-post", newFormData);
+
+      if (res.status === 200) {
+        setYourPosts((prev) => {
+          return prev.map((post) => {
+            if (post.post_id === postId) {
+              return {
+                ...post,
+                title: res.data.title as string,
+                content: res.data.content as string,
+              };
+            } else {
+              return post;
+            }
+          });
+        });
+        toast({
+          title: "Success",
+          description: "Post has deleted successfully",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Unexpected error occured. Please try deleting it later",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error",
+        description: "Unexpected error occured. Please try editing it later",
+      });
+    }
+  };
   const handleDelete = async (postId: string) => {
     try {
       const res = await axios.delete("/api/delete-post", {

@@ -25,7 +25,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 
-type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
+export type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 
 export default function CreatePostPage() {
   const [error, setError] = useState("");

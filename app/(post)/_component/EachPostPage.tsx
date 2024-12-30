@@ -17,6 +17,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./useFavouriteHook";
 import { MdOutlineHeartBroken } from "react-icons/md";
+import { CreatePostFormType } from "../create-post/page";
 
 type EachPostProps = {
   title: string;
@@ -26,7 +27,6 @@ type EachPostProps = {
   authorId: string;
   postId: string;
   dateDifferent: string;
-  handleDelete: (postId: string) => void;
 };
 
 export default function EachPostPage({
@@ -37,7 +37,6 @@ export default function EachPostPage({
   author,
   postId,
   authorId,
-  handleDelete,
 }: EachPostProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -209,7 +208,8 @@ export default function EachPostPage({
         userId={userId ?? ""}
         authorId={authorId}
         postId={postId}
-        handleDelete={handleDelete}
+        title={title}
+        content={content}
       />
       <div className="flex flex-row gap-4 border-b-2">
         Title:

@@ -26,6 +26,7 @@ import { BiLike } from "react-icons/bi";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { useSWRConfig } from "swr";
 import { BiComment } from "react-icons/bi";
+import PostOptionComponent from "./PostOptionComponent";
 
 type CommentType = z.infer<typeof CommentSchema>;
 
@@ -131,8 +132,18 @@ export default function CommentPage({
           </Button>
         </DialogTrigger>
         <DialogContent>
+          <PostOptionComponent
+            userId={userId}
+            postId={postId}
+            authorId={authorId}
+            title={title}
+            content={content}
+            styleProperty={"top-[10px] right-[40px]"}
+          />
           <DialogHeader>
-            <DialogTitle>{author}'s post</DialogTitle>
+            <DialogTitle>
+              <span>{author}'s post</span>
+            </DialogTitle>
             <div className="flex flex-col">
               <div className="flex">
                 <span>{title}</span>
@@ -200,7 +211,7 @@ export default function CommentPage({
                   )}
                 />
                 <Button className="ml-auto" type="submit">
-                  Submit
+                  Comment
                 </Button>
               </form>
             </Form>

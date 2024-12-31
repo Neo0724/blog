@@ -1,6 +1,8 @@
 import axios from "axios";
-import { UserType } from "./GetPost";
+import { UserType } from "../GetPost";
 import useSWR from "swr";
+import { replyCommentStore } from "../_store/replyCommentStore";
+import { useStore } from "zustand";
 
 export type GetBackReplyCommentType = {
   comment_reply_id: string;
@@ -33,8 +35,15 @@ export default function useReplyComment(comment_id: string) {
 
   const { data, isLoading, error } = useSWR(
     ["/api/get-reply-comment", comment_id],
-    ([url, comment_id]) => getReplyComment(url, comment_id),
+    ([url, comment_id]) => getReplyComment(url, comment_id)
   );
 
-  return { replyComments: data, isLoading, replyCommentsError: error };
+  const actions = useStore(replyCommentStore, (state) => state.actions);
+
+  return {
+    replyComments: data,
+    isLoading,
+    replyCommentsError: error,
+    ...actions,
+  };
 }

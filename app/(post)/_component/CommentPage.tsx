@@ -9,15 +9,13 @@ import {
 
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CommentSchema } from "@/app/api/create-comment/route";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import axios from "axios";
-import useComment, { GetBackCommentType } from "./useCommentHook";
+import useComment, { GetBackCommentType } from "./_custom_hook/useCommentHook";
 import EachCommentPage from "./EachCommentPage";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -27,8 +25,11 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { useSWRConfig } from "swr";
 import { BiComment } from "react-icons/bi";
 import PostOptionComponent from "./PostOptionComponent";
+import { commentStore, CommentType } from "./_store/commentStore";
+import { useStore } from "zustand";
 
-type CommentType = z.infer<typeof CommentSchema>;
+// The dialog when the user clicked on the "Comment" button, each comments in the dialog will be shown
+// in the EachCommentPage component
 
 export default function CommentPage({
   postId,
@@ -60,6 +61,10 @@ export default function CommentPage({
   const [userId, _] = useLocalStorage<string>("test-userId");
   const { mutate } = useSWRConfig();
   const { comments, isLoading } = useComment(postId, userId ?? null);
+  const createComment = useStore(
+    commentStore,
+    (state) => state.actions.createComment
+  );
 
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
@@ -85,43 +90,10 @@ export default function CommentPage({
         ),
       });
     } else {
-      try {
-        const response = await axios.post("/api/create-comment", data);
-
-        if (response.status === 200) {
-          mutate(["/api/get-comment", postId, userId]);
-          form.reset({ ...data, content: "" });
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      createComment(data, form);
     }
   };
 
-  const handleDeleteComment = async (comment_id: string) => {
-    try {
-      const res = await axios.delete("/api/delete-comment", {
-        params: {
-          comment_id: comment_id,
-        },
-      });
-
-      if (res.status === 200) {
-        mutate(["/api/get-comment", postId, userId]);
-      } else {
-        toast({
-          title: "Error",
-          description: "Unexpected error occured. Please try deleting it later",
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      toast({
-        title: "Error",
-        description: "Unexpected error occured. Please try deleting it later",
-      });
-    }
-  };
   return (
     <>
       <Dialog>
@@ -142,7 +114,7 @@ export default function CommentPage({
           />
           <DialogHeader>
             <DialogTitle>
-              <span>{author}'s post</span>
+              <span>{author}&apos;s post</span>
             </DialogTitle>
             <div className="flex flex-col">
               <div className="flex">
@@ -182,7 +154,6 @@ export default function CommentPage({
                       post_id={postId}
                       authorId={authorId}
                       dateDifferent={c.dateDifferent}
-                      handleDeleteComment={handleDeleteComment}
                     />
                   );
                 })}

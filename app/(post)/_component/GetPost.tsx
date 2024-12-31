@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
 import { useToast } from "@/components/ui/use-toast";
 import { useStore } from "zustand";
-import { postStore } from "./postStore";
+import { postStore } from "./_store/postStore";
+import axios from "axios";
+import { GetBackFavouritePost } from "./_custom_hook/useFavouriteHook";
+import useSWR from "swr";
+import usePost from "./_custom_hook/usePostHook";
 
 export type UserType = {
   user_id: string;
@@ -24,28 +28,25 @@ export type PostType = {
 
 type GetPostProps =
   | {
-    searchPostType:
-    | SearchPostType.ALL_POST
-    | SearchPostType.OWN_POST
-    | SearchPostType.FAVOURITE_POST;
-    searchText?: string;
-  }
-  | { searchPostType: SearchPostType.SEARCH_POST; searchText: string };
+      searchPostType: SearchPostType.ALL_POST | SearchPostType.FAVOURITE_POST;
+      searchText?: string;
+      userId?: string;
+    }
+  | {
+      searchPostType: SearchPostType.SEARCH_POST;
+      searchText: string;
+      userId?: string;
+    }
+  | {
+      searchPostType: SearchPostType.OWN_POST;
+      searchText?: string;
+      userId: string;
+    };
 
 export default function GetPost({ searchPostType, searchText }: GetPostProps) {
   const [userId, _] = useLocalStorage<string>("test-userId");
-  const { toast } = useToast();
 
-  const { yourPosts, isLoading } = useStore(postStore, (state) => ({
-    yourPosts: state.yourPosts,
-    isLoading: state.isLoading,
-  }));
-  const { fetch } = useStore(postStore, (state) => state.actions);
-
-  useEffect(() => {
-    searchText = searchText ?? "";
-    fetch({ searchPostType, searchText, userId });
-  }, []);
+  const { yourPosts, isLoading } = usePost(searchPostType, searchText, userId);
 
   return (
     <>

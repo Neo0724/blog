@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import axios from "axios";
-import { PostType } from "./GetPost";
+import { PostType } from "../GetPost";
 
 export type GetBackFavouritePost = {
   Post: PostType;
@@ -29,7 +29,7 @@ export default function useFavourite(userId: string | null) {
   };
   const { data, isLoading, error } = useSWR(
     [userId ? "/api/get-favourite-post" : null, userId],
-    ([url, userId]) => fetchData(url, userId),
+    ([url, userId]) => fetchData(url, userId)
   );
 
   return {

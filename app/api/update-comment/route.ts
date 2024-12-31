@@ -1,28 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function PUT(request: NextRequest) {
-  const { postId, title, content } = await request.json();
+  const { comment_id, content } = await request.json();
 
   const prisma = new PrismaClient();
 
   try {
-    const updatedPost = await prisma.post.update({
+    const updatedComment = await prisma.comment.update({
       where: {
-        post_id: postId as string,
+        comment_id: comment_id as string,
       },
       data: {
-        title: title as string,
         content: content as string,
       },
       select: {
-        post_id: true,
-        title: true,
+        comment_id: true,
         content: true,
       },
     });
 
-    return NextResponse.json({ ...updatedPost }, { status: 200 });
+    return NextResponse.json(updatedComment, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

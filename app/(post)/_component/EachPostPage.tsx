@@ -1,23 +1,19 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { BiComment } from "react-icons/bi";
 import CommentPage from "./CommentPage";
-import { BiSolidLike } from "react-icons/bi";
 import { BiLike } from "react-icons/bi";
-import { BiSolidDislike } from "react-icons/bi";
 import PostOptionComponent from "./PostOptionComponent";
 import { BiDislike } from "react-icons/bi";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import useLikedPost from "./useLikedPostHook";
+import useLikedPost from "./_custom_hook/useLikedPostHook";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
-import useFavourite from "./useFavouriteHook";
+import useFavourite from "./_custom_hook/useFavouriteHook";
 import { MdOutlineHeartBroken } from "react-icons/md";
-import { CreatePostFormType } from "../create-post/page";
 
 type EachPostProps = {
   title: string;

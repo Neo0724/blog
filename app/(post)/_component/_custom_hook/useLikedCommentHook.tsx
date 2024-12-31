@@ -6,7 +6,11 @@ export type GetBackLikedCommentType = {
 };
 
 export default function useLikedComment(user_id: string, post_id: string) {
-  const fetchData = async (url: string, user_id: string, post_id: string) => {
+  const fetchData = async (
+    url: string | null,
+    user_id: string,
+    post_id: string
+  ) => {
     if (!url) {
       return [];
     }
@@ -32,7 +36,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
 
   const { data, error, isLoading } = useSWR(
     [user_id ? "/api/get-liked-comment" : null, user_id, post_id],
-    ([url, user_id, post_id]) => fetchData(url, user_id, post_id),
+    ([url, user_id, post_id]) => fetchData(url, user_id, post_id)
   );
 
   return { likedComment: data as GetBackLikedCommentType[] | [], error };

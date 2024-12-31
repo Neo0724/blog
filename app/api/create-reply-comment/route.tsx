@@ -2,26 +2,25 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-export const ReplyComment = z.object({
+export const ReplyCommentSchema = z.object({
   content: z.string().min(1).max(200),
   user_id: z.string(),
   target_user_id: z.string(),
   comment_id: z.string(),
+  comment_reply_id: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
   try {
-    const body: z.infer<typeof ReplyComment> = await request.json();
+    const body: z.infer<typeof ReplyCommentSchema> = await request.json();
 
-    const validation = ReplyComment.safeParse(body);
+    const validation = ReplyCommentSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(validation.error, {
         status: 400,
       });
     }
-
-    console.log(body);
 
     const prisma = new PrismaClient();
 
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
     console.error(err);
     return NextResponse.json(
       { error: "Unexpected error occured" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 }

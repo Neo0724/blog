@@ -9,7 +9,8 @@ const fetchPost = async (
   apiUrl: string,
   searchText?: string,
   userId?: string
-) => {
+): Promise<PostType[] | []> => {
+  let returnedPosts: PostType[] | [] = [];
   try {
     const res = await axios.get(apiUrl, {
       params: {
@@ -19,7 +20,7 @@ const fetchPost = async (
     });
 
     if (res.status === 200) {
-      let returnedPosts = res.data ?? [];
+      returnedPosts = res.data ?? [];
       if (apiUrl.match("favourite")) {
         const favouritePosts: PostType[] = res.data.map(
           (item: GetBackFavouritePost) => {
@@ -29,11 +30,11 @@ const fetchPost = async (
 
         returnedPosts = favouritePosts;
       }
-      return returnedPosts;
     }
   } catch (err) {
     console.log(err);
-    return [];
+  } finally {
+    return returnedPosts;
   }
 };
 

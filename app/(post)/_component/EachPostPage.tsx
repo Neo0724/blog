@@ -14,6 +14,9 @@ import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./_custom_hook/useFavouriteHook";
 import { MdOutlineHeartBroken } from "react-icons/md";
+import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
+import { useStore } from "zustand";
+import { likedPostStore } from "./_store/likedPostStore";
 
 type EachPostProps = {
   title: string;
@@ -37,13 +40,18 @@ export default function EachPostPage({
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", null);
-  const [totalLike, setTotalLike] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const { likedPost, likedPostLoading } = useLikedPost(userId);
   const { favouritedPost, favouritePostLoading } = useFavourite(userId);
   const [isFavourited, setIsFavourited] = useState(false);
+  const likeCount = useLikedPostCount(postId);
+  const { addLikePost, removeLikePost } = useStore(
+    likedPostStore,
+    (state) => state.actions
+  );
 
   const handleLike = async () => {
+    // User is not logged in
     if (!userId) {
       toast({
         title: "Error",
@@ -57,65 +65,16 @@ export default function EachPostPage({
           </ToastAction>
         ),
       });
-    } else {
-      if (isLiked) {
-        try {
-          const res = await axios.delete("/api/delete-like-post", {
-            params: {
-              user_id: userId,
-              post_id: postId,
-            },
-          });
-
-          if (res.status === 200) {
-            setTotalLike((prev) => prev - 1);
-            setIsLiked(false);
-          }
-        } catch (err) {
-          console.log(err);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when removing like from the post. Please try again later",
-          });
-        }
-      } else {
-        try {
-          const res = await axios.post("/api/add-like-post", {
-            user_id: userId,
-            post_id: postId,
-          });
-
-          if (res.status === 200) {
-            setTotalLike((prev) => prev + 1);
-            setIsLiked(true);
-          }
-        } catch (err) {
-          console.log(err);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when liking the post. Please try again later",
-          });
-        }
-      }
+      return;
     }
-  };
+    // User is logged in
 
-  const fetchTotalLike = async () => {
-    try {
-      const res = await axios.get("/api/count-like-post", {
-        params: { post_id: postId },
-      });
-
-      if (res.status === 200) {
-        return res.data;
-      } else {
-        return 0;
-      }
-    } catch (err) {
-      console.log(err);
-      return 0;
+    // User wants to remove the like
+    if (isLiked) {
+      removeLikePost(userId, postId, setIsLiked, toast);
+    } else {
+      // User wants to add the like
+      addLikePost(userId, postId, setIsLiked, toast);
     }
   };
 
@@ -190,13 +149,13 @@ export default function EachPostPage({
         : false;
       setIsFavourited(favourited);
     }
-
-    const initializeTotalLike = async () => {
-      setTotalLike(await fetchTotalLike());
-    };
-
-    initializeTotalLike();
-  }, [likedPost, favouritedPost]);
+  }, [
+    likedPost,
+    favouritedPost,
+    likedPostLoading,
+    favouritePostLoading,
+    postId,
+  ]);
 
   return (
     <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5">
@@ -225,7 +184,7 @@ export default function EachPostPage({
         <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleLike}>
           {isLiked ? <BiDislike /> : <BiLike />}
           {isLiked ? "Dislike" : "Like"}
-          {"  " + totalLike}
+          {"  " + likeCount}
         </Button>
         {/* Comment button */}
         <CommentPage
@@ -236,7 +195,6 @@ export default function EachPostPage({
           author={author}
           handleLike={handleLike}
           isLiked={isLiked}
-          totalLike={totalLike}
           handleFavourite={handleFavourite}
           isFavourited={isFavourited}
           dateDifferent={dateDifferent}

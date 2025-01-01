@@ -6,10 +6,15 @@ export type GetBackLikedPostType = {
 };
 
 export default function useLikedPost(user_id: string | null) {
-  const fetchData = async (url: string | null, user_id: string | null) => {
+  const fetchData = async (
+    url: string | null,
+    user_id: string | null
+  ): Promise<GetBackLikedPostType[] | []> => {
     if (!url || !user_id) {
       return [];
     }
+
+    let returnedLikedPost: GetBackLikedPostType[] | [] = [];
 
     try {
       const response = await axios.get(url, {
@@ -19,13 +24,12 @@ export default function useLikedPost(user_id: string | null) {
       });
 
       if (response.status === 200) {
-        return response.data;
-      } else {
-        return [];
+        returnedLikedPost = response.data;
       }
     } catch (err) {
       console.log(err);
-      return [];
+    } finally {
+      return returnedLikedPost;
     }
   };
 
@@ -35,7 +39,7 @@ export default function useLikedPost(user_id: string | null) {
   );
 
   return {
-    likedPost: data as GetBackLikedPostType[] | [],
+    likedPost: data,
     likedPostError: error,
     likedPostLoading: isLoading,
   };

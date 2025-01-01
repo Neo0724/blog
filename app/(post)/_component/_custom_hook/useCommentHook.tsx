@@ -17,7 +17,8 @@ export default function useComment(post_id: string, userId: string | null) {
     url: string,
     post_id: string,
     userId: string | null
-  ) => {
+  ): Promise<GetBackCommentType[] | []> => {
+    let returnedComments: GetBackCommentType[] | [] = [];
     try {
       const response = await axios.get(url, {
         params: {
@@ -27,13 +28,12 @@ export default function useComment(post_id: string, userId: string | null) {
       });
 
       if (response.status === 200) {
-        return response.data as GetBackCommentType[];
-      } else {
-        return [];
+        returnedComments = response.data as GetBackCommentType[];
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
-      return [];
+    } finally {
+      return returnedComments;
     }
   };
 

@@ -22,11 +22,11 @@ import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
 import { BiLike } from "react-icons/bi";
 import { IoIosHeartEmpty } from "react-icons/io";
-import { useSWRConfig } from "swr";
 import { BiComment } from "react-icons/bi";
 import PostOptionComponent from "./PostOptionComponent";
 import { commentStore, CommentType } from "./_store/commentStore";
 import { useStore } from "zustand";
+import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 
 // The dialog when the user clicked on the "Comment" button, each comments in the dialog will be shown
 // in the EachCommentPage component
@@ -39,7 +39,6 @@ export default function CommentPage({
   authorId,
   handleLike,
   isLiked,
-  totalLike,
   handleFavourite,
   isFavourited,
   dateDifferent,
@@ -51,7 +50,6 @@ export default function CommentPage({
   authorId: string;
   handleLike: () => void;
   isLiked: boolean;
-  totalLike: number;
   handleFavourite: () => void;
   isFavourited: boolean;
   dateDifferent: string;
@@ -59,8 +57,8 @@ export default function CommentPage({
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
-  const { mutate } = useSWRConfig();
   const { comments, isLoading } = useComment(postId, userId ?? null);
+  const likeCount = useLikedPostCount(postId);
   const createComment = useStore(
     commentStore,
     (state) => state.actions.createComment
@@ -130,7 +128,7 @@ export default function CommentPage({
               <Button className="flex gap-2 flex-1" onClick={handleLike}>
                 <BiLike />
                 {isLiked ? "Dislike" : "Like"}
-                {"  " + totalLike}
+                {"  " + likeCount}
               </Button>
               {/* Favourite button  */}
 

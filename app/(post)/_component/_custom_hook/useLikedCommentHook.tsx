@@ -10,11 +10,11 @@ export default function useLikedComment(user_id: string, post_id: string) {
     url: string | null,
     user_id: string,
     post_id: string
-  ) => {
+  ): Promise<GetBackLikedCommentType[] | []> => {
     if (!url) {
       return [];
     }
-
+    let returnedLikedComment: GetBackLikedCommentType[] | [] = [];
     try {
       const response = await axios.get(url, {
         params: {
@@ -24,13 +24,12 @@ export default function useLikedComment(user_id: string, post_id: string) {
       });
 
       if (response.status === 200) {
-        return response.data;
-      } else {
-        return [];
+        returnedLikedComment = response.data;
       }
     } catch (err) {
       console.log(err);
-      return [];
+    } finally {
+      return returnedLikedComment;
     }
   };
 
@@ -39,5 +38,5 @@ export default function useLikedComment(user_id: string, post_id: string) {
     ([url, user_id, post_id]) => fetchData(url, user_id, post_id)
   );
 
-  return { likedComment: data as GetBackLikedCommentType[] | [], error };
+  return { likedComment: data, error };
 }

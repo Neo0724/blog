@@ -149,24 +149,6 @@ export default function EachCommentReplyPage({
   const { createReplyComments, deleteReplyComments } =
     useReplyComment(comment_id);
 
-  const fetchTotalLike = async () => {
-    try {
-      const response = await axios.get("/api/count-like-replycomment", {
-        params: {
-          comment_reply_id: comment_reply_id,
-        },
-      });
-
-      if (response.status === 200) {
-        return response.data;
-      } else {
-        return 0;
-      }
-    } catch (err) {
-      console.log(err);
-      return 0;
-    }
-  };
   const handleOpenReply = () => {
     if (!userId) {
       toast({
@@ -282,12 +264,31 @@ export default function EachCommentReplyPage({
       setIsLiked(userLiked);
     }
 
+    const fetchTotalLike = async () => {
+      try {
+        const response = await axios.get("/api/count-like-replycomment", {
+          params: {
+            comment_reply_id: comment_reply_id,
+          },
+        });
+
+        if (response.status === 200) {
+          return response.data;
+        } else {
+          return 0;
+        }
+      } catch (err) {
+        console.log(err);
+        return 0;
+      }
+    };
+
     const initalizeTotalLike = async () => {
       setTotalLike(await fetchTotalLike());
     };
 
     initalizeTotalLike();
-  }, [likedReply]);
+  }, [comment_reply_id, likedReply]);
 
   return (
     <div className="ml-[3px]">

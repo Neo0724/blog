@@ -137,6 +137,7 @@ export default function EachCommentPage({
   authorId: string;
   dateDifferent: string;
 }) {
+  // TODO Move the total like to a useSwr function and zustand to have the add and remove method
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", "");

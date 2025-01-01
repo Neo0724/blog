@@ -7,24 +7,28 @@ export type GetBackFavouritePost = {
 };
 
 export default function useFavourite(userId: string | null) {
-  const fetchData = async (url: string | null, userId: string | null) => {
+  const fetchData = async (
+    url: string | null,
+    userId: string | null
+  ): Promise<PostType[] | []> => {
     if (!url || !userId) {
       return [];
     }
+
+    let returnedFavouritePost: PostType[] | [] = [];
 
     try {
       const res = await axios.get(url, { params: { user_id: userId } });
 
       if (res.status === 200) {
-        return res.data.map((item: GetBackFavouritePost) => {
+        returnedFavouritePost = res.data.map((item: GetBackFavouritePost) => {
           return item.Post;
         });
-      } else {
-        return [];
       }
     } catch (err) {
       console.log(err);
-      return [];
+    } finally {
+      return returnedFavouritePost;
     }
   };
   const { data, isLoading, error } = useSWR(
@@ -33,7 +37,7 @@ export default function useFavourite(userId: string | null) {
   );
 
   return {
-    favouritedPost: data as PostType[] | [],
+    favouritedPost: data,
     favouriteError: error,
     favouritePostLoading: isLoading,
   };

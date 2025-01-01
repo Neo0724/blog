@@ -11,6 +11,7 @@ export type UserType = {
 };
 
 export type PostType = {
+  likeCount: number;
   title: string;
   content: string;
   created_at: Date;

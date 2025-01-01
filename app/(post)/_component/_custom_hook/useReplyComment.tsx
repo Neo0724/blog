@@ -14,7 +14,11 @@ export type GetBackReplyCommentType = {
 };
 
 export default function useReplyComment(comment_id: string) {
-  const getReplyComment = async (url: string, comment_id: string) => {
+  const getReplyComment = async (
+    url: string,
+    comment_id: string
+  ): Promise<GetBackReplyCommentType[] | []> => {
+    let returnedReplyComments: GetBackReplyCommentType[] | [] = [];
     try {
       const response = await axios.get(url, {
         params: {
@@ -23,13 +27,12 @@ export default function useReplyComment(comment_id: string) {
       });
 
       if (response.status === 200) {
-        return response.data as GetBackReplyCommentType[];
-      } else {
-        return [];
+        returnedReplyComments = response.data;
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
-      return [];
+    } finally {
+      return returnedReplyComments;
     }
   };
 

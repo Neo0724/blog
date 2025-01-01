@@ -4,12 +4,6 @@ import React from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
-import { useToast } from "@/components/ui/use-toast";
-import { useStore } from "zustand";
-import { postStore } from "./_store/postStore";
-import axios from "axios";
-import { GetBackFavouritePost } from "./_custom_hook/useFavouriteHook";
-import useSWR from "swr";
 import usePost from "./_custom_hook/usePostHook";
 
 export type UserType = {
@@ -69,7 +63,7 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
             </div>
           );
         })}
-      {!isLoading && yourPosts.length === 0 && <div>No posts found...</div>}
+      {!isLoading && yourPosts?.length === 0 && <div>No posts found...</div>}
     </>
   );
 }

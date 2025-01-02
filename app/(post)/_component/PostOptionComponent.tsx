@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdDeleteForever } from "react-icons/md";
 import { cn } from "@/lib/utils";
@@ -56,6 +56,7 @@ function EditPostDialog({
 }) {
   const { toast } = useToast();
   const updatePost = useStore(postStore, (state) => state.actions.updatePosts);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const form = useForm<CreatePostFormType>({
     resolver: zodResolver(CreatePostFormSchema),
@@ -67,6 +68,7 @@ function EditPostDialog({
 
   const onSubmit = (formData: CreatePostFormType) => {
     updatePost(postId, formData, fetchUrl, toast);
+    setDialogOpen(false);
   };
 
   const onInvalid = () => {
@@ -74,11 +76,11 @@ function EditPostDialog({
   };
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <span className="hover:opacity-75 flex gap-3 items-center transition-opacity duration-150 justify-left">
+        <span className="hover:opacity-75 flex gap-3 items-center transition-opacity duration-150 justify-left cursor-pointer">
           <MdEdit />
-          <button>Edit post</button>
+          Edit post
         </span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -124,9 +126,9 @@ function EditPostDialog({
                   </FormItem>
                 )}
               />
-              <DialogClose className="ml-auto">
-                <Button type="submit">Save changes</Button>
-              </DialogClose>
+              <Button className="ml-auto" type="submit">
+                Save changes
+              </Button>
             </form>
           </Form>
         </div>
@@ -152,15 +154,32 @@ export default function PostOptionComponent({
 }) {
   const [toolbar, setToolbar] = useState(false);
   const { toast } = useToast();
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
-  const { deletePosts, updatePosts } = useStore(
-    postStore,
-    (state) => state.actions
-  );
+  const deletePosts = useStore(postStore, (state) => state.actions.deletePosts);
 
   const handleOpenToolbar = () => {
     setToolbar((prev) => !prev);
   };
+
+  // Check if user click outside of the menu
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      // Outside
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Element)
+      ) {
+        setToolbar(false);
+      }
+    }
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef, setToolbar]);
 
   return (
     <>
@@ -185,6 +204,7 @@ export default function PostOptionComponent({
               "bg-gray-800 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
               toolbar ? "scale-100" : "scale-0"
             )}
+            ref={menuRef}
           >
             <button
               onClick={() => deletePosts(postId, fetchUrl, toast)}
@@ -197,14 +217,15 @@ export default function PostOptionComponent({
           </div>
         ) : (
           // To be continue ...
-          <button
+          <div
             className={cn(
               "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
               toolbar ? "scale-100" : "scale-0"
             )}
+            ref={menuRef}
           >
             Empty...
-          </button>
+          </div>
         )}
       </div>
     </>

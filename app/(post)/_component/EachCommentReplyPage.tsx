@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/form";
 import { useStore } from "zustand";
 import { replyCommentStore } from "./_store/replyCommentStore";
+import { useLikedReplyCommentCount } from "./_custom_hook/useLikedReplyCommentCountHook";
 
 function EditCommentDialog({
   content,
@@ -143,9 +144,10 @@ export default function EachCommentReplyPage({
   const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { likedReply } = useLikedReplyComment(userId, comment_id);
+  const { likedReply, addLikeCommentReply, removeLikeCommentReply } =
+    useLikedReplyComment(userId, comment_id);
   const [isLiked, setIsLiked] = useState<boolean>();
-  const [totalLike, setTotalLike] = useState(0);
+  const replyCommentLikeCount = useLikedReplyCommentCount(comment_reply_id);
   const { createReplyComments, deleteReplyComments } =
     useReplyComment(comment_id);
 
@@ -194,6 +196,7 @@ export default function EachCommentReplyPage({
   };
 
   const handleLike = async () => {
+    // User not logged in
     if (!userId) {
       toast({
         title: "Error",
@@ -207,49 +210,13 @@ export default function EachCommentReplyPage({
           </ToastAction>
         ),
       });
+
+      return;
     } else {
       if (isLiked) {
-        try {
-          const res = await axios.delete("/api/delete-like-replycomment", {
-            params: {
-              user_id: userId,
-              comment_reply_id: comment_reply_id,
-            },
-          });
-
-          if (res.status === 200) {
-            console.log("Deleted successfully");
-            setIsLiked((prev) => !prev);
-            setTotalLike((prev) => prev - 1);
-          }
-        } catch (err) {
-          console.log(err);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when removing like from the comment. Please try again later",
-          });
-        }
+        removeLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
       } else {
-        try {
-          const res = await axios.post("/api/add-like-replycomment", {
-            user_id: userId,
-            comment_reply_id: comment_reply_id,
-          });
-
-          if (res.status === 200) {
-            console.log("Added successfully");
-            setIsLiked((prev) => !prev);
-            setTotalLike((prev) => prev + 1);
-          }
-        } catch (error) {
-          console.error(error);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when liking the comment. Please try again later",
-          });
-        }
+        addLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
       }
     }
   };
@@ -263,31 +230,6 @@ export default function EachCommentReplyPage({
         : false;
       setIsLiked(userLiked);
     }
-
-    const fetchTotalLike = async () => {
-      try {
-        const response = await axios.get("/api/count-like-replycomment", {
-          params: {
-            comment_reply_id: comment_reply_id,
-          },
-        });
-
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          return 0;
-        }
-      } catch (err) {
-        console.log(err);
-        return 0;
-      }
-    };
-
-    const initalizeTotalLike = async () => {
-      setTotalLike(await fetchTotalLike());
-    };
-
-    initalizeTotalLike();
   }, [comment_reply_id, likedReply]);
 
   return (
@@ -324,7 +266,7 @@ export default function EachCommentReplyPage({
           onClick={handleLike}
         >
           {isLiked ? "Dislike" : "Like"}
-          {"  " + totalLike}
+          {"  " + (replyCommentLikeCount ?? 0)}
         </Button>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}

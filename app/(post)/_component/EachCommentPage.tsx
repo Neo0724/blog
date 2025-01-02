@@ -35,6 +35,7 @@ import { useStore } from "zustand";
 import { commentStore, CommentType } from "./_store/commentStore";
 import { CommentSchema } from "@/app/api/create-comment/route";
 import { Form } from "@/components/ui/form";
+import { useLikeCommentCount } from "./_custom_hook/useLikedCommentCountHook";
 
 /*
  * The page when the user click "Comment" button on the post
@@ -145,12 +146,14 @@ export default function EachCommentPage({
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, isLoading } = useReplyComment(comment_id);
-  const { likedComment } = useLikedComment(userId, post_id);
+  const { likedComment, addLikeComment, removeLikeComment } = useLikedComment(
+    userId,
+    post_id
+  );
   const [isLiked, setIsLiked] = useState<boolean>();
-  const [totalLike, setTotalLike] = useState(0);
-  const { mutate } = useSWRConfig();
   const { deleteComments } = useComment(post_id, userId);
   const { createReplyComments } = useReplyComment(comment_id);
+  const commentLikeCount = useLikeCommentCount(comment_id);
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
   const handleSubmitReply = () => {
@@ -199,6 +202,7 @@ export default function EachCommentPage({
   };
 
   const handleLike = async () => {
+    // User not logged in
     if (!userId) {
       toast({
         title: "Error",
@@ -212,75 +216,12 @@ export default function EachCommentPage({
           </ToastAction>
         ),
       });
-    } else {
-      if (isLiked) {
-        try {
-          const res = await axios.delete("/api/delete-like-comment", {
-            params: {
-              user_id: userId,
-              comment_id: comment_id,
-            },
-          });
-
-          if (res.status === 200) {
-            console.log("Deleted successfully");
-            setIsLiked((prev) => !prev);
-            setTotalLike((prev) => prev - 1);
-          }
-        } catch (error) {
-          console.error(error);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when removing like from the comment. Please try again later",
-          });
-        }
-      } else {
-        try {
-          const res = await axios.post("/api/add-like-comment", {
-            user_id: userId,
-            comment_id: comment_id,
-          });
-
-          if (res.status === 200) {
-            console.log("Added successfully");
-            setIsLiked((prev) => !prev);
-            setTotalLike((prev) => prev + 1);
-          }
-        } catch (error) {
-          console.error(error);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when liking the comment. Please try again later",
-          });
-        }
-      }
+      return;
     }
-  };
-
-  const handleDeleteCommentReply = async (comment_reply_id: string) => {
-    try {
-      const res = await axios.delete("/api/delete-reply-comment", {
-        params: {
-          comment_reply_id: comment_reply_id,
-        },
-      });
-
-      if (res.status === 200) {
-        mutate(["/api/get-reply-comment", comment_id]);
-      } else {
-        toast({
-          title: "Error",
-          description: "Unexpected error occured. Please try deleting it later",
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      toast({
-        title: "Error",
-        description: "Unexpected error occured. Please try deleting it later",
-      });
+    if (isLiked) {
+      removeLikeComment(userId, comment_id, setIsLiked, toast);
+    } else {
+      addLikeComment(userId, comment_id, setIsLiked, toast);
     }
   };
 
@@ -293,31 +234,6 @@ export default function EachCommentPage({
         : false;
       setIsLiked(userLiked);
     }
-
-    const fetchTotalLike = async () => {
-      try {
-        const response = await axios.get("/api/count-like-comment", {
-          params: {
-            comment_id: comment_id,
-          },
-        });
-
-        if (response.status === 200) {
-          return response.data;
-        } else {
-          return 0;
-        }
-      } catch (err) {
-        console.log(err);
-        return 0;
-      }
-    };
-
-    const initializeLikeCount = async () => {
-      setTotalLike(await fetchTotalLike());
-    };
-
-    initializeLikeCount();
   }, [comment_id, likedComment]);
 
   return (
@@ -349,7 +265,7 @@ export default function EachCommentPage({
           onClick={handleLike}
         >
           {isLiked ? "Dislike" : "Like"}
-          {"  " + totalLike}
+          {"  " + (commentLikeCount ?? 0)}
         </Button>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}

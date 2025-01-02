@@ -58,7 +58,7 @@ export default function CommentPage({
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
   const { comments, isLoading } = useComment(postId, userId ?? null);
-  const likeCount = useLikedPostCount(postId);
+  const postLikeCount = useLikedPostCount(postId);
   const createComment = useStore(
     commentStore,
     (state) => state.actions.createComment
@@ -128,7 +128,7 @@ export default function CommentPage({
               <Button className="flex gap-2 flex-1" onClick={handleLike}>
                 <BiLike />
                 {isLiked ? "Dislike" : "Like"}
-                {"  " + likeCount}
+                {"  " + (postLikeCount ?? 0)}
               </Button>
               {/* Favourite button  */}
 

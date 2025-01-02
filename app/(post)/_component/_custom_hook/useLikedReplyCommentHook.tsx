@@ -1,5 +1,7 @@
 import axios from "axios";
 import useSwr from "swr";
+import { useStore } from "zustand";
+import { likedCommentReplyStore } from "../_store/likedCommentReplyStore";
 
 export type GetBackLikedReplyCommentType = {
   CommentReply_comment_reply_id: string;
@@ -45,5 +47,7 @@ export default function useLikedReplyComment(
       fetchLikedReplyComment(url, user_id, comment_id)
   );
 
-  return { likedReply: data as GetBackLikedReplyCommentType[], error };
+  const actions = useStore(likedCommentReplyStore, (state) => state.actions);
+
+  return { likedReply: data, error, ...actions };
 }

@@ -6,7 +6,6 @@ import PostOptionComponent from "./PostOptionComponent";
 import { BiDislike } from "react-icons/bi";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import useLikedPost from "./_custom_hook/useLikedPostHook";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -42,9 +41,14 @@ export default function EachPostPage({
   const [userId, _] = useLocalStorage("test-userId", null);
   const [isLiked, setIsLiked] = useState(false);
   const { likedPost, likedPostLoading } = useLikedPost(userId);
-  const { favouritedPost, favouritePostLoading } = useFavourite(userId);
+  const {
+    favouritedPost,
+    favouritePostLoading,
+    addToFavourite,
+    removeFromFavourite,
+  } = useFavourite(userId);
   const [isFavourited, setIsFavourited] = useState(false);
-  const likeCount = useLikedPostCount(postId);
+  const postLikeCount = useLikedPostCount(postId);
   const { addLikePost, removeLikePost } = useStore(
     likedPostStore,
     (state) => state.actions
@@ -79,6 +83,7 @@ export default function EachPostPage({
   };
 
   const handleFavourite = async () => {
+    // User not logged in
     if (!userId) {
       toast({
         title: "Error",
@@ -92,46 +97,13 @@ export default function EachPostPage({
           </ToastAction>
         ),
       });
+
+      return;
+    }
+    if (isFavourited) {
+      removeFromFavourite(userId, postId, setIsFavourited, toast);
     } else {
-      if (isFavourited) {
-        try {
-          const res = await axios.delete("/api/delete-favourite-post", {
-            params: {
-              user_id: userId,
-              post_id: postId,
-            },
-          });
-
-          if (res.status === 200) {
-            setIsFavourited(false);
-          }
-        } catch (err) {
-          console.log(err);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when removing from favourite. Please try again later",
-          });
-        }
-      } else {
-        try {
-          const res = await axios.post("/api/add-favourite-post", {
-            user_id: userId,
-            post_id: postId,
-          });
-
-          if (res.status === 200) {
-            setIsFavourited(true);
-          }
-        } catch (err) {
-          console.log(err);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when adding to favourite. Please try again later",
-          });
-        }
-      }
+      addToFavourite(userId, postId, setIsFavourited, toast);
     }
   };
 
@@ -184,7 +156,7 @@ export default function EachPostPage({
         <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleLike}>
           {isLiked ? <BiDislike /> : <BiLike />}
           {isLiked ? "Dislike" : "Like"}
-          {"  " + likeCount}
+          {"  " + (postLikeCount ?? 0)}
         </Button>
         {/* Comment button */}
         <CommentPage

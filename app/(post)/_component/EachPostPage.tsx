@@ -150,6 +150,7 @@ export default function EachPostPage({
         <h2 className="pb-5">
           {author}, {dateDifferent}
         </h2>
+        {userId !== authorId && <Button>Follower</Button>}
       </div>
       <div className="flex items-center justify-center flex-wrap gap-2 max-w-[40rem] w-full m-auto">
         {/* Like button  */}

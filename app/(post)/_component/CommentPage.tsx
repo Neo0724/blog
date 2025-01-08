@@ -9,25 +9,27 @@ import {
 
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CommentSchema } from "@/app/api/create-comment/route";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import axios from "axios";
-import useComment, { GetBackCommentType } from "./useCommentHook";
+import useComment, { GetBackCommentType } from "./_custom_hook/useCommentHook";
 import EachCommentPage from "./EachCommentPage";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
 import { BiLike } from "react-icons/bi";
 import { IoIosHeartEmpty } from "react-icons/io";
-import { useSWRConfig } from "swr";
 import { BiComment } from "react-icons/bi";
+import PostOptionComponent from "./PostOptionComponent";
+import { commentStore, CommentType } from "./_store/commentStore";
+import { useStore } from "zustand";
+import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 
-type CommentType = z.infer<typeof CommentSchema>;
+// The dialog when the user clicked on the "Comment" button, each comments in the dialog will be shown
+// in the EachCommentPage component
 
 export default function CommentPage({
   postId,
@@ -37,7 +39,6 @@ export default function CommentPage({
   authorId,
   handleLike,
   isLiked,
-  totalLike,
   handleFavourite,
   isFavourited,
   dateDifferent,
@@ -49,7 +50,6 @@ export default function CommentPage({
   authorId: string;
   handleLike: () => void;
   isLiked: boolean;
-  totalLike: number;
   handleFavourite: () => void;
   isFavourited: boolean;
   dateDifferent: string;
@@ -57,8 +57,12 @@ export default function CommentPage({
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
-  const { mutate } = useSWRConfig();
   const { comments, isLoading } = useComment(postId, userId ?? null);
+  const postLikeCount = useLikedPostCount(postId);
+  const createComment = useStore(
+    commentStore,
+    (state) => state.actions.createComment
+  );
 
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
@@ -84,43 +88,10 @@ export default function CommentPage({
         ),
       });
     } else {
-      try {
-        const response = await axios.post("/api/create-comment", data);
-
-        if (response.status === 200) {
-          mutate(["/api/get-comment", postId, userId]);
-          form.reset({ ...data, content: "" });
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      createComment(data, form);
     }
   };
 
-  const handleDeleteComment = async (comment_id: string) => {
-    try {
-      const res = await axios.delete("/api/delete-comment", {
-        params: {
-          comment_id: comment_id,
-        },
-      });
-
-      if (res.status === 200) {
-        mutate(["/api/get-comment", postId, userId]);
-      } else {
-        toast({
-          title: "Error",
-          description: "Unexpected error occured. Please try deleting it later",
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      toast({
-        title: "Error",
-        description: "Unexpected error occured. Please try deleting it later",
-      });
-    }
-  };
   return (
     <>
       <Dialog>
@@ -131,8 +102,18 @@ export default function CommentPage({
           </Button>
         </DialogTrigger>
         <DialogContent>
+          <PostOptionComponent
+            userId={userId}
+            postId={postId}
+            authorId={authorId}
+            title={title}
+            content={content}
+            styleProperty={"top-[10px] right-[40px]"}
+          />
           <DialogHeader>
-            <DialogTitle>{author}'s post</DialogTitle>
+            <DialogTitle>
+              <span>{author}&apos;s post</span>
+            </DialogTitle>
             <div className="flex flex-col">
               <div className="flex">
                 <span>{title}</span>
@@ -147,7 +128,7 @@ export default function CommentPage({
               <Button className="flex gap-2 flex-1" onClick={handleLike}>
                 <BiLike />
                 {isLiked ? "Dislike" : "Like"}
-                {"  " + totalLike}
+                {"  " + (postLikeCount ?? 0)}
               </Button>
               {/* Favourite button  */}
 
@@ -171,7 +152,6 @@ export default function CommentPage({
                       post_id={postId}
                       authorId={authorId}
                       dateDifferent={c.dateDifferent}
-                      handleDeleteComment={handleDeleteComment}
                     />
                   );
                 })}
@@ -200,7 +180,7 @@ export default function CommentPage({
                   )}
                 />
                 <Button className="ml-auto" type="submit">
-                  Submit
+                  Comment
                 </Button>
               </form>
             </Form>

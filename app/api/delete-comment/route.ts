@@ -11,15 +11,12 @@ export async function DELETE(request: NextRequest) {
         comment_id: comment_id as string,
       },
     });
-    return NextResponse.json(
-      { deletedComment: deletedComment },
-      { status: 200 },
-    );
+    return NextResponse.json({ deletedComment }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 }

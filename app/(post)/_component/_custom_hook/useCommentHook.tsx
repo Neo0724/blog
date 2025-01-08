@@ -1,6 +1,8 @@
 import axios from "axios";
-import { UserType } from "./GetPost";
-import useSWR from "swr";
+import { UserType } from "../GetPost";
+import useSWR, { useSWRConfig } from "swr";
+import { commentStore } from "../_store/commentStore";
+import { useStore } from "zustand";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -14,8 +16,9 @@ export default function useComment(post_id: string, userId: string | null) {
   const getComment = async (
     url: string,
     post_id: string,
-    userId: string | null,
-  ) => {
+    userId: string | null
+  ): Promise<GetBackCommentType[] | []> => {
+    let returnedComments: GetBackCommentType[] | [] = [];
     try {
       const response = await axios.get(url, {
         params: {
@@ -25,19 +28,21 @@ export default function useComment(post_id: string, userId: string | null) {
       });
 
       if (response.status === 200) {
-        return response.data as GetBackCommentType[];
-      } else {
-        return [];
+        returnedComments = response.data as GetBackCommentType[];
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
-      return [];
+    } finally {
+      return returnedComments;
     }
   };
 
   const { data, isLoading, error } = useSWR(
     ["/api/get-comment", post_id, userId],
-    ([url, post_id, userId]) => getComment(url, post_id, userId),
+    ([url, post_id, userId]) => getComment(url, post_id, userId)
   );
-  return { comments: data, isLoading, commentError: error };
+
+  const actions = useStore(commentStore, (state) => state.actions);
+
+  return { comments: data, isLoading, commentError: error, ...actions };
 }

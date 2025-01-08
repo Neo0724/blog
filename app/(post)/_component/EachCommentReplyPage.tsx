@@ -1,18 +1,124 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { UserType } from "./GetPost";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { GetBackReplyCommentType } from "./useReplyComment";
+import useReplyComment from "./_custom_hook/useReplyComment";
 import axios from "axios";
-import useLikedReplyComment from "./useLikedReplyCommentHook";
+import useLikedReplyComment from "./_custom_hook/useLikedReplyCommentHook";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
-import { useSWRConfig } from "swr";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  UpdateReplyCommentSchema,
+  UpdateReplyCommentType,
+} from "@/app/api/update-reply-comment/route";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  Form,
+} from "@/components/ui/form";
+import { useStore } from "zustand";
+import { replyCommentStore } from "./_store/replyCommentStore";
+import { useLikedReplyCommentCount } from "./_custom_hook/useLikedReplyCommentCountHook";
+
+function EditCommentDialog({
+  content,
+  commentReplyId,
+  commentId,
+}: {
+  content: string;
+  commentReplyId: string;
+  commentId: string;
+}) {
+  const { toast } = useToast();
+
+  const updateReplyComment = useStore(
+    replyCommentStore,
+    (state) => state.actions.updateReplyComment
+  );
+
+  const form = useForm<UpdateReplyCommentType>({
+    resolver: zodResolver(UpdateReplyCommentSchema),
+    defaultValues: {
+      content,
+      comment_reply_id: commentReplyId,
+      comment_id: commentId,
+    },
+  });
+
+  const onSubmit = (formData: UpdateReplyCommentType) => {
+    updateReplyComment(formData, toast);
+  };
+
+  const onInvalid = () => {
+    console.log("Invalid");
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <span className="hover:opacity-75 flex gap-3 items-center transition-opacity duration-150 justify-left">
+          <button>Edit</button>
+        </span>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Editing comment</DialogTitle>
+          <DialogDescription>
+            Make changes to your comment here. Click save when you are done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4 justify-items-center">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+              className="flex flex-col min-w-[25%] w-[85%] max-w-[700px] space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className="min-h-[150px] max-h-[250px] h-[50vh]"
+                        placeholder="Enter content..."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogClose className="ml-auto">
+                <Button type="submit">Save changes</Button>
+              </DialogClose>
+            </form>
+          </Form>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function EachCommentReplyPage({
   content,
@@ -22,7 +128,7 @@ export default function EachCommentReplyPage({
   target_user,
   authorId,
   dateDifferent,
-  handleDeleteCommentReply,
+  setViewReplies,
 }: {
   content: string;
   comment_reply_id: string;
@@ -31,36 +137,20 @@ export default function EachCommentReplyPage({
   target_user: UserType;
   authorId: string;
   dateDifferent: string;
-  handleDeleteCommentReply: (comment_reply_id: string) => void;
+  setViewReplies: React.Dispatch<boolean>;
 }) {
   const router = useRouter();
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { likedReply } = useLikedReplyComment(userId, comment_id);
+  const { likedReply, addLikeCommentReply, removeLikeCommentReply } =
+    useLikedReplyComment(userId, comment_id);
   const [isLiked, setIsLiked] = useState<boolean>();
-  const [totalLike, setTotalLike] = useState(0);
-  const { mutate } = useSWRConfig();
+  const replyCommentLikeCount = useLikedReplyCommentCount(comment_reply_id);
+  const { createReplyComments, deleteReplyComments } =
+    useReplyComment(comment_id);
 
-  const fetchTotalLike = async () => {
-    try {
-      const response = await axios.get("/api/count-like-replycomment", {
-        params: {
-          comment_reply_id: comment_reply_id,
-        },
-      });
-
-      if (response.status === 200) {
-        return response.data;
-      } else {
-        return 0;
-      }
-    } catch (err) {
-      console.log(err);
-      return 0;
-    }
-  };
   const handleOpenReply = () => {
     if (!userId) {
       toast({
@@ -85,36 +175,28 @@ export default function EachCommentReplyPage({
   };
 
   const handleSubmitReply = async () => {
-    try {
-      const replyData = {
-        content: replyContent,
-        user_id: userId,
-        target_user_id: user.user_id,
-        comment_id: comment_id,
-      };
+    const replyData = {
+      content: replyContent,
+      user_id: userId,
+      target_user_id: user.user_id,
+      comment_id: comment_id,
+    };
 
-      const res = await axios.post("/api/create-reply-comment", replyData);
+    createReplyComments(
+      replyData,
+      setViewReplies,
+      setReplyContent,
+      setOpenReply,
+      toast
+    );
+  };
 
-      if (res.status === 200) {
-        mutate(["/api/get-reply-comment", comment_id]);
-      } else {
-        toast({
-          title: "Error",
-          description: "An error occured when replying. Please try again later",
-        });
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "An error occured when replying. Please try again later",
-      });
-    } finally {
-      setReplyContent("");
-      setOpenReply(false);
-    }
+  const handleDeleteCommentReply = () => {
+    deleteReplyComments(comment_reply_id, toast, comment_id);
   };
 
   const handleLike = async () => {
+    // User not logged in
     if (!userId) {
       toast({
         title: "Error",
@@ -128,49 +210,13 @@ export default function EachCommentReplyPage({
           </ToastAction>
         ),
       });
+
+      return;
     } else {
       if (isLiked) {
-        try {
-          const res = await axios.delete("/api/delete-like-replycomment", {
-            params: {
-              user_id: userId,
-              comment_reply_id: comment_reply_id,
-            },
-          });
-
-          if (res.status === 200) {
-            console.log("Deleted successfully");
-            setIsLiked((prev) => !prev);
-            setTotalLike((prev) => prev - 1);
-          }
-        } catch (err) {
-          console.log(err);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when removing like from the comment. Please try again later",
-          });
-        }
+        removeLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
       } else {
-        try {
-          const res = await axios.post("/api/add-like-replycomment", {
-            user_id: userId,
-            comment_reply_id: comment_reply_id,
-          });
-
-          if (res.status === 200) {
-            console.log("Added successfully");
-            setIsLiked((prev) => !prev);
-            setTotalLike((prev) => prev + 1);
-          }
-        } catch (error) {
-          console.error(error);
-          toast({
-            title: "Error",
-            description:
-              "An error occured when liking the comment. Please try again later",
-          });
-        }
+        addLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
       }
     }
   };
@@ -178,19 +224,13 @@ export default function EachCommentReplyPage({
   useEffect(() => {
     if (likedReply && likedReply.length > 0) {
       const userLiked = likedReply.find(
-        (item) => item.CommentReply_comment_reply_id === comment_reply_id,
+        (item) => item.CommentReply_comment_reply_id === comment_reply_id
       )
         ? true
         : false;
       setIsLiked(userLiked);
     }
-
-    const initalizeTotalLike = async () => {
-      setTotalLike(await fetchTotalLike());
-    };
-
-    initalizeTotalLike();
-  }, [likedReply]);
+  }, [comment_reply_id, likedReply]);
 
   return (
     <div className="ml-[3px]">
@@ -226,20 +266,29 @@ export default function EachCommentReplyPage({
           onClick={handleLike}
         >
           {isLiked ? "Dislike" : "Like"}
-          {"  " + totalLike}
+          {"  " + (replyCommentLikeCount ?? 0)}
         </Button>
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
         {/* Delete comment reply button */}
         {userId === user?.user_id && (
-          <Button
-            variant="link"
-            className="px-0"
-            onClick={() => handleDeleteCommentReply(comment_reply_id)}
-          >
-            Delete
-          </Button>
+          <>
+            <Button
+              variant="link"
+              className="px-0"
+              onClick={handleDeleteCommentReply}
+            >
+              Delete
+            </Button>
+            <Button variant="link" className="px-0">
+              <EditCommentDialog
+                content={content}
+                commentId={comment_id}
+                commentReplyId={comment_reply_id}
+              />
+            </Button>
+          </>
         )}
       </div>
       {openReply && (

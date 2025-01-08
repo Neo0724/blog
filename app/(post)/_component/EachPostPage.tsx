@@ -16,6 +16,8 @@ import { MdOutlineHeartBroken } from "react-icons/md";
 import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 import { useStore } from "zustand";
 import { likedPostStore } from "./_store/likedPostStore";
+import { followingStore } from "./_store/followingStore";
+import { useFollowing } from "./_custom_hook/useFollowingHook";
 
 type EachPostProps = {
   title: string;
@@ -53,6 +55,40 @@ export default function EachPostPage({
     likedPostStore,
     (state) => state.actions
   );
+  const { addFollowing, removeFollowing } = useStore(
+    followingStore,
+    (state) => state.actions
+  );
+  const { allFollowing } = useFollowing(userId ?? "");
+  // Check if user is following any of the author of each post
+  const isFollowing = allFollowing?.find(
+    (following) => following.UserFollowing.user_id === authorId
+  );
+
+  const handleFollow = () => {
+    // User is not logged in
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "Please sign in to like",
+        action: (
+          <ToastAction
+            altText="Sign in now"
+            onClick={() => router.push("sign-in")}
+          >
+            Sign in
+          </ToastAction>
+        ),
+      });
+      return;
+    }
+
+    addFollowing(userId, authorId, toast);
+  };
+
+  const handleUnfollow = () => {
+    removeFollowing(userId ?? "", authorId, toast);
+  };
 
   const handleLike = async () => {
     // User is not logged in
@@ -72,7 +108,6 @@ export default function EachPostPage({
       return;
     }
     // User is logged in
-
     // User wants to remove the like
     if (isLiked) {
       removeLikePost(userId, postId, setIsLiked, toast);
@@ -150,7 +185,14 @@ export default function EachPostPage({
         <h2 className="pb-5">
           {author}, {dateDifferent}
         </h2>
-        {userId !== authorId && <Button>Follower</Button>}
+        {/* Current user is not the author and has not follow the author */}
+        {userId !== authorId && !isFollowing && (
+          <Button onClick={handleFollow}>Follow</Button>
+        )}
+        {/* Current user is not the author and has already follwed the author */}
+        {userId !== authorId && isFollowing && (
+          <Button onClick={handleUnfollow}>Unfollow</Button>
+        )}
       </div>
       <div className="flex items-center justify-center flex-wrap gap-2 max-w-[40rem] w-full m-auto">
         {/* Like button  */}

@@ -1,0 +1,43 @@
+import useSWR from "swr";
+import { useStore } from "zustand";
+import { followingStore } from "../_store/followingStore";
+import axios from "axios";
+import { UserType } from "../GetPost";
+
+type AllFollowing = {
+  UserFollowing: UserType;
+  createdAt: Date;
+};
+
+const fetchFollowing = async (
+  url: string,
+  ownerId: string
+): Promise<AllFollowing[] | []> => {
+  let following = [];
+  try {
+    const res = await axios.get(url, {
+      params: {
+        owner_id: ownerId,
+      },
+    });
+
+    if (res.status === 200) {
+      following = res.data;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    return following;
+  }
+};
+
+export const useFollowing = (ownerId: string) => {
+  const { data, isLoading, error } = useSWR(
+    ["/api/get-following", ownerId],
+    () => fetchFollowing("/api/get-following", ownerId)
+  );
+
+  const actions = useStore(followingStore, (state) => state.actions);
+
+  return { ...actions, allFollowing: data, isLoading, error };
+};

@@ -26,6 +26,20 @@ model User {
     CommentReplyOwner  CommentReply[]      @relation(name: "owner")
     CommentReplyTarget CommentReply[]      @relation(name: "target")
     LikedCommentReply  LikedCommentReply[]
+    owner              Follower[]          @relation(name: "UserOwner")
+    following          Follower[]          @relation(name: "UserFollowing")
+}
+
+// User_owner_id is like a whole person and User_following_id is the people that 
+// the "User_owner_id" follows
+model Follower {
+    UserOwner         User     @relation(fields: [User_owner_id], references: [user_id], name: "UserOwner")
+    User_owner_id     String
+    UserFollowing     User     @relation(fields: [User_following_id], references: [user_id], name: "UserFollowing")
+    User_following_id String
+    createdAt         DateTime @default(now())
+
+    @@id([User_owner_id, User_following_id])
 }
 
 model Post {

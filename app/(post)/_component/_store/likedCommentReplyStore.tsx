@@ -20,13 +20,13 @@ type LikedCommentReplyAction = {
   };
 };
 
-export const likedCommentReplyStore = create<LikedCommentReplyAction>(() => ({
+export const likedComentReplyStore = create<LikedCommentReplyAction>(() => ({
   actions: {
     addLikeCommentReply: async (
-      userId: string,
-      commentReplyId: string,
-      setIsLiked: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
+      userId,
+      commentReplyId,
+      setIsLiked,
+      showToast
     ) => {
       try {
         const res = await axios.post("/api/add-like-replycomment", {
@@ -49,10 +49,10 @@ export const likedCommentReplyStore = create<LikedCommentReplyAction>(() => ({
       }
     },
     removeLikeCommentReply: async (
-      userId: string,
-      commentReplyId: string,
-      setIsLiked: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
+      userId,
+      commentReplyId,
+      setIsLiked,
+      showToast
     ) => {
       try {
         const res = await axios.delete("/api/delete-like-replycomment", {

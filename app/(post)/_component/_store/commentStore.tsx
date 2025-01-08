@@ -44,8 +44,8 @@ type CommentAction = {
 export const commentStore = create<CommentAction>(() => ({
   actions: {
     updateComments: async (
-      commentId: string,
-      updatedComments: CommentType,
+      commentId,
+      updatedComments,
       showToast: ({ title, description }: ToastProp) => void
     ) => {
       try {
@@ -84,9 +84,9 @@ export const commentStore = create<CommentAction>(() => ({
       }
     },
     deleteComments: async (
-      commentId: string,
-      postId: string,
-      userId: string,
+      commentId,
+      postId,
+      userId,
       showToast: ({ title, description }: ToastProp) => void
     ) => {
       try {
@@ -117,14 +117,7 @@ export const commentStore = create<CommentAction>(() => ({
         });
       }
     },
-    createComment: async (
-      newComment: CommentType,
-      form: UseFormReturn<{
-        content: string;
-        post_id: string;
-        user_id: string;
-      }>
-    ) => {
+    createComment: async (newComment, form) => {
       try {
         const response = await axios.post("/api/create-comment", newComment);
 

@@ -35,11 +35,11 @@ type ReplyCommentAction = {
 export const replyCommentStore = create<ReplyCommentAction>(() => ({
   actions: {
     createReplyComments: async (
-      replyData: ReplyData,
-      setViewReplies: React.Dispatch<boolean>,
-      setReplyContent: React.Dispatch<string>,
-      setOpenReply: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
+      replyData,
+      setViewReplies,
+      setReplyContent,
+      setOpenReply,
+      showToast
     ) => {
       try {
         const res = await axios.post("/api/create-reply-comment", replyData);
@@ -58,11 +58,7 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
         setOpenReply(false);
       }
     },
-    deleteReplyComments: async (
-      comment_reply_id: string,
-      showToast: ({ title, description }: ToastProp) => void,
-      commentId: string
-    ) => {
+    deleteReplyComments: async (comment_reply_id, showToast, commentId) => {
       try {
         const res = await axios.delete("/api/delete-reply-comment", {
           params: {
@@ -91,10 +87,7 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
         });
       }
     },
-    updateReplyComment: async (
-      replyComment: UpdateReplyCommentType,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    updateReplyComment: async (replyComment, showToast) => {
       try {
         const res = await axios.put("/api/update-reply-comment", replyComment);
 

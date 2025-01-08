@@ -22,12 +22,7 @@ type LikedCommentAction = {
 
 export const likedCommentStore = create<LikedCommentAction>(() => ({
   actions: {
-    addLikeComment: async (
-      userId: string,
-      commentId: string,
-      setIsLiked: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    addLikeComment: async (userId, commentId, setIsLiked, showToast) => {
       try {
         const res = await axios.post("/api/add-like-comment", {
           user_id: userId,
@@ -48,12 +43,7 @@ export const likedCommentStore = create<LikedCommentAction>(() => ({
         });
       }
     },
-    removeLikeComment: async (
-      userId: string,
-      commentId: string,
-      setIsLiked: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    removeLikeComment: async (userId, commentId, setIsLiked, showToast) => {
       try {
         const res = await axios.delete("/api/delete-like-comment", {
           params: {

@@ -22,12 +22,7 @@ type FavouriteActions = {
 
 export const favouriteStore = create<FavouriteActions>(() => ({
   actions: {
-    addToFavourite: async (
-      userId: string,
-      postId: string,
-      setIsFavourited: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    addToFavourite: async (userId, postId, setIsFavourited, showToast) => {
       try {
         const res = await axios.post("/api/add-favourite-post", {
           user_id: userId,
@@ -48,10 +43,10 @@ export const favouriteStore = create<FavouriteActions>(() => ({
     },
 
     removeFromFavourite: async (
-      userId: string,
-      postId: string,
+      userId,
+      postId,
       setIsFavourited: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast
     ) => {
       try {
         const res = await axios.delete("/api/delete-favourite-post", {

@@ -22,12 +22,7 @@ type LikedPostAction = {
 
 export const likedPostStore = create<LikedPostAction>(() => ({
   actions: {
-    addLikePost: async (
-      userId: string,
-      postId: string,
-      setIsLiked: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    addLikePost: async (userId, postId, setIsLiked, showToast) => {
       try {
         const res = await axios.post("/api/add-like-post", {
           user_id: userId,
@@ -47,12 +42,7 @@ export const likedPostStore = create<LikedPostAction>(() => ({
         });
       }
     },
-    removeLikePost: async (
-      userId: string,
-      postId: string,
-      setIsLiked: React.Dispatch<boolean>,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    removeLikePost: async (userId, postId, setIsLiked, showToast) => {
       try {
         const res = await axios.delete("/api/delete-like-post", {
           params: {

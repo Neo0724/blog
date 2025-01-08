@@ -50,16 +50,11 @@ type PostAction = {
   };
 };
 
-export const postStore = create<PostAction>((set) => ({
+export const postStore = create<PostAction>(() => ({
   // Store all action
   actions: {
     // Action to update post
-    updatePosts: async (
-      postId: string,
-      updatedPost: CreatePostFormType,
-      url: string,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    updatePosts: async (postId, updatedPost, url, showToast) => {
       try {
         const res = await axios.put("/api/update-post", {
           ...updatedPost,
@@ -89,11 +84,7 @@ export const postStore = create<PostAction>((set) => ({
     },
 
     // Action to delete post
-    deletePosts: async (
-      postId: string,
-      url: string,
-      showToast: ({ title, description }: ToastProp) => void
-    ) => {
+    deletePosts: async (postId, url, showToast) => {
       try {
         const res = await axios.delete("/api/delete-post", {
           params: {
@@ -123,15 +114,7 @@ export const postStore = create<PostAction>((set) => ({
     },
 
     // Action to create post
-    createPost: async (
-      newPost: CreatePostFormType,
-      showToast: ({ title, description }: ToastProp) => void,
-      form: UseFormReturn<{
-        title: string;
-        content: string;
-      }>,
-      setError: Dispatch<string>
-    ) => {
+    createPost: async (newPost, showToast, form, setError) => {
       try {
         const res = await axios.post("/api/create-post", newPost);
 

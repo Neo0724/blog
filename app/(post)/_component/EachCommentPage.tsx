@@ -11,7 +11,6 @@ import useLikedComment from "./_custom_hook/useLikedCommentHook";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
-import { useSWRConfig } from "swr";
 import useComment from "./_custom_hook/useCommentHook";
 import { DialogHeader } from "@/components/ui/dialog";
 import {

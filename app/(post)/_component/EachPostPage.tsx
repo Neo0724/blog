@@ -217,7 +217,9 @@ export default function EachPostPage({
           variant="ghost"
           className={cn(
             "flex gap-2 min-w-fit rounded-xl bg-gray-200",
-            isLiked ? "hover:text-red-800" : "hover:text-blue-800"
+            isLiked
+              ? "hover:text-red-800 active:text-red-800"
+              : "hover:text-blue-600 active:text-blue-600"
           )}
           onClick={handleLike}
         >
@@ -244,7 +246,9 @@ export default function EachPostPage({
           variant="ghost"
           className={cn(
             "flex gap-2 min-w-fit rounded-xl bg-gray-200",
-            isFavourited ? "hover:text-red-800" : "hover:text-blue-800"
+            isFavourited
+              ? "hover:text-red-800 active:text-red-800"
+              : "hover:text-blue-600 active:text-blue-600"
           )}
           onClick={handleFavourite}
         >

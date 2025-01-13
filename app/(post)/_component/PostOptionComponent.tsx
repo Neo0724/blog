@@ -154,7 +154,7 @@ export default function PostOptionComponent({
 }) {
   const [toolbar, setToolbar] = useState(false);
   const { toast } = useToast();
-  const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const deletePosts = useStore(postStore, (state) => state.actions.deletePosts);
 
@@ -170,11 +170,14 @@ export default function PostOptionComponent({
         menuRef.current &&
         !menuRef.current.contains(event.target as Element)
       ) {
+        console.log("Clicked outside");
         setToolbar(false);
       }
     }
+
     // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       // Unbind the event listener on clean up
       document.removeEventListener("mousedown", handleClickOutside);
@@ -188,6 +191,7 @@ export default function PostOptionComponent({
           "flex z-10 flex-col items-end absolute right-5",
           styleProperty
         )}
+        ref={menuRef}
       >
         <button
           title="Open option"
@@ -204,7 +208,6 @@ export default function PostOptionComponent({
               "bg-gray-800 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150 text-white",
               toolbar ? "scale-100" : "scale-0"
             )}
-            ref={menuRef}
           >
             <button
               onClick={() => deletePosts(postId, fetchUrl, toast)}

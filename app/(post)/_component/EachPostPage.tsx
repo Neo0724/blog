@@ -60,6 +60,7 @@ export default function EachPostPage({
     followingStore,
     (state) => state.actions
   );
+  const [readMore, setReadMore] = useState(false);
   const { allFollowing } = useFollowing(userId ?? "");
   // Check if user is following any of the author of each post
   const isFollowing = allFollowing?.find(
@@ -209,7 +210,21 @@ export default function EachPostPage({
         <h1 className="font-bold">{title}</h1>
       </div>
       <div className="flex flex-row gap-4 pb-2">
-        <span>{content}</span>
+        {content.length > 255 ? (
+          <span>
+            {readMore ? content : content.substring(0, 255) + "..."}
+            <button
+              className="text-blue-600 hover:opacity-75"
+              onClick={() => {
+                setReadMore((prev) => !prev);
+              }}
+            >
+              {readMore ? "Read less" : "Read more"}
+            </button>
+          </span>
+        ) : (
+          <span>{content}</span>
+        )}
       </div>
       <div className="flex items-center flex-wrap gap-2 max-w-[40rem] w-full">
         {/* Like button  */}

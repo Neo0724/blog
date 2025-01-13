@@ -170,7 +170,6 @@ export default function PostOptionComponent({
         menuRef.current &&
         !menuRef.current.contains(event.target as Element)
       ) {
-        console.log("Clicked outside");
         setToolbar(false);
       }
     }

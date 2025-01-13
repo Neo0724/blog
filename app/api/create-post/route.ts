@@ -9,8 +9,8 @@ export const CreatePostSchema = z.object({
 });
 
 export const CreatePostFormSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
+  title: z.string().min(1).max(65535),
+  content: z.string().min(1).max(65535),
 });
 
 export const POST = async (request: NextRequest) => {
@@ -40,13 +40,13 @@ export const POST = async (request: NextRequest) => {
     });
     return NextResponse.json(
       { message: "Success", data: newPost },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (err) {
     console.error(err);
     return NextResponse.json(
       { error: "Unexpected error occured" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 };

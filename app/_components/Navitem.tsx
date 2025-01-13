@@ -14,11 +14,11 @@ export default function Navitem({ name, href, active, icon }: NavItemsType) {
     <>
       <div className="hidden md:block bg-white w-[1px] h-10"></div>
       <Button
-        variant="outline"
+        variant="ghost"
         asChild
         className={cn(
-          "hover:underline md:w-23 w-full bg-zinc-500 text-white border-0",
-          userId && href === "/sign-up" ? "hidden" : "",
+          "hover:underline md:w-23 w-full bg-zinc-500 text-white border-0 rounded-lg",
+          userId && href === "/sign-up" ? "hidden" : ""
         )}
       >
         <div className="flex flex-col md:flex-row md:gap-3 hover:cursor-pointer">

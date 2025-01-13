@@ -219,7 +219,7 @@ export default function CommentPage({
               </div>
             </DialogTitle>
             <div className="flex flex-col">
-              <div className="flex mb-3">
+              <div className="flex mb-3 font-bold">
                 <span>{title}</span>
               </div>
               <span className="overflow-y-scroll max-h-[125px]">{content}</span>

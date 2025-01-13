@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 export const UpdateReplyCommentSchema = z.object({
-  content: z.string().min(1).max(200),
+  content: z.string().min(1).max(65535),
   comment_reply_id: z.string(),
   comment_id: z.string(),
 });

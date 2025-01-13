@@ -45,7 +45,7 @@ model Follower {
 model Post {
     post_id   String   @id @default(uuid())
     title     String
-    content   String
+    content   String   @db.Text
     createdAt DateTime @default(now())
 
     User                  User            @relation(fields: [User_user_id], references: [user_id])
@@ -89,7 +89,7 @@ model Comment {
     Post_post_id String
 
     createdAt DateTime @default(now())
-    content   String
+    content   String   @db.Text
 
     being_replied_comment CommentReply[]
     being_liked_comment   LikedComment[]
@@ -122,7 +122,7 @@ model CommentReply {
     LikedCommentReply LikedCommentReply[]
 
     createdAt DateTime @default(now())
-    content   String
+    content   String   @db.Text
 }
 
 model LikedCommentReply {

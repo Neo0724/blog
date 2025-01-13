@@ -201,7 +201,7 @@ export default function PostOptionComponent({
         {userId === authorId ? (
           <div
             className={cn(
-              "bg-gray-800 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
+              "bg-gray-800 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150 text-white",
               toolbar ? "scale-100" : "scale-0"
             )}
             ref={menuRef}
@@ -219,7 +219,7 @@ export default function PostOptionComponent({
           // To be continue ...
           <div
             className={cn(
-              "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150",
+              "bg-gray-800 hover:opacity-75 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150 text-white",
               toolbar ? "scale-100" : "scale-0"
             )}
             ref={menuRef}

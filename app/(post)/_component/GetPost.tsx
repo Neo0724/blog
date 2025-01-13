@@ -5,7 +5,6 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
 import usePost from "./_custom_hook/usePostHook";
-import { useFollowing } from "./_custom_hook/useFollowingHook";
 
 export type UserType = {
   user_id: string;
@@ -15,7 +14,7 @@ export type UserType = {
 export type PostType = {
   title: string;
   content: string;
-  created_at: Date;
+  createdAt: string;
   post_id: string;
   dateDifferent: string;
   User: UserType;
@@ -42,7 +41,6 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
   const [userId, _] = useLocalStorage<string>("test-userId");
 
   const { yourPosts, isLoading } = usePost(searchPostType, searchText, userId);
-  const { allFollowing } = useFollowing(userId);
 
   return (
     <>
@@ -56,7 +54,7 @@ export default function GetPost({ searchPostType, searchText }: GetPostProps) {
               <EachPostPage
                 title={post.title}
                 content={post.content}
-                createdAt={post.created_at}
+                createdAt={post.createdAt}
                 author={post.User.name}
                 postId={post.post_id}
                 authorId={post.User.user_id}

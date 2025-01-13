@@ -10,16 +10,6 @@ export type UserType = {
   name: string;
 };
 
-export type PostType = {
-  likeCount: number;
-  title: string;
-  content: string;
-  created_at: Date;
-  post_id: string;
-  dateDifferent: string;
-  User: UserType;
-};
-
 export type ToastProp = {
   title: string;
   description: string;

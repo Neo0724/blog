@@ -18,11 +18,12 @@ import { useStore } from "zustand";
 import { likedPostStore } from "./_store/likedPostStore";
 import { followingStore } from "./_store/followingStore";
 import { useFollowing } from "./_custom_hook/useFollowingHook";
+import { cn } from "@/lib/utils";
 
 type EachPostProps = {
   title: string;
   content: string;
-  createdAt: Date;
+  createdAt: string;
   author: string;
   authorId: string;
   postId: string;
@@ -165,7 +166,7 @@ export default function EachPostPage({
   ]);
 
   return (
-    <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5">
+    <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5 max-w-[800px] mx-auto">
       <PostOptionComponent
         userId={userId ?? ""}
         authorId={authorId}
@@ -173,30 +174,53 @@ export default function EachPostPage({
         title={title}
         content={content}
       />
-      <div className="flex flex-row gap-4 border-b-2">
-        Title:
-        <h1 className="pb-5">{title}</h1>
-      </div>
-      <div className="flex flex-row gap-4 border-b-2">
-        <h2 className="pb-5">{content}</h2>
-      </div>
-      <div className="flex flex-row gap-4 border-b-2">
-        By:
-        <h2 className="pb-5">
-          {author}, {dateDifferent}
-        </h2>
+      <div className="flex flex-row gap-2 border-b-2 pb-5 flex-wrap">
+        <span>{author}</span>
+        <span className="opacity-80">&#x2022;</span>
+        <span className="opacity-80">{dateDifferent}</span>
         {/* Current user is not the author and has not follow the author */}
         {userId !== authorId && !isFollowing && (
-          <Button onClick={handleFollow}>Follow</Button>
+          <div className="mr-[30px]">
+            <span className="text-black opacity-80 mr-2">&#x2022;</span>
+            <Button
+              variant="link"
+              onClick={handleFollow}
+              className="p-0 h-auto text-base leading-none  text-blue-400 "
+            >
+              Follow
+            </Button>
+          </div>
         )}
         {/* Current user is not the author and has already follwed the author */}
         {userId !== authorId && isFollowing && (
-          <Button onClick={handleUnfollow}>Unfollow</Button>
+          <>
+            <span className="text-black opacity-80">&#x2022;</span>
+            <Button
+              variant="link"
+              onClick={handleUnfollow}
+              className="p-0 h-auto text-base leading-none text-blue-400"
+            >
+              Unfollow
+            </Button>
+          </>
         )}
       </div>
-      <div className="flex items-center justify-center flex-wrap gap-2 max-w-[40rem] w-full m-auto">
+      <div className="flex flex-row gap-4 pb-1">
+        <h1 className="font-bold">{title}</h1>
+      </div>
+      <div className="flex flex-row gap-4 pb-2">
+        <span>{content}</span>
+      </div>
+      <div className="flex items-center flex-wrap gap-2 max-w-[40rem] w-full">
         {/* Like button  */}
-        <Button className="flex gap-2 flex-1 min-w-fit" onClick={handleLike}>
+        <Button
+          variant="ghost"
+          className={cn(
+            "flex gap-2 min-w-fit rounded-xl bg-gray-200",
+            isLiked ? "hover:text-red-800" : "hover:text-blue-800"
+          )}
+          onClick={handleLike}
+        >
           {isLiked ? <BiDislike /> : <BiLike />}
           {isLiked ? "Dislike" : "Like"}
           {"  " + (postLikeCount ?? 0)}
@@ -213,14 +237,19 @@ export default function EachPostPage({
           handleFavourite={handleFavourite}
           isFavourited={isFavourited}
           dateDifferent={dateDifferent}
+          createdAt={createdAt}
         />
         {/* Favourite button  */}
         <Button
-          className="flex gap-2 flex-1 min-w-fit"
+          variant="ghost"
+          className={cn(
+            "flex gap-2 min-w-fit rounded-xl bg-gray-200",
+            isFavourited ? "hover:text-red-800" : "hover:text-blue-800"
+          )}
           onClick={handleFavourite}
         >
           {isFavourited ? <MdOutlineHeartBroken /> : <IoIosHeartEmpty />}
-          {isFavourited ? "Remove from favourite" : "Add to favourite"}
+          {isFavourited ? "Unfavourite" : "Favourite"}
         </Button>
       </div>
     </div>

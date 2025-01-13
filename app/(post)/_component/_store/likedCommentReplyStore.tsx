@@ -20,7 +20,7 @@ type LikedCommentReplyAction = {
   };
 };
 
-export const likedComentReplyStore = create<LikedCommentReplyAction>(() => ({
+export const likedCommentReplyStore = create<LikedCommentReplyAction>(() => ({
   actions: {
     addLikeCommentReply: async (
       userId,
@@ -36,7 +36,6 @@ export const likedComentReplyStore = create<LikedCommentReplyAction>(() => ({
 
         if (res.status === 200) {
           mutate(["/api/count-like-replycomment", commentReplyId]);
-          console.log("Added successfully");
           setIsLiked(true);
         }
       } catch (error) {
@@ -64,7 +63,6 @@ export const likedComentReplyStore = create<LikedCommentReplyAction>(() => ({
 
         if (res.status === 200) {
           mutate(["/api/count-like-replycomment", commentReplyId]);
-          console.log("Deleted successfully");
           setIsLiked(false);
         }
       } catch (err) {

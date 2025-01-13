@@ -1,9 +1,10 @@
 import useSWR from "swr";
-import { postStore, PostType } from "../_store/postStore";
+import { postStore } from "../_store/postStore";
 import { SearchPostType } from "../Enum";
 import { GetBackFavouritePost } from "./useFavouriteHook";
 import axios from "axios";
 import { useStore } from "zustand";
+import { PostType } from "../GetPost";
 
 const fetchPost = async (
   apiUrl: string,

@@ -31,7 +31,6 @@ export const likedCommentStore = create<LikedCommentAction>(() => ({
 
         if (res.status === 200) {
           mutate(["/api/count-like-comment", commentId]);
-          console.log("Added successfully");
           setIsLiked(true);
         }
       } catch (error) {

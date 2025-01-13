@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const allFollower = await prisma.follower.findMany({
       where: {
+        // Fetch all user that follows the targetId
         User_following_id: targetId as string,
       },
       select: {

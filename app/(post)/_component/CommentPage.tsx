@@ -219,15 +219,15 @@ export default function CommentPage({
               </div>
             </DialogTitle>
             <div className="flex flex-col">
-              <div className="flex">
+              <div className="flex mb-3">
                 <span>{title}</span>
               </div>
-              <span>{content}</span>
+              <span className="overflow-y-scroll max-h-[125px]">{content}</span>
               <span className="text-sm text-black opacity-70 font-normal">
                 {getReadableDate(createdAt)}
               </span>
             </div>
-            <div className="flex gap-5">
+            <div className="flex gap-5 mb-5">
               {/* Like button  */}
               <Button
                 variant="ghost"
@@ -258,7 +258,7 @@ export default function CommentPage({
                 {isFavourited ? "Unfavourite" : "Favourite"}
               </Button>
             </div>
-            <div className="overflow-y-scroll border-solid border-2 border-black-500 p-3 rounded-lg h-[60vh]">
+            <div className="overflow-y-scroll border-solid border-2 border-black-500 p-3 rounded-lg h-[50svh]">
               {isLoading && <div>Comments are loading...</div>}
               {!isLoading &&
                 comments &&

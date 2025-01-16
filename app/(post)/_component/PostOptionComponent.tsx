@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { CreatePostFormType } from "../create-post/page";
+import { CreatePostFormType } from "../create-post/[userId]/page";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreatePostFormSchema } from "@/app/api/create-post/route";

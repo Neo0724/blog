@@ -6,18 +6,20 @@ import { UserType } from "../GetPost";
 
 type AllFollowing = {
   UserFollowing: UserType;
-  createdAt: Date;
+  createdAt: string;
 };
 
 const fetchFollowing = async (
   url: string,
-  ownerId: string
+  ownerId: string,
+  queryUsername: string
 ): Promise<AllFollowing[] | []> => {
   let following = [];
   try {
     const res = await axios.get(url, {
       params: {
         owner_id: ownerId,
+        query_username: queryUsername,
       },
     });
 
@@ -31,10 +33,10 @@ const fetchFollowing = async (
   }
 };
 
-export const useFollowing = (ownerId: string) => {
+export const useFollowing = (ownerId: string, queryUsername = "") => {
   const { data, isLoading, error } = useSWR(
     ["/api/get-following", ownerId],
-    () => fetchFollowing("/api/get-following", ownerId)
+    () => fetchFollowing("/api/get-following", ownerId, queryUsername)
   );
 
   const actions = useStore(followingStore, (state) => state.actions);

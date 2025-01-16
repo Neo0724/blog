@@ -23,8 +23,14 @@ export default function Navbar() {
       icon: <FaHome />,
     },
     {
+      name: "Profile",
+      href: "/user/",
+      active: false,
+      icon: <FaHome />,
+    },
+    {
       name: "Your posts",
-      href: "/your-posts",
+      href: "/user-posts/",
       active: false,
       icon: <TbPinnedFilled />,
     },
@@ -36,13 +42,13 @@ export default function Navbar() {
     },
     {
       name: "Favourite post",
-      href: "/favourite-post",
+      href: "/favourite-post/",
       active: false,
       icon: <FaHeart />,
     },
     {
       name: "Create post",
-      href: "/create-post",
+      href: "/create-post/",
       active: false,
       icon: <AiFillEdit />,
     },

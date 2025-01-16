@@ -1,5 +1,15 @@
-import Image from "next/image";
+"use client";
+
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 export default function Home() {
-  return <main>Hello World</main>;
+  const [userId] = useLocalStorage<string | null>("test-userId");
+  const [username] = useLocalStorage<string | null>("test-username");
+  return (
+    <main>
+      {username && <div>Current logged in user: {username}</div>}
+      {/* User not signed in */}
+      {!userId && <div>Not signed in</div>}
+    </main>
+  );
 }

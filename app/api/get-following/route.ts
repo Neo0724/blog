@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const ownerId = request.nextUrl.searchParams.get("owner_id");
+  const queryUsername = request.nextUrl.searchParams.get("query_username");
 
   const prisma = new PrismaClient();
 
@@ -10,6 +11,11 @@ export async function GET(request: NextRequest) {
     const allFollowings = await prisma.follower.findMany({
       where: {
         User_owner_id: ownerId as string,
+        UserFollowing: {
+          name: {
+            contains: queryUsername as string,
+          },
+        },
       },
       select: {
         UserFollowing: {

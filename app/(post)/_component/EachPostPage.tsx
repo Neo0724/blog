@@ -166,6 +166,10 @@ export default function EachPostPage({
     postId,
   ]);
 
+  const handleRouteAuthorProfile = (authorId: string) => {
+    router.push("/user/" + authorId);
+  };
+
   return (
     <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5 max-w-[800px] mx-auto">
       <PostOptionComponent
@@ -175,8 +179,16 @@ export default function EachPostPage({
         title={title}
         content={content}
       />
-      <div className="flex flex-row gap-2 border-b-2 pb-5 flex-wrap">
-        <span>{author}</span>
+      <div className="flex flex-row gap-2 border-b-2 pb-5 flex-wrap items-center">
+        <span>
+          <Button
+            variant="link"
+            onClick={() => handleRouteAuthorProfile(authorId)}
+            className="font-bold p-0 h-0 text-lg"
+          >
+            {author}
+          </Button>
+        </span>
         <span className="opacity-80">&#x2022;</span>
         <span className="opacity-80">{dateDifferent}</span>
         {/* Current user is not the author and has not follow the author */}

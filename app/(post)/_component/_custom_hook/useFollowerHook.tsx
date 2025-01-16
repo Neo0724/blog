@@ -6,18 +6,20 @@ import { followerStore } from "../_store/followerStore";
 
 type UserFollower = {
   UserFollower: UserType;
-  createdAt: Date;
+  createdAt: string;
 };
 
 const fetchFollower = async (
   url: string,
-  targetId: string
+  targetId: string,
+  queryUsername: string
 ): Promise<UserFollower[] | []> => {
   let follower = [];
   try {
     const res = await axios.get(url, {
       params: {
         target_id: targetId,
+        query_username: queryUsername,
       },
     });
 
@@ -31,10 +33,10 @@ const fetchFollower = async (
   }
 };
 
-export const useFollowing = (targetId: string) => {
+export const useFollower = (targetId: string, queryUsername = "") => {
   const { data, isLoading, error } = useSWR(
     ["/api/get-follower", targetId],
-    () => fetchFollower("/api/get-follower", targetId)
+    () => fetchFollower("/api/get-follower", targetId, queryUsername)
   );
 
   const actions = useStore(followerStore, (state) => state.actions);

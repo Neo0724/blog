@@ -27,9 +27,12 @@ import { useToast } from "@/components/ui/use-toast";
 
 export type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 
-export default function CreatePostPage() {
+export default function CreatePostPage({
+  params,
+}: {
+  params: { userId: string };
+}) {
   const [error, setError] = useState("");
-  const [userId, _] = useLocalStorage("test-userId");
   const { toast } = useToast();
 
   const form = useForm<CreatePostFormType>({
@@ -41,7 +44,7 @@ export default function CreatePostPage() {
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
-    const formDataWithUserId = { ...formData, user_id: userId };
+    const formDataWithUserId = { ...formData, user_id: params.userId };
     try {
       const res = await axios.post("/api/create-post", formDataWithUserId);
 

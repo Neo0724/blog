@@ -22,12 +22,15 @@ import { SignInSchema } from "@/app/api/sign-in/route";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useCookie from "react-use-cookie";
+import { useSearchParams } from "next/navigation";
 
 const SignInPage = () => {
   type SignInType = z.infer<typeof SignInSchema>;
 
   const [_, saveUserId] = useLocalStorage("test-userId", null);
-  const [userToken, setUserToken, __] = useCookie("userId", undefined);
+  const [__, saveUserName] = useLocalStorage("test-username", null);
+  const [userToken, setUserToken, ___] = useCookie("userId", undefined);
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const form = useForm<SignInType>({
@@ -47,10 +50,14 @@ const SignInPage = () => {
     try {
       const res = await axios.post("api/sign-in", formData);
       saveUserId(res.data.user_id);
+      saveUserName(res.data.username);
       setUserToken(res.data.user_id);
       setToastMessage({ msg: "Sign in successful!", error: false });
       await waitClearToast;
-      router.push("/");
+      const newUrl = searchParams.get("redirectUrl")
+        ? "/" + searchParams.get("redirectUrl") + "/" + res.data.user_id
+        : "/";
+      router.push(newUrl);
     } catch (error: any) {
       console.log(error);
       setToastMessage({ msg: error.response.data.error, error: true });

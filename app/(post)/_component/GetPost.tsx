@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
 import usePost from "./_custom_hook/usePostHook";
@@ -22,7 +21,7 @@ export type PostType = {
 
 type GetPostProps =
   | {
-      searchPostType: SearchPostType.ALL_POST | SearchPostType.FAVOURITE_POST;
+      searchPostType: SearchPostType.ALL_POST;
       searchText?: string;
       userId?: string;
     }
@@ -32,14 +31,18 @@ type GetPostProps =
       userId?: string;
     }
   | {
-      searchPostType: SearchPostType.OWN_POST;
+      searchPostType:
+        | SearchPostType.USER_POST
+        | SearchPostType.USER_FAVOURITE_POST;
       searchText?: string;
       userId: string;
     };
 
-export default function GetPost({ searchPostType, searchText }: GetPostProps) {
-  const [userId, _] = useLocalStorage<string>("test-userId");
-
+export default function GetPost({
+  searchPostType,
+  searchText,
+  userId,
+}: GetPostProps) {
   const { yourPosts, isLoading } = usePost(searchPostType, searchText, userId);
 
   return (

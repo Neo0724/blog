@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const targetId = request.nextUrl.searchParams.get("target_id");
+  const queryUsername = request.nextUrl.searchParams.get("query_username");
 
   const prisma = new PrismaClient();
 
@@ -11,6 +12,11 @@ export async function GET(request: NextRequest) {
       where: {
         // Fetch all user that follows the targetId
         User_following_id: targetId as string,
+        UserOwner: {
+          name: {
+            contains: queryUsername as string,
+          },
+        },
       },
       select: {
         UserOwner: {

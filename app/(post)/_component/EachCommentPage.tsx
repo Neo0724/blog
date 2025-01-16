@@ -329,7 +329,7 @@ export default function EachCommentPage({
         {/* All the comments' replies */}
         <div
           className={cn(
-            "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
+            "min-h-[150px] max-h-[350px] h-[80vh]",
             !viewReplies && "hidden"
           )}
         >

@@ -12,19 +12,9 @@ export function middleware(request: NextRequest) {
         new URL("/sign-in?redirectUrl=favourite-post", request.url)
       );
     }
-
-    if (request.nextUrl.pathname.startsWith("/create-post")) {
-      return NextResponse.redirect(
-        new URL("/sign-in?redirectUrl=create-post", request.url)
-      );
-    }
   }
 }
 
 export const config = {
-  matcher: [
-    "/favourite-post",
-    "/create-post/:userId*",
-    "/favourite-post/:userId*",
-  ],
+  matcher: ["/favourite-post/:userId*"],
 };

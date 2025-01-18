@@ -36,8 +36,7 @@ export default function Navitem({ name, href, active, icon }: NavItemsType) {
             href={
               name === "Profile" ||
               name === "Your posts" ||
-              name === "Favourite post" ||
-              name === "Create post"
+              name === "Favourite post"
                 ? href + userId
                 : href
             }

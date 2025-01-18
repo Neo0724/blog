@@ -224,6 +224,10 @@ export default function EachCommentPage({
     }
   };
 
+  function handleAuthorProfileNavigation(user_id: string): void {
+    router.push(`/user/${user_id}`);
+  }
+
   useEffect(() => {
     if (likedComment && likedComment.length > 0) {
       const userLiked = likedComment.find(
@@ -237,8 +241,14 @@ export default function EachCommentPage({
 
   return (
     <div className="flex flex-col ml-[7px]">
-      <h2 className="font-bold">
-        {user?.name}
+      <div className="font-bold">
+        <Button
+          variant="link"
+          className="p-0 h-auto text-base leading-none font-bold"
+          onClick={() => handleAuthorProfileNavigation(user.user_id)}
+        >
+          {user.name}
+        </Button>
         {/* The comment is created by the logged in user */}
         {user?.user_id === userId && (
           <span className="ml-1 text-black opacity-70 font-normal">
@@ -251,7 +261,7 @@ export default function EachCommentPage({
             ( Author )
           </span>
         )}
-      </h2>
+      </div>
       <div>{content}</div>
       <span className="mt-[5px] text-sm text-black opacity-70 font-normal">
         {dateDifferent}
@@ -329,7 +339,7 @@ export default function EachCommentPage({
         {/* All the comments' replies */}
         <div
           className={cn(
-            "min-h-[150px] max-h-[350px] h-[80vh]",
+            "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
             !viewReplies && "hidden"
           )}
         >

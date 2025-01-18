@@ -9,7 +9,7 @@ export default function SearchBar() {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const handleSearch = () => {
-    router.push(`/search-post/${searchText}`);
+    router.push(`/post/search-post/${searchText}`);
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {

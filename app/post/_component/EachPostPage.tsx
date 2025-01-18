@@ -41,7 +41,7 @@ export default function EachPostPage({
 }: EachPostProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [userId, _] = useLocalStorage("test-userId", null);
+  const [userId, _] = useLocalStorage<string | null>("test-userId", null);
   const [isLiked, setIsLiked] = useState(false);
   const { likedPost, likedPostLoading } = useLikedPost(userId);
   const {
@@ -166,7 +166,7 @@ export default function EachPostPage({
     postId,
   ]);
 
-  const handleRouteAuthorProfile = (authorId: string) => {
+  const handleAuthorProfileNavigation = (authorId: string) => {
     router.push("/user/" + authorId);
   };
 
@@ -183,7 +183,7 @@ export default function EachPostPage({
         <span>
           <Button
             variant="link"
-            onClick={() => handleRouteAuthorProfile(authorId)}
+            onClick={() => handleAuthorProfileNavigation(authorId)}
             className="font-bold p-0 h-0 text-lg"
           >
             {author}
@@ -198,7 +198,7 @@ export default function EachPostPage({
             <Button
               variant="link"
               onClick={handleFollow}
-              className="p-0 h-auto text-base leading-none  text-blue-400 "
+              className="p-0 h-auto text-base leading-none  text-blue-400"
             >
               Follow
             </Button>

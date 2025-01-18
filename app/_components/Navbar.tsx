@@ -18,7 +18,7 @@ export default function Navbar() {
   const navItems: NavItemsType[] = [
     {
       name: "Home",
-      href: "/",
+      href: "/post/all-posts",
       active: true,
       icon: <FaHome />,
     },
@@ -30,27 +30,15 @@ export default function Navbar() {
     },
     {
       name: "Your posts",
-      href: "/user-posts/",
+      href: "/post/user-posts/",
       active: false,
       icon: <TbPinnedFilled />,
     },
     {
-      name: "All posts",
-      href: "/all-posts",
-      active: false,
-      icon: <IoCreate />,
-    },
-    {
       name: "Favourite post",
-      href: "/favourite-post/",
+      href: "/post/favourite-post/",
       active: false,
       icon: <FaHeart />,
-    },
-    {
-      name: "Create post",
-      href: "/create-post/",
-      active: false,
-      icon: <AiFillEdit />,
     },
     {
       name: "Sign Up",

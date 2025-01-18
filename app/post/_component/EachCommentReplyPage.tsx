@@ -76,7 +76,7 @@ function EditCommentDialog({
     <Dialog>
       <DialogTrigger asChild>
         <span className="hover:opacity-75 flex gap-3 items-center transition-opacity duration-150 justify-left">
-          <button>Edit</button>
+          Edit
         </span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -221,6 +221,10 @@ export default function EachCommentReplyPage({
     }
   };
 
+  function handleAuthorProfileNavigation(user_id: string): void {
+    router.push(`/user/${user_id}`);
+  }
+
   useEffect(() => {
     if (likedReply && likedReply.length > 0) {
       const userLiked = likedReply.find(
@@ -235,9 +239,14 @@ export default function EachCommentReplyPage({
   return (
     <div className="ml-[3px]">
       <hr className="h-px mb-[5px] bg-gray-200 border-0 dark:bg-gray-700" />
-      <span className="font-bold">
-        {user.name}
-
+      <div className="font-bold">
+        <Button
+          variant="link"
+          className="p-0 h-auto text-base leading-none font-bold"
+          onClick={() => handleAuthorProfileNavigation(user.user_id)}
+        >
+          {user.name}
+        </Button>
         {/* The comment is created by the logged in user */}
         {user?.user_id === userId && (
           <span className="ml-1 text-black opacity-50 font-normal">
@@ -250,7 +259,7 @@ export default function EachCommentReplyPage({
             ( Author )
           </span>
         )}
-      </span>
+      </div>
       <div>
         <span className="text-blue-500 font-bold">@{target_user.name} </span>
         {content}

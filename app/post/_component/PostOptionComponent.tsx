@@ -1,4 +1,5 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+"use client";
+import { useEffect, useRef, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdDeleteForever } from "react-icons/md";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { CreatePostFormType } from "../create-post/[userId]/page";
+import { CreatePostFormType } from "./CreatePost";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreatePostFormSchema } from "@/app/api/create-post/route";
@@ -37,7 +38,7 @@ let currentUrl = window.location.href;
 
 if (currentUrl.match("all-posts")) {
   fetchUrl = "/api/get-all-post";
-} else if (currentUrl.match("your-posts")) {
+} else if (currentUrl.match("user")) {
   fetchUrl = "/api/get-own-post";
 } else if (currentUrl.match("favourite-post")) {
   fetchUrl = "/api/get-favourite-post";

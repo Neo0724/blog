@@ -1,3 +1,4 @@
+"use client";
 import useSWR from "swr";
 import { postStore } from "../_store/postStore";
 import { SearchPostType } from "../Enum";
@@ -66,5 +67,5 @@ export default function usePost(
 
   const actions = useStore(postStore, (state) => state.actions);
 
-  return { isLoading, error, yourPosts: data, ...actions };
+  return { isLoading, error, yourPosts: data, ...actions, fetchUrl: apiUrl };
 }

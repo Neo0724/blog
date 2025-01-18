@@ -3,10 +3,7 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CreatePostSchema,
-  CreatePostFormSchema,
-} from "@/app/api/create-post/route";
+import { CreatePostFormSchema } from "@/app/api/create-post/route";
 
 import {
   Form,
@@ -21,19 +18,27 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useLocalStorage } from "@uidotdev/usehooks";
-import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import usePost from "./_custom_hook/usePostHook";
+import { SearchPostType } from "./Enum";
 
 export type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 
-export default function CreatePostPage({
-  params,
+/* 
+  searchPostType is for the createPost action to determine which page the user is currently on for data mutating 
+*/
+export default function CreatePost({
+  searchPostType,
+  userId,
 }: {
-  params: { userId: string };
+  searchPostType: SearchPostType.ALL_POST | SearchPostType.USER_POST;
+  userId: string;
 }) {
+  const [username] = useLocalStorage<string | null>("test-username");
   const [error, setError] = useState("");
   const { toast } = useToast();
+  const { createPost, fetchUrl } = usePost(searchPostType, "", userId);
 
   const form = useForm<CreatePostFormType>({
     resolver: zodResolver(CreatePostFormSchema),
@@ -44,26 +49,7 @@ export default function CreatePostPage({
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
-    const formDataWithUserId = { ...formData, user_id: params.userId };
-    try {
-      const res = await axios.post("/api/create-post", formDataWithUserId);
-
-      if (res.status === 200) {
-        toast({
-          title: "Success!",
-          description: "Post is successfully created!",
-        });
-        form.reset({
-          title: "",
-          content: "",
-        });
-      }
-    } catch (error) {
-      setError("An unexpected error occur");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-    }
+    createPost(formData, toast, form, setError, userId, fetchUrl);
   };
 
   const onInvalid = () => {
@@ -71,12 +57,14 @@ export default function CreatePostPage({
   };
 
   return (
-    <div className="flex items-center max-w-[70%]  mb-[15px] sm:mb-0 mx-auto justify-center flex-col space-y-8 py-5 border-2 rounded-md">
-      Creata a post
+    <div className="flex items-start w-full mx-auto justify-center flex-col border-2 rounded-md p-5 mb-4 max-w-[800px]">
+      <span className="w-[85%] font-bold text-xl">
+        What's on your mind, {username}?
+      </span>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-          className="flex flex-col min-w-[25%] w-[85%] max-w-[700px] space-y-4"
+          className="flex flex-col w-full max-w-[800px] space-y-2"
         >
           <FormField
             control={form.control}
@@ -99,7 +87,7 @@ export default function CreatePostPage({
                 <FormLabel>Content</FormLabel>
                 <FormControl>
                   <Textarea
-                    className="min-h-[150px] max-h-[250px] h-[50vh]"
+                    className="h-[3svh]"
                     placeholder="Enter content..."
                     {...field}
                   />
@@ -108,8 +96,12 @@ export default function CreatePostPage({
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-20 mx-auto">
-            Submit
+          <Button
+            type="submit"
+            variant="ghost"
+            className="flex gap-2 w-min self-start rounded-xl bg-gray-200"
+          >
+            Create post
           </Button>
         </form>
         {error && (

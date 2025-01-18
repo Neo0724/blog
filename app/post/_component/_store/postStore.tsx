@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { CreatePostFormType } from "../../create-post/[userId]/page";
+import { CreatePostFormType } from "../CreatePost";
 import { mutate } from "swr";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch } from "react";
@@ -35,7 +35,9 @@ type PostAction = {
         title: string;
         content: string;
       }>,
-      setError: Dispatch<string>
+      setError: Dispatch<string>,
+      userId: string,
+      url: string
     ) => Promise<void>;
   };
 };
@@ -104,15 +106,18 @@ export const postStore = create<PostAction>(() => ({
     },
 
     // Action to create post
-    createPost: async (newPost, showToast, form, setError) => {
+    createPost: async (newPost, showToast, form, setError, userId, url) => {
+      const newPostWithUserId = { ...newPost, user_id: userId };
+
       try {
-        const res = await axios.post("/api/create-post", newPost);
+        const res = await axios.post("/api/create-post", newPostWithUserId);
 
         if (res.status === 200) {
           showToast({
             title: "Success!",
             description: "Post is successfully created!",
           });
+          mutate(url);
           form.reset({
             title: "",
             content: "",

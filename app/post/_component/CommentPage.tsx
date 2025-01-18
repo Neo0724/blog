@@ -165,6 +165,10 @@ export default function CommentPage({
     return splittedDate.reverse().join(" ");
   };
 
+  function handleAuthorProfileNavigation(user_id: string): void {
+    router.push(`/user/${user_id}`);
+  }
+
   return (
     <>
       <Dialog>
@@ -189,7 +193,13 @@ export default function CommentPage({
           <DialogHeader>
             <DialogTitle>
               <div className="flex flex-row gap-2">
-                <span>{author}</span>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-base leading-none font-bold"
+                  onClick={() => handleAuthorProfileNavigation(authorId)}
+                >
+                  {author}
+                </Button>
                 {/* Current user is not the author and has not follow the author */}
                 {userId !== authorId && !isFollowing && (
                   <>

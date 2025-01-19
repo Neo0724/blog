@@ -1,10 +1,9 @@
 import NavDesktop from "./NavDesktop";
 import NavMobile from "./NavMobile";
 import { FaHome } from "react-icons/fa";
-import { TbPinnedFilled } from "react-icons/tb";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
-import { CgProfile } from "react-icons/cg";
+import { FaCircleUser } from "react-icons/fa6";
 
 export type NavItemsType = {
   name: string;
@@ -25,7 +24,7 @@ export default function Navbar() {
       name: "Profile",
       href: "/user/",
       active: false,
-      icon: <CgProfile />,
+      icon: <FaCircleUser />,
     },
     {
       name: "Favourite post",

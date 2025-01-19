@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useReplyComment from "./_custom_hook/useReplyComment";
-import axios from "axios";
 import useLikedReplyComment from "./_custom_hook/useLikedReplyCommentHook";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";

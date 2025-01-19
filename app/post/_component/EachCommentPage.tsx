@@ -2,7 +2,7 @@ import { UserType } from "./GetPost";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useReplyComment from "./_custom_hook/useReplyComment";
 import EachCommentReplyPage from "./EachCommentReplyPage";
@@ -139,6 +139,7 @@ export default function EachCommentPage({
 }) {
   // TODO Move the total like to a useSwr function and zustand to have the add and remove method
   const router = useRouter();
+  const viewRepliesRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
@@ -239,6 +240,17 @@ export default function EachCommentPage({
     }
   }, [comment_id, likedComment]);
 
+  // Scroll user to the view replies block to improve user experience
+  useEffect(() => {
+    if (viewReplies) {
+      viewRepliesRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [viewReplies]);
+
   return (
     <div className="flex flex-col ml-[7px]">
       <div className="font-bold">
@@ -317,7 +329,7 @@ export default function EachCommentPage({
         </span>
       </button>
       {/* Reply textarea for user to enter */}
-      <div className="ml-8">
+      <div className="ml-8 mb-5">
         {openReply && (
           <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">
             <span className="opacity-70">Replying to {user.name} :</span>
@@ -342,6 +354,7 @@ export default function EachCommentPage({
             "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
             !viewReplies && "hidden"
           )}
+          ref={viewRepliesRef}
         >
           {replyComments &&
             replyComments.length > 0 &&

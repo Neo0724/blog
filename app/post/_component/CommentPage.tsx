@@ -304,13 +304,17 @@ export default function CommentPage({
                         <Textarea
                           placeholder="Write a comment ......"
                           {...field}
-                          className="w-[90%] mx-auto"
+                          className="w-[90%] mx-auto m-0"
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <Button className="ml-auto" type="submit">
+                <Button
+                  className="ml-auto flex gap-2 min-w-fit rounded-xl bg-gray-200"
+                  type="submit"
+                  variant="ghost"
+                >
                   Comment
                 </Button>
               </form>

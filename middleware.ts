@@ -13,8 +13,12 @@ export function middleware(request: NextRequest) {
       );
     }
   }
+
+  if (request.nextUrl.pathname.startsWith("/")) {
+    return NextResponse.redirect(new URL("/post/all-posts", request.url));
+  }
 }
 
 export const config = {
-  matcher: ["/favourite-post/:userId*"],
+  matcher: ["/favourite-post/:userId*", "/"],
 };

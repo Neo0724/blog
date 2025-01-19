@@ -11,10 +11,14 @@ import { useRouter } from "next/navigation";
 export default function SignOut() {
   const router = useRouter();
   const [userId, setUserId] = useLocalStorage<string | null>("test-userId");
+  const [username, setUsername] = useLocalStorage<string | null>(
+    "test-username"
+  );
   const [_, setUserToken, __] = useCookie("userId", undefined);
 
   const handleSignOut = () => {
     setUserId(null);
+    setUsername(null);
     setUserToken("");
     router.push("/sign-in");
   };
@@ -24,7 +28,7 @@ export default function SignOut() {
       asChild
       className={cn(
         "w-full hover:underline text-white border-none bg-zinc-500",
-        !userId ? "hidden" : "",
+        !userId ? "hidden" : ""
       )}
       onClick={handleSignOut}
     >

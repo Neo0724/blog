@@ -46,8 +46,6 @@ export async function GET(request: NextRequest) {
         };
       });
 
-    console.log(replyCommentWithDateDifferent);
-
     return NextResponse.json(replyCommentWithDateDifferent ?? [], {
       status: 200,
     });

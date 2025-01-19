@@ -56,7 +56,7 @@ const SignInPage = () => {
       await waitClearToast;
       const newUrl = searchParams.get("redirectUrl")
         ? "/" + searchParams.get("redirectUrl") + "/" + res.data.user_id
-        : "/";
+        : "/user/" + res.data.user_id;
       router.push(newUrl);
     } catch (error: any) {
       console.log(error);

@@ -24,22 +24,22 @@ export type PostType = {
 
 export type GetPostProps =
   | {
-      searchPostType: SearchPostType.ALL_POST;
-      searchText?: string;
-      userId?: string;
-    }
+    searchPostType: SearchPostType.ALL_POST;
+    searchText?: string;
+    userId?: string;
+  }
   | {
-      searchPostType: SearchPostType.SEARCH_POST;
-      searchText: string;
-      userId?: string;
-    }
+    searchPostType: SearchPostType.SEARCH_POST;
+    searchText: string;
+    userId?: string;
+  }
   | {
-      searchPostType:
-        | SearchPostType.USER_POST
-        | SearchPostType.USER_FAVOURITE_POST;
-      searchText?: string;
-      userId: string;
-    };
+    searchPostType:
+    | SearchPostType.USER_POST
+    | SearchPostType.USER_FAVOURITE_POST;
+    searchText?: string;
+    userId: string;
+  };
 
 const ShowSkeleton = () => {
   return (
@@ -107,7 +107,7 @@ export default function GetPost({
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   return (
     <>
-      {userId === loggedInUserId && username && (
+      {userId === loggedInUserId && username && searchPostType !== 4 && (
         <CreatePost
           searchPostType={
             searchPostType as SearchPostType.ALL_POST | SearchPostType.USER_POST
@@ -134,7 +134,9 @@ export default function GetPost({
             </div>
           );
         })}
-      {!isLoading && yourPosts?.length === 0 && <div>No posts found...</div>}
+      {!isLoading && yourPosts?.length === 0 && (
+        <div className="max-w-[800px] w-full mx-auto">No posts found...</div>
+      )}
     </>
   );
 }

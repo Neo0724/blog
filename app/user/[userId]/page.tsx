@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function UserPage({ params }: { params: { userId: string } }) {
   return (
     <div>
-      <Tabs defaultValue="following" className="max-w-[800px]">
+      <Tabs defaultValue="post" className="max-w-[800px]">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger className="font-bold" value="post">
             Posts

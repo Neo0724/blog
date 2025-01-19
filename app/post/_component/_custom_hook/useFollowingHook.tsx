@@ -14,6 +14,8 @@ const fetchFollowing = async (
   ownerId: string,
   queryUsername: string
 ): Promise<AllFollowing[] | []> => {
+  if (!ownerId || ownerId.length === 0) return [];
+
   let following = [];
   try {
     const res = await axios.get(url, {
@@ -35,7 +37,7 @@ const fetchFollowing = async (
 
 export const useFollowing = (ownerId: string, queryUsername = "") => {
   const { data, isLoading, error, isValidating } = useSWR(
-    ["/api/get-following", ownerId],
+    ownerId ? ["/api/get-following", ownerId] : null,
     () => fetchFollowing("/api/get-following", ownerId, queryUsername)
   );
 

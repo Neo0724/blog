@@ -35,11 +35,10 @@ const fetchFollower = async (
 
 export const useFollower = (targetId: string, queryUsername = "") => {
   const { data, isLoading, error, isValidating } = useSWR(
-    ["/api/get-follower", targetId],
+    targetId ? ["/api/get-follower", targetId] : null,
     () => fetchFollower("/api/get-follower", targetId, queryUsername)
   );
 
-  console.log(isValidating);
   const actions = useStore(followerStore, (state) => state.actions);
 
   return { ...actions, allFollower: data, isLoading, error, isValidating };

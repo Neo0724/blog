@@ -4,3 +4,13 @@ export enum SearchPostType {
   SEARCH_POST = 3,
   USER_FAVOURITE_POST = 4,
 }
+
+export enum NotificationType {
+  LIKE_POST = "LIKE_POST",
+  LIKE_COMMENT = "LIKE_COMMENT",
+  LIKE_REPLY_COMMENT = "LIKE_REPLY_COMMENT",
+  POST = "POST",
+  COMMENT = "LIKE_COMMENT",
+  COMMENT_REPLY = "COMMENT_REPLY",
+  FOLLOW = "LIKE_COMMENT",
+}

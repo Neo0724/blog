@@ -38,7 +38,7 @@ type PostAction = {
       setError: Dispatch<string>,
       userId: string,
       url: string
-    ) => Promise<void>;
+    ) => Promise<string>;
   };
 };
 
@@ -108,7 +108,7 @@ export const postStore = create<PostAction>(() => ({
     // Action to create post
     createPost: async (newPost, showToast, form, setError, userId, url) => {
       const newPostWithUserId = { ...newPost, user_id: userId };
-
+      let newPostId = "";
       try {
         const res = await axios.post("/api/create-post", newPostWithUserId);
 
@@ -122,12 +122,15 @@ export const postStore = create<PostAction>(() => ({
             title: "",
             content: "",
           });
+          newPostId = res.data.data.post_id;
         }
       } catch (error) {
         setError("An unexpected error occur");
         setTimeout(() => {
           setError("");
         }, 3000);
+      } finally {
+        return newPostId;
       }
     },
   },

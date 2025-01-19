@@ -21,7 +21,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import usePost from "./_custom_hook/usePostHook";
-import { SearchPostType } from "./Enum";
+import { NotificationType, SearchPostType } from "./Enum";
+import { useFollower } from "./_custom_hook/useFollowerHook";
+import useNotification from "./_custom_hook/useNotificationHook";
 
 export type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 
@@ -39,6 +41,8 @@ export default function CreatePost({
   const [error, setError] = useState("");
   const { toast } = useToast();
   const { createPost, fetchUrl } = usePost(searchPostType, "", userId);
+  const { allFollower } = useFollower(userId);
+  const { addNotification } = useNotification(userId);
 
   const form = useForm<CreatePostFormType>({
     resolver: zodResolver(CreatePostFormSchema),
@@ -49,7 +53,21 @@ export default function CreatePost({
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
-    createPost(formData, toast, form, setError, userId, fetchUrl);
+    const postId = await createPost(
+      formData,
+      toast,
+      form,
+      setError,
+      userId,
+      fetchUrl
+    );
+    addNotification({
+      fromUserId: userId ?? "",
+      targetUserId:
+        allFollower?.map((follower) => follower.UserFollower.user_id) ?? [],
+      type: NotificationType.POST,
+      resourceId: postId,
+    });
   };
 
   const onInvalid = () => {
@@ -59,7 +77,7 @@ export default function CreatePost({
   return (
     <div className="flex items-start w-full mx-auto justify-center flex-col border-2 rounded-md p-5 mb-4 max-w-[800px]">
       <span className="w-[85%] font-bold text-xl">
-        What's on your mind, {username}?
+        What&apos;s on your mind, {username}?
       </span>
       <Form {...form}>
         <form

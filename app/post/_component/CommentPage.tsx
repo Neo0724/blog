@@ -108,7 +108,7 @@ export default function CommentPage({
       fromUserId: userId,
       targetUserId: [authorId],
       type: NotificationType.FOLLOW,
-      resourceId: authorId,
+      resourceId: userId,
     });
 
     // Add to following
@@ -122,7 +122,7 @@ export default function CommentPage({
         fromUserId: userId,
         targetUserId: authorId,
         type: NotificationType.FOLLOW,
-        resourceId: authorId,
+        resourceId: userId,
       });
 
       // Remove from the following

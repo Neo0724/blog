@@ -59,7 +59,7 @@ export default function CreatePost({
       form,
       setError,
       userId,
-      fetchUrl
+      fetchUrl,
     );
     addNotification({
       fromUserId: userId ?? "",

@@ -2,7 +2,7 @@
 
 - Implement notification system logic
   - [x] Create post
-  - [ ] Like post
+  - [x] Like post
   - [ ] Like comment
   - [ ] Like reply comment
   - [ ] Comment

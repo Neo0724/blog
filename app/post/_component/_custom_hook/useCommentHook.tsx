@@ -1,6 +1,6 @@
 import axios from "axios";
 import { UserType } from "../GetPost";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { commentStore } from "../_store/commentStore";
 import { useStore } from "zustand";
 
@@ -9,7 +9,7 @@ export type GetBackCommentType = {
   content: string;
   created_at: Date;
   dateDifferent: string;
-  User: UserType;
+  User: UserType; // User is the one who created the comment
 };
 
 export default function useComment(post_id: string, userId: string | null) {

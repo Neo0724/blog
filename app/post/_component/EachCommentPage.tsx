@@ -36,6 +36,7 @@ import { CommentSchema } from "@/app/api/create-comment/route";
 import { Form } from "@/components/ui/form";
 import { useLikeCommentCount } from "./_custom_hook/useLikedCommentCountHook";
 import { NotificationType } from "./Enum";
+import { useFollower } from "./_custom_hook/useFollowerHook";
 
 /*
  * The page when the user click "Comment" button on the post
@@ -56,7 +57,7 @@ function EditCommentDialog({
   const { toast } = useToast();
   const updateComments = useStore(
     commentStore,
-    (state) => state.actions.updateComments,
+    (state) => state.actions.updateComments
   );
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
@@ -149,7 +150,7 @@ export default function EachCommentPage({
   const { replyComments, isLoading } = useReplyComment(comment_id);
   const { likedComment, addLikeComment, removeLikeComment } = useLikedComment(
     userId,
-    post_id,
+    post_id
   );
   const [isLiked, setIsLiked] = useState<boolean>();
   const { deleteComments } = useComment(post_id, userId);
@@ -170,7 +171,7 @@ export default function EachCommentPage({
       setViewReplies,
       setReplyContent,
       setOpenReply,
-      toast,
+      toast
     );
   };
 
@@ -223,6 +224,15 @@ export default function EachCommentPage({
     if (isLiked) {
       removeLikeComment(userId, comment_id, setIsLiked, toast);
     } else {
+      // Only send notification if the user who liked is not the author
+      if (userId !== user.user_id) {
+        addNotification({
+          fromUserId: userId,
+          targetUserId: [user.user_id],
+          type: NotificationType.LIKE_COMMENT,
+          resourceId: comment_id,
+        });
+      }
       addLikeComment(userId, comment_id, setIsLiked, toast);
     }
   };
@@ -234,7 +244,7 @@ export default function EachCommentPage({
   useEffect(() => {
     if (likedComment && likedComment.length > 0) {
       const userLiked = likedComment.find(
-        (item) => item.Comment_comment_id === comment_id,
+        (item) => item.Comment_comment_id === comment_id
       )
         ? true
         : false;
@@ -324,10 +334,10 @@ export default function EachCommentPage({
           {isLoading
             ? "Loading..."
             : replyComments && replyComments.length > 0
-              ? viewReplies
-                ? "Hide replies"
-                : "View replies (" + replyComments.length.toString() + ")"
-              : "No replies"}
+            ? viewReplies
+              ? "Hide replies"
+              : "View replies (" + replyComments.length.toString() + ")"
+            : "No replies"}
         </span>
       </button>
       {/* Reply textarea for user to enter */}
@@ -354,7 +364,7 @@ export default function EachCommentPage({
         <div
           className={cn(
             "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
-            !viewReplies && "hidden",
+            !viewReplies && "hidden"
           )}
           ref={viewRepliesRef}
         >

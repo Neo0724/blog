@@ -56,16 +56,16 @@ export default function EachPostPage({
   const postLikeCount = useLikedPostCount(postId);
   const { addLikePost, removeLikePost } = useStore(
     likedPostStore,
-    (state) => state.actions,
+    (state) => state.actions
   );
   const [readMore, setReadMore] = useState(false);
   const { addNotification } = useNotification(userId ?? "");
   const { allFollowing, addFollowing, removeFollowing } = useFollowing(
-    userId ?? "",
+    userId ?? ""
   );
   // Check if user is following any of the author of each post
   const isFollowing = allFollowing?.find(
-    (following) => following.UserFollowing.user_id === authorId,
+    (following) => following.UserFollowing.user_id === authorId
   );
 
   const handleFollow = () => {
@@ -116,13 +116,16 @@ export default function EachPostPage({
       removeLikePost(userId, postId, setIsLiked, toast);
     } else {
       // User wants to add the like
-      // Send notification to the author of the post
-      addNotification({
-        fromUserId: userId,
-        targetUserId: userId !== authorId ? [authorId] : [],
-        type: NotificationType.LIKE_POST,
-        resourceId: postId,
-      });
+      // Only send notification if the user who liked is not the author
+
+      if (userId !== authorId) {
+        addNotification({
+          fromUserId: userId,
+          targetUserId: [authorId],
+          type: NotificationType.LIKE_POST,
+          resourceId: postId,
+        });
+      }
 
       // Add the like to the post
       addLikePost(userId, postId, setIsLiked, toast);
@@ -256,7 +259,7 @@ export default function EachPostPage({
             "flex gap-2 min-w-fit rounded-xl bg-gray-200",
             isLiked
               ? "hover:text-red-800 active:text-red-800"
-              : "hover:text-blue-600 active:text-blue-600",
+              : "hover:text-blue-600 active:text-blue-600"
           )}
           onClick={handleLike}
         >
@@ -285,7 +288,7 @@ export default function EachPostPage({
             "flex gap-2 min-w-fit rounded-xl bg-gray-200",
             isFavourited
               ? "hover:text-red-800 active:text-red-800"
-              : "hover:text-blue-600 active:text-blue-600",
+              : "hover:text-blue-600 active:text-blue-600"
           )}
           onClick={handleFavourite}
         >

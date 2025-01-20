@@ -1,12 +1,23 @@
 import { create } from "zustand";
 import axios from "axios";
 import { NotificationType } from "../Enum";
+import { UserType } from "../GetPost";
 
 type NewNotificationType = {
   targetUserId: string[];
   fromUserId: string;
   type: NotificationType;
   resourceId: string;
+};
+
+export type ReturnedNotificationType = {
+  notification_id: string;
+  type: NotificationType;
+  resourceId: string;
+  hasViewed: boolean;
+  createdAt: string;
+  TargetUser: UserType;
+  FromUser: UserType;
 };
 
 type NotificationAction = {

@@ -1,15 +1,17 @@
 "use client";
 import useSWR from "swr";
-import { notificationStore } from "../_store/notificationStore";
+import {
+  notificationStore,
+  ReturnedNotificationType,
+} from "../_store/notificationStore";
 import { useStore } from "zustand";
-import { NotificationType } from "../Enum";
 import axios from "axios";
 
 const fetchNotification = async (
   apiUrl: string,
   userId: string
-): Promise<NotificationType[]> => {
-  let fetchedNotification: NotificationType[] = [];
+): Promise<ReturnedNotificationType[]> => {
+  let fetchedNotification: ReturnedNotificationType[] = [];
   try {
     const res = await axios.get(apiUrl, {
       params: {

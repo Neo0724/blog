@@ -69,12 +69,12 @@ export default function CommentPage({
   const postLikeCount = useLikedPostCount(postId);
   const createComment = useStore(
     commentStore,
-    (state) => state.actions.createComment,
+    (state) => state.actions.createComment
   );
   const { allFollowing, addFollowing, removeFollowing } = useFollowing(userId);
   // Check if user is following any of the author of each post
   const isFollowing = allFollowing?.find(
-    (following) => following.UserFollowing.user_id === authorId,
+    (following) => following.UserFollowing.user_id === authorId
   );
 
   const form = useForm<CommentType>({
@@ -130,13 +130,15 @@ export default function CommentPage({
       const commentId = await createComment(data, form);
 
       // Send notification to the author of the post
-      // TODO get the new comment id
-      addNotification({
-        fromUserId: userId,
-        targetUserId: userId !== authorId ? [authorId] : [],
-        type: NotificationType.COMMENT,
-        resourceId: commentId,
-      });
+      // Only send notification if the user who comments is not the author
+      if (userId !== authorId) {
+        addNotification({
+          fromUserId: userId,
+          targetUserId: [authorId],
+          type: NotificationType.COMMENT,
+          resourceId: commentId,
+        });
+      }
     }
   };
 
@@ -258,7 +260,7 @@ export default function CommentPage({
                   "flex gap-2 min-w-fit rounded-xl bg-gray-200",
                   isLiked
                     ? "hover:text-red-800 active:text-red-800"
-                    : "hover:text-blue-600 active:text-blue-600",
+                    : "hover:text-blue-600 active:text-blue-600"
                 )}
                 onClick={handleLike}
               >
@@ -273,7 +275,7 @@ export default function CommentPage({
                   "flex gap-2 min-w-fit rounded-xl bg-gray-200",
                   isFavourited
                     ? "hover:text-red-800 active:text-red-800"
-                    : "hover:text-blue-600 active:text-blue-600",
+                    : "hover:text-blue-600 active:text-blue-600"
                 )}
                 onClick={handleFavourite}
               >

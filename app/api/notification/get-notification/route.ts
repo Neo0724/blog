@@ -13,6 +13,28 @@ export async function GET(request: NextRequest) {
           user_id: user_id as string,
         },
       },
+      select: {
+        TargetUser: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
+        FromUser: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
+        notification_id: true,
+        type: true,
+        resourceId: true,
+        hasViewed: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return NextResponse.json(allNotification ?? [], { status: 200 });

@@ -4,6 +4,7 @@ import { FaHome } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import { FaCircleUser } from "react-icons/fa6";
+import { FaBell } from "react-icons/fa";
 
 export type NavItemsType = {
   name: string;
@@ -31,6 +32,12 @@ export default function Navbar() {
       href: "/post/favourite-post/",
       active: false,
       icon: <FaHeart />,
+    },
+    {
+      name: "Notification",
+      href: "/notification",
+      active: false,
+      icon: <FaBell />,
     },
     {
       name: "Sign Up",

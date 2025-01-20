@@ -22,13 +22,13 @@ type CommentAction = {
     updateComments: (
       commentId: string,
       updatedComments: CommentType,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast: ({ title, description }: ToastProp) => void,
     ) => Promise<void>;
     deleteComments: (
       commentId: string,
       postId: string,
       userId: string,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast: ({ title, description }: ToastProp) => void,
     ) => Promise<void>;
     createComment: (
       newComment: CommentType,
@@ -36,8 +36,8 @@ type CommentAction = {
         content: string;
         post_id: string;
         user_id: string;
-      }>
-    ) => Promise<void>;
+      }>,
+    ) => Promise<string>;
   };
 };
 
@@ -46,7 +46,7 @@ export const commentStore = create<CommentAction>(() => ({
     updateComments: async (
       commentId,
       updatedComments,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast: ({ title, description }: ToastProp) => void,
     ) => {
       try {
         const updatedCommentsWithId = {
@@ -55,7 +55,7 @@ export const commentStore = create<CommentAction>(() => ({
         };
         const res = await axios.put(
           "/api/update-comment",
-          updatedCommentsWithId
+          updatedCommentsWithId,
         );
 
         if (res.status === 200) {
@@ -87,7 +87,7 @@ export const commentStore = create<CommentAction>(() => ({
       commentId,
       postId,
       userId,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast: ({ title, description }: ToastProp) => void,
     ) => {
       try {
         const res = await axios.delete("/api/delete-comment", {
@@ -118,15 +118,19 @@ export const commentStore = create<CommentAction>(() => ({
       }
     },
     createComment: async (newComment, form) => {
+      let commentId = "";
       try {
         const response = await axios.post("/api/create-comment", newComment);
 
         if (response.status === 200) {
           mutate(["/api/get-comment", newComment.post_id, newComment.user_id]);
           form.reset({ ...newComment, content: "" });
+          commentId = response.data.comment_id;
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        return commentId;
       }
     },
   },

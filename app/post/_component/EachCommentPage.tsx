@@ -1,7 +1,7 @@
 import { UserType } from "./GetPost";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
+import useNotification from "./_custom_hook/useNotificationHook";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useReplyComment from "./_custom_hook/useReplyComment";
@@ -35,6 +35,7 @@ import { commentStore, CommentType } from "./_store/commentStore";
 import { CommentSchema } from "@/app/api/create-comment/route";
 import { Form } from "@/components/ui/form";
 import { useLikeCommentCount } from "./_custom_hook/useLikedCommentCountHook";
+import { NotificationType } from "./Enum";
 
 /*
  * The page when the user click "Comment" button on the post
@@ -55,7 +56,7 @@ function EditCommentDialog({
   const { toast } = useToast();
   const updateComments = useStore(
     commentStore,
-    (state) => state.actions.updateComments
+    (state) => state.actions.updateComments,
   );
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
@@ -148,12 +149,13 @@ export default function EachCommentPage({
   const { replyComments, isLoading } = useReplyComment(comment_id);
   const { likedComment, addLikeComment, removeLikeComment } = useLikedComment(
     userId,
-    post_id
+    post_id,
   );
   const [isLiked, setIsLiked] = useState<boolean>();
   const { deleteComments } = useComment(post_id, userId);
   const { createReplyComments } = useReplyComment(comment_id);
   const commentLikeCount = useLikeCommentCount(comment_id);
+  const { addNotification } = useNotification(userId ?? "");
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
   const handleSubmitReply = () => {
@@ -168,7 +170,7 @@ export default function EachCommentPage({
       setViewReplies,
       setReplyContent,
       setOpenReply,
-      toast
+      toast,
     );
   };
 
@@ -232,7 +234,7 @@ export default function EachCommentPage({
   useEffect(() => {
     if (likedComment && likedComment.length > 0) {
       const userLiked = likedComment.find(
-        (item) => item.Comment_comment_id === comment_id
+        (item) => item.Comment_comment_id === comment_id,
       )
         ? true
         : false;
@@ -322,10 +324,10 @@ export default function EachCommentPage({
           {isLoading
             ? "Loading..."
             : replyComments && replyComments.length > 0
-            ? viewReplies
-              ? "Hide replies"
-              : "View replies (" + replyComments.length.toString() + ")"
-            : "No replies"}
+              ? viewReplies
+                ? "Hide replies"
+                : "View replies (" + replyComments.length.toString() + ")"
+              : "No replies"}
         </span>
       </button>
       {/* Reply textarea for user to enter */}
@@ -352,7 +354,7 @@ export default function EachCommentPage({
         <div
           className={cn(
             "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
-            !viewReplies && "hidden"
+            !viewReplies && "hidden",
           )}
           ref={viewRepliesRef}
         >

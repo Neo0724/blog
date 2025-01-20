@@ -14,6 +14,7 @@ import { MdOutlineHeartBroken } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CommentSchema } from "@/app/api/create-comment/route";
+import useNotification from "./_custom_hook/useNotificationHook";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalStorage } from "@uidotdev/usehooks";
@@ -31,6 +32,7 @@ import { useStore } from "zustand";
 import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 import { useFollowing } from "./_custom_hook/useFollowingHook";
 import { getDateDifference } from "@/app/(util)/getDateDifference";
+import { NotificationType } from "./Enum";
 
 // The dialog when the user clicked on the "Comment" button, each comments in the dialog will be shown
 // in the EachCommentPage component
@@ -63,15 +65,16 @@ export default function CommentPage({
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
   const { comments, isLoading } = useComment(postId, userId ?? null);
+  const { addNotification } = useNotification(userId ?? "");
   const postLikeCount = useLikedPostCount(postId);
   const createComment = useStore(
     commentStore,
-    (state) => state.actions.createComment
+    (state) => state.actions.createComment,
   );
   const { allFollowing, addFollowing, removeFollowing } = useFollowing(userId);
   // Check if user is following any of the author of each post
   const isFollowing = allFollowing?.find(
-    (following) => following.UserFollowing.user_id === authorId
+    (following) => following.UserFollowing.user_id === authorId,
   );
 
   const form = useForm<CommentType>({
@@ -123,7 +126,17 @@ export default function CommentPage({
         ),
       });
     } else {
-      createComment(data, form);
+      // Add the comment
+      const commentId = await createComment(data, form);
+
+      // Send notification to the author of the post
+      // TODO get the new comment id
+      addNotification({
+        fromUserId: userId,
+        targetUserId: userId !== authorId ? [authorId] : [],
+        type: NotificationType.COMMENT,
+        resourceId: commentId,
+      });
     }
   };
 
@@ -245,7 +258,7 @@ export default function CommentPage({
                   "flex gap-2 min-w-fit rounded-xl bg-gray-200",
                   isLiked
                     ? "hover:text-red-800 active:text-red-800"
-                    : "hover:text-blue-600 active:text-blue-600"
+                    : "hover:text-blue-600 active:text-blue-600",
                 )}
                 onClick={handleLike}
               >
@@ -260,7 +273,7 @@ export default function CommentPage({
                   "flex gap-2 min-w-fit rounded-xl bg-gray-200",
                   isFavourited
                     ? "hover:text-red-800 active:text-red-800"
-                    : "hover:text-blue-600 active:text-blue-600"
+                    : "hover:text-blue-600 active:text-blue-600",
                 )}
                 onClick={handleFavourite}
               >

@@ -5,6 +5,6 @@
   - [x] Like post
   - [ ] Like comment
   - [ ] Like reply comment
-  - [ ] Comment
+  - [x] Comment
   - [ ] Reply to a comment
   - [ ] Obtained new follower

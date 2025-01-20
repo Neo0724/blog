@@ -7,4 +7,4 @@
   - [x] Like reply comment
   - [x] Comment
   - [x] Reply to a comment
-  - [ ] Obtained new follower
+  - [x] Obtained new follower

@@ -65,7 +65,7 @@ export default function CommentPage({
   const { toast } = useToast();
   const [userId, _] = useLocalStorage<string>("test-userId");
   const { comments, isLoading } = useComment(postId, userId ?? null);
-  const { addNotification } = useNotification(userId ?? "");
+  const { addNotification, deleteNotification } = useNotification(userId ?? "");
   const postLikeCount = useLikedPostCount(postId);
   const createComment = useStore(
     commentStore,
@@ -103,12 +103,31 @@ export default function CommentPage({
       });
       return;
     }
+    // Send notification to the author that someone started following him or her
+    addNotification({
+      fromUserId: userId,
+      targetUserId: [authorId],
+      type: NotificationType.FOLLOW,
+      resourceId: authorId,
+    });
 
+    // Add to following
     addFollowing(userId, authorId, toast);
   };
 
   const handleUnfollow = () => {
-    removeFollowing(userId ?? "", authorId, toast);
+    if (userId) {
+      // Delete the follow notification
+      deleteNotification({
+        fromUserId: userId,
+        targetUserId: authorId,
+        type: NotificationType.FOLLOW,
+        resourceId: authorId,
+      });
+
+      // Remove from the following
+      removeFollowing(userId, authorId, toast);
+    }
   };
 
   const submitComment = async (data: CommentType) => {

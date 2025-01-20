@@ -86,11 +86,31 @@ export default function EachPostPage({
       return;
     }
 
+    // Send notification to the author that someone started following him or her
+    addNotification({
+      fromUserId: userId,
+      targetUserId: [authorId],
+      type: NotificationType.FOLLOW,
+      resourceId: authorId,
+    });
+
+    // Add to following
     addFollowing(userId, authorId, toast);
   };
 
   const handleUnfollow = () => {
-    removeFollowing(userId ?? "", authorId, toast);
+    if (userId) {
+      // Delete the follow notification
+      deleteNotification({
+        fromUserId: userId,
+        targetUserId: authorId,
+        type: NotificationType.FOLLOW,
+        resourceId: authorId,
+      });
+
+      // Remove from the following
+      removeFollowing(userId, authorId, toast);
+    }
   };
 
   const handleLikePost = async () => {

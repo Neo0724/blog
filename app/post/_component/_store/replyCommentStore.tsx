@@ -4,7 +4,7 @@ import { ToastProp } from "./postStore";
 import axios from "axios";
 import { UpdateReplyCommentType } from "@/app/api/update-reply-comment/route";
 
-type ReplyData = {
+export type ReplyData = {
   content: string;
   user_id: string;
   target_user_id: string;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { UserType } from "./GetPost";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -35,10 +35,12 @@ import {
   Form,
 } from "@/components/ui/form";
 import { useStore } from "zustand";
-import { replyCommentStore } from "./_store/replyCommentStore";
+import { replyCommentStore, ReplyData } from "./_store/replyCommentStore";
 import { useLikedReplyCommentCount } from "./_custom_hook/useLikedReplyCommentCountHook";
 import useNotification from "./_custom_hook/useNotificationHook";
 import { NotificationType } from "./Enum";
+import useSWRMutation from "swr/mutation";
+import axios from "axios";
 
 function EditCommentDialog({
   content,
@@ -152,6 +154,8 @@ export default function EachCommentReplyPage({
   const { createReplyComments, deleteReplyComments } =
     useReplyComment(comment_id);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");
+
+  const openReplyRef = useRef<HTMLDivElement | null>(null);
 
   const handleOpenReply = () => {
     if (!userId) {
@@ -284,6 +288,17 @@ export default function EachCommentReplyPage({
     }
   }, [comment_reply_id, likedReply]);
 
+  // Scroll the reply box into user view
+  useEffect(() => {
+    if (openReplyRef) {
+      openReplyRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [openReplyRef, openReply]);
+
   return (
     <div className="ml-[3px]">
       <hr className="h-px mb-[5px] bg-gray-200 border-0 dark:bg-gray-700" />
@@ -351,7 +366,10 @@ export default function EachCommentReplyPage({
       {openReply && (
         <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">
           <span className="opacity-70">Replying to {user.name} :</span>
-          <div className="flex gap-3 justify-center items-center">
+          <div
+            className="flex gap-3 justify-center items-center"
+            ref={openReplyRef}
+          >
             <Textarea
               name="replyComment"
               id="replyComment"

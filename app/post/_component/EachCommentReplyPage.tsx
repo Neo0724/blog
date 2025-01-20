@@ -37,6 +37,8 @@ import {
 import { useStore } from "zustand";
 import { replyCommentStore } from "./_store/replyCommentStore";
 import { useLikedReplyCommentCount } from "./_custom_hook/useLikedReplyCommentCountHook";
+import useNotification from "./_custom_hook/useNotificationHook";
+import { NotificationType } from "./Enum";
 
 function EditCommentDialog({
   content,
@@ -149,6 +151,7 @@ export default function EachCommentReplyPage({
   const replyCommentLikeCount = useLikedReplyCommentCount(comment_reply_id);
   const { createReplyComments, deleteReplyComments } =
     useReplyComment(comment_id);
+  const { addNotification, deleteNotification } = useNotification(userId ?? "");
 
   const handleOpenReply = () => {
     if (!userId) {
@@ -181,20 +184,43 @@ export default function EachCommentReplyPage({
       comment_id: comment_id,
     };
 
-    createReplyComments(
+    // Add the reply comment
+    const commentReplyId = await createReplyComments(
       replyData,
       setViewReplies,
       setReplyContent,
       setOpenReply,
       toast
     );
+
+    // Send the notification if the user is replying to other instead of himself
+    if (user.user_id !== userId) {
+      addNotification({
+        fromUserId: userId,
+        targetUserId: [user.user_id],
+        type: NotificationType.COMMENT_REPLY,
+        resourceId: commentReplyId,
+      });
+    }
   };
 
   const handleDeleteCommentReply = () => {
+    // Remove the notification if user is not the author of the comment
+    if (userId !== target_user.user_id) {
+      deleteNotification({
+        fromUserId: userId,
+        // Target_user is the user that this comment is replying to
+        targetUserId: target_user.user_id,
+        type: NotificationType.COMMENT_REPLY,
+        resourceId: comment_reply_id,
+      });
+    }
+
+    // Delete the reply comment
     deleteReplyComments(comment_reply_id, toast, comment_id);
   };
 
-  const handleLike = async () => {
+  const handleLikeReplyComment = async () => {
     // User not logged in
     if (!userId) {
       toast({
@@ -213,8 +239,31 @@ export default function EachCommentReplyPage({
       return;
     } else {
       if (isLiked) {
+        // Remove the notification from the target user
+        if (userId !== user.user_id) {
+          deleteNotification({
+            fromUserId: userId,
+            targetUserId: user.user_id,
+            type: NotificationType.LIKE_REPLY_COMMENT,
+            resourceId: comment_reply_id,
+          });
+        }
+
+        // Remove the like
         removeLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
       } else {
+        // User wants to add the like
+        // Only send notification if the user who liked is not the author
+        if (userId !== user.user_id) {
+          addNotification({
+            fromUserId: userId,
+            targetUserId: [user.user_id],
+            type: NotificationType.LIKE_REPLY_COMMENT,
+            resourceId: comment_reply_id,
+          });
+        }
+
+        // Add the like
         addLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
       }
     }
@@ -271,7 +320,7 @@ export default function EachCommentReplyPage({
         <Button
           variant="link"
           className={cn("px-0", isLiked ? "text-red-500" : "")}
-          onClick={handleLike}
+          onClick={handleLikeReplyComment}
         >
           {isLiked ? "Dislike" : "Like"}
           {"  " + (replyCommentLikeCount ?? 0)}

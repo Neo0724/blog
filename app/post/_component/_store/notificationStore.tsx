@@ -10,6 +10,10 @@ type NewNotificationType = {
   resourceId: string;
 };
 
+type DeleteNotificationType = Omit<NewNotificationType, "targetUserId"> & {
+  targetUserId: string;
+};
+
 export type ReturnedNotificationType = {
   notification_id: string;
   type: NotificationType;
@@ -24,6 +28,9 @@ type NotificationAction = {
   actions: {
     addNotification: (newNotification: NewNotificationType) => Promise<void>;
     readNotification: (notificationId: string) => Promise<void>;
+    deleteNotification: (
+      deleteNotification: DeleteNotificationType
+    ) => Promise<void>;
   };
 };
 
@@ -53,6 +60,20 @@ export const notificationStore = create<NotificationAction>(() => ({
         if (res.status === 200) {
           console.log("Read successful");
         }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    deleteNotification: async (deleteNotification: DeleteNotificationType) => {
+      try {
+        await axios.delete("/api/notification/delete-notification", {
+          params: {
+            type: deleteNotification.type,
+            target_user_id: deleteNotification.targetUserId,
+            from_user_id: deleteNotification.fromUserId,
+            resource_id: deleteNotification.resourceId,
+          },
+        });
       } catch (err) {
         console.log(err);
       }

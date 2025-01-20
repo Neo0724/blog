@@ -19,7 +19,7 @@ type ReplyCommentAction = {
       setReplyContent: React.Dispatch<string>,
       setOpenReply: React.Dispatch<boolean>,
       showToast: ({ title, description }: ToastProp) => void
-    ) => Promise<void>;
+    ) => Promise<string>;
     deleteReplyComments: (
       comment_reply_id: string,
       showToast: ({ title, description }: ToastProp) => void,
@@ -41,12 +41,14 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
       setOpenReply,
       showToast
     ) => {
+      let commentReplyId = "";
       try {
         const res = await axios.post("/api/create-reply-comment", replyData);
 
         if (res.status === 200) {
           mutate(["/api/get-reply-comment", replyData.comment_id]);
           setViewReplies(true);
+          commentReplyId = res.data.comment_reply_id;
         }
       } catch (err) {
         showToast({
@@ -56,6 +58,7 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
       } finally {
         setReplyContent("");
         setOpenReply(false);
+        return commentReplyId;
       }
     },
     deleteReplyComments: async (comment_reply_id, showToast, commentId) => {

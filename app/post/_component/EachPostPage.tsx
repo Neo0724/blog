@@ -59,7 +59,7 @@ export default function EachPostPage({
     (state) => state.actions
   );
   const [readMore, setReadMore] = useState(false);
-  const { addNotification } = useNotification(userId ?? "");
+  const { addNotification, deleteNotification } = useNotification(userId ?? "");
   const { allFollowing, addFollowing, removeFollowing } = useFollowing(
     userId ?? ""
   );
@@ -93,7 +93,7 @@ export default function EachPostPage({
     removeFollowing(userId ?? "", authorId, toast);
   };
 
-  const handleLike = async () => {
+  const handleLikePost = async () => {
     // User is not logged in
     if (!userId) {
       toast({
@@ -113,6 +113,15 @@ export default function EachPostPage({
     // User is logged in
     // User wants to remove the like
     if (isLiked) {
+      // Remove the notification if user is not the author of the post
+      if (userId !== authorId) {
+        deleteNotification({
+          fromUserId: userId,
+          targetUserId: authorId,
+          type: NotificationType.LIKE_POST,
+          resourceId: postId,
+        });
+      }
       removeLikePost(userId, postId, setIsLiked, toast);
     } else {
       // User wants to add the like
@@ -261,7 +270,7 @@ export default function EachPostPage({
               ? "hover:text-red-800 active:text-red-800"
               : "hover:text-blue-600 active:text-blue-600"
           )}
-          onClick={handleLike}
+          onClick={handleLikePost}
         >
           {isLiked ? <BiDislike /> : <BiLike />}
           {isLiked ? "Dislike" : "Like"}
@@ -274,7 +283,7 @@ export default function EachPostPage({
           title={title}
           content={content}
           author={author}
-          handleLike={handleLike}
+          handleLike={handleLikePost}
           isLiked={isLiked}
           handleFavourite={handleFavourite}
           isFavourited={isFavourited}

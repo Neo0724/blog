@@ -156,23 +156,50 @@ export default function EachCommentPage({
   const { deleteComments } = useComment(post_id, userId);
   const { createReplyComments } = useReplyComment(comment_id);
   const commentLikeCount = useLikeCommentCount(comment_id);
-  const { addNotification } = useNotification(userId ?? "");
+  const { addNotification, deleteNotification } = useNotification(userId ?? "");
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
-  const handleSubmitReply = () => {
+  const handleSubmitReply = async () => {
     const replyData = {
       content: replyContent,
       user_id: userId,
       target_user_id: user.user_id,
       comment_id: comment_id,
     };
-    createReplyComments(
+
+    // Add the reply comment
+    const commentReplyId = await createReplyComments(
       replyData,
       setViewReplies,
       setReplyContent,
       setOpenReply,
       toast
     );
+
+    // Send the notification if the user is replying to other instead of himself
+    if (user.user_id !== userId) {
+      addNotification({
+        fromUserId: userId,
+        targetUserId: [user.user_id],
+        type: NotificationType.COMMENT_REPLY,
+        resourceId: commentReplyId,
+      });
+    }
+  };
+
+  const handleDeleteComment = () => {
+    // Remove the notification if user is not the author of the post
+    if (userId !== authorId) {
+      deleteNotification({
+        fromUserId: userId,
+        targetUserId: authorId,
+        type: NotificationType.COMMENT,
+        resourceId: comment_id,
+      });
+    }
+
+    // Delete the comment
+    deleteComments(comment_id, post_id, userId, toast);
   };
 
   const handleOpenReply = () => {
@@ -204,7 +231,7 @@ export default function EachCommentPage({
     }
   };
 
-  const handleLike = async () => {
+  const handleLikeComment = async () => {
     // User not logged in
     if (!userId) {
       toast({
@@ -222,6 +249,17 @@ export default function EachCommentPage({
       return;
     }
     if (isLiked) {
+      // Remove the notification from the target user
+      if (userId !== user.user_id) {
+        deleteNotification({
+          fromUserId: userId,
+          targetUserId: user.user_id,
+          type: NotificationType.LIKE_COMMENT,
+          resourceId: comment_id,
+        });
+      }
+
+      // Remove the like
       removeLikeComment(userId, comment_id, setIsLiked, toast);
     } else {
       // Only send notification if the user who liked is not the author
@@ -233,6 +271,8 @@ export default function EachCommentPage({
           resourceId: comment_id,
         });
       }
+
+      // Add the like
       addLikeComment(userId, comment_id, setIsLiked, toast);
     }
   };
@@ -295,7 +335,7 @@ export default function EachCommentPage({
         <Button
           variant="link"
           className={cn("px-0", isLiked ? "text-red-500" : "")}
-          onClick={handleLike}
+          onClick={handleLikeComment}
         >
           {isLiked ? "Dislike" : "Like"}
           {"  " + (commentLikeCount ?? 0)}
@@ -309,7 +349,7 @@ export default function EachCommentPage({
             <Button
               variant="link"
               className="px-0"
-              onClick={() => deleteComments(comment_id, post_id, userId, toast)}
+              onClick={handleDeleteComment}
             >
               Delete
             </Button>

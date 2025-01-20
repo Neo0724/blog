@@ -4,7 +4,7 @@
   - [x] Create post
   - [x] Like post
   - [x] Like comment
-  - [ ] Like reply comment
+  - [x] Like reply comment
   - [x] Comment
-  - [ ] Reply to a comment
+  - [x] Reply to a comment
   - [ ] Obtained new follower

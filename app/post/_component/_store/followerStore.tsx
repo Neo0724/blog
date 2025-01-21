@@ -17,14 +17,14 @@ export const followerStore = create<FollowerAction>(() => ({
   actions: {
     removeFollower: async (ownerId, followerId, showToast) => {
       try {
-        const res = await axios.delete("/api/delete-follower", {
+        const res = await axios.delete("/api/user-relation/delete-follower", {
           params: {
             owner_id: ownerId,
             follower_id: followerId,
           },
         });
         if (res.status === 200) {
-          mutate(["/api/get-follower", ownerId]);
+          mutate(["/api/user-relation/get-follower", ownerId]);
         } else {
           showToast({
             title: "Error",

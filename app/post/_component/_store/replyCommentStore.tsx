@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { mutate } from "swr";
 import { ToastProp } from "./postStore";
 import axios from "axios";
-import { UpdateReplyCommentType } from "@/app/api/update-reply-comment/route";
+import { UpdateReplyCommentType } from "@/app/api/comment-reply/update-comment-reply/route";
 
 export type ReplyData = {
   content: string;
@@ -43,10 +43,16 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
     ) => {
       let commentReplyId = "";
       try {
-        const res = await axios.post("/api/create-reply-comment", replyData);
+        const res = await axios.post(
+          "/api/comment-reply/create-comment-reply",
+          replyData
+        );
 
         if (res.status === 200) {
-          mutate(["/api/get-reply-comment", replyData.comment_id]);
+          mutate([
+            "/api/comment-reply/get-comment-reply",
+            replyData.comment_id,
+          ]);
           setViewReplies(true);
           commentReplyId = res.data.comment_reply_id;
         }
@@ -63,14 +69,17 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
     },
     deleteReplyComments: async (comment_reply_id, showToast, commentId) => {
       try {
-        const res = await axios.delete("/api/delete-reply-comment", {
-          params: {
-            comment_reply_id: comment_reply_id,
-          },
-        });
+        const res = await axios.delete(
+          "/api/comment-reply/delete-comment-reply",
+          {
+            params: {
+              comment_reply_id: comment_reply_id,
+            },
+          }
+        );
 
         if (res.status === 200) {
-          mutate(["/api/get-reply-comment", commentId]);
+          mutate(["/api/comment-reply/get-comment-reply", commentId]);
           showToast({
             title: "Success",
             description: "Your reply has been deleted",
@@ -92,10 +101,16 @@ export const replyCommentStore = create<ReplyCommentAction>(() => ({
     },
     updateReplyComment: async (replyComment, showToast) => {
       try {
-        const res = await axios.put("/api/update-reply-comment", replyComment);
+        const res = await axios.put(
+          "/api/comment-reply/update-comment-reply",
+          replyComment
+        );
 
         if (res.status === 200) {
-          mutate(["/api/get-reply-comment", replyComment.comment_id]);
+          mutate([
+            "/api/comment-reply/get-comment-reply",
+            replyComment.comment_id,
+          ]);
           showToast({
             title: "Success",
             description: "Your reply has been updated",

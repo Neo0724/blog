@@ -48,16 +48,16 @@ export default function usePost(
   let apiUrl = "";
   switch (searchPostType) {
     case 1:
-      apiUrl = "/api/get-own-post";
+      apiUrl = "/api/post/get-own-post";
       break;
     case 2:
-      apiUrl = "/api/get-all-post";
+      apiUrl = "/api/post/get-all-post";
       break;
     case 3:
-      apiUrl = "/api/get-search-post";
+      apiUrl = "/api/post/get-search-post";
       break;
     case 4:
-      apiUrl = "/api/get-favourite-post";
+      apiUrl = "/api/post/get-favourite-post";
       break;
   }
 

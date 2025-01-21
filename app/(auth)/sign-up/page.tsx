@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useState } from "react";
-import { SignUpSchema } from "@/app/api/sign-up/route";
+import { SignUpSchema } from "@/app/api/auth/sign-up/route";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,7 @@ const SignUpPage = () => {
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
-      await axios.post("api/sign-up", formData);
+      await axios.post("api/auth/sign-up", formData);
       setToastMessage({ msg: "Sign up successful!", error: false });
       await waitClearToast;
       router.push("/sign-in");

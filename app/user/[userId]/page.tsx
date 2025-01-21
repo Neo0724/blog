@@ -1,7 +1,7 @@
 import { SearchPostType } from "@/app/post/_component/Enum";
 import GetPost from "@/app/post/_component/GetPost";
-import { FollowerTab } from "@/app/_components/FollowerTab";
-import { FollowingTab } from "@/app/_components/FollowingTab";
+import { FollowerTab } from "@/app/_components/userRelationship/FollowerTab";
+import { FollowingTab } from "@/app/_components/userRelationship/FollowingTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function UserPage({ params }: { params: { userId: string } }) {

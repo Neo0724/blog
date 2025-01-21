@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { UserType } from "../GetPost";
 import { z } from "zod";
-import { CommentSchema } from "@/app/api/create-comment/route";
+import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import { ToastProp } from "./postStore";
 import axios from "axios";
 import { mutate } from "swr";
@@ -22,13 +22,13 @@ type CommentAction = {
     updateComments: (
       commentId: string,
       updatedComments: CommentType,
-      showToast: ({ title, description }: ToastProp) => void,
+      showToast: ({ title, description }: ToastProp) => void
     ) => Promise<void>;
     deleteComments: (
       commentId: string,
       postId: string,
       userId: string,
-      showToast: ({ title, description }: ToastProp) => void,
+      showToast: ({ title, description }: ToastProp) => void
     ) => Promise<void>;
     createComment: (
       newComment: CommentType,
@@ -36,7 +36,7 @@ type CommentAction = {
         content: string;
         post_id: string;
         user_id: string;
-      }>,
+      }>
     ) => Promise<string>;
   };
 };
@@ -46,7 +46,7 @@ export const commentStore = create<CommentAction>(() => ({
     updateComments: async (
       commentId,
       updatedComments,
-      showToast: ({ title, description }: ToastProp) => void,
+      showToast: ({ title, description }: ToastProp) => void
     ) => {
       try {
         const updatedCommentsWithId = {
@@ -54,13 +54,13 @@ export const commentStore = create<CommentAction>(() => ({
           comment_id: commentId,
         };
         const res = await axios.put(
-          "/api/update-comment",
-          updatedCommentsWithId,
+          "/api/comment/update-comment",
+          updatedCommentsWithId
         );
 
         if (res.status === 200) {
           mutate([
-            "/api/get-comment",
+            "/api/comment/get-comment",
             updatedComments.post_id,
             updatedComments.user_id,
           ]);
@@ -87,17 +87,17 @@ export const commentStore = create<CommentAction>(() => ({
       commentId,
       postId,
       userId,
-      showToast: ({ title, description }: ToastProp) => void,
+      showToast: ({ title, description }: ToastProp) => void
     ) => {
       try {
-        const res = await axios.delete("/api/delete-comment", {
+        const res = await axios.delete("/api/comment/delete-comment", {
           params: {
             comment_id: commentId,
           },
         });
 
         if (res.status === 200) {
-          mutate(["/api/get-comment", postId, userId]);
+          mutate(["/api/comment/get-comment", postId, userId]);
           showToast({
             title: "Success",
             description: "Comment has deleted successfully",
@@ -120,10 +120,17 @@ export const commentStore = create<CommentAction>(() => ({
     createComment: async (newComment, form) => {
       let commentId = "";
       try {
-        const response = await axios.post("/api/create-comment", newComment);
+        const response = await axios.post(
+          "/api/comment/create-comment",
+          newComment
+        );
 
         if (response.status === 200) {
-          mutate(["/api/get-comment", newComment.post_id, newComment.user_id]);
+          mutate([
+            "/api/comment/get-comment",
+            newComment.post_id,
+            newComment.user_id,
+          ]);
           form.reset({ ...newComment, content: "" });
           commentId = response.data.comment_id;
         }

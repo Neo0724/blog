@@ -38,7 +38,7 @@ export default function useComment(post_id: string, userId: string | null) {
   };
 
   const { data, isLoading, error } = useSWR(
-    ["/api/get-comment", post_id, userId],
+    ["/api/comment/get-comment", post_id, userId],
     ([url, post_id, userId]) => getComment(url, post_id, userId)
   );
 

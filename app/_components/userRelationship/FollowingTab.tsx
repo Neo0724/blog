@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { useFollowing } from "../post/_component/_custom_hook/useFollowingHook";
+import { useFollowing } from "../../post/_component/_custom_hook/useFollowingHook";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
@@ -76,7 +76,7 @@ export function FollowingTab({ userId }: FollowingTabProps) {
   }
 
   useEffect(() => {
-    mutate(["/api/get-following", userId]);
+    mutate(["/api/user-relation/get-following", userId]);
   }, [newSearchVal, userId]);
 
   return (

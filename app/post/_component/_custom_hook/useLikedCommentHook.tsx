@@ -36,7 +36,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
   };
 
   const { data, error, isLoading } = useSWR(
-    [user_id ? "/api/get-liked-comment" : null, user_id, post_id],
+    [user_id ? "/api/comment/get-liked-comment" : null, user_id, post_id],
     ([url, user_id, post_id]) => fetchData(url, user_id, post_id)
   );
 

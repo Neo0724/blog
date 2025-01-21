@@ -24,12 +24,15 @@ export default function useLikedReplyComment(
     let returnedLikedReplyComment: GetBackLikedReplyCommentType[] | [] = [];
 
     try {
-      const response = await axios.get("/api/get-liked-replycomment", {
-        params: {
-          comment_id: comment_id,
-          user_id: user_id,
-        },
-      });
+      const response = await axios.get(
+        "/api/comment-reply/get-liked-comment-reply",
+        {
+          params: {
+            comment_id: comment_id,
+            user_id: user_id,
+          },
+        }
+      );
 
       if (response.status === 200) {
         returnedLikedReplyComment = response.data;
@@ -42,7 +45,11 @@ export default function useLikedReplyComment(
   };
 
   const { data, error, isLoading } = useSwr(
-    [user_id ? "/api/get-liked-replycomment" : null, user_id, comment_id],
+    [
+      user_id ? "/api/comment-reply/get-liked-comment-reply" : null,
+      user_id,
+      comment_id,
+    ],
     ([url, user_id, comment_id]) =>
       fetchLikedReplyComment(url, user_id, comment_id)
   );

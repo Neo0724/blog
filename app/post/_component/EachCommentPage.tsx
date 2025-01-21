@@ -32,7 +32,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useStore } from "zustand";
 import { commentStore, CommentType } from "./_store/commentStore";
-import { CommentSchema } from "@/app/api/create-comment/route";
+import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import { Form } from "@/components/ui/form";
 import { useLikeCommentCount } from "./_custom_hook/useLikedCommentCountHook";
 import { NotificationType } from "./Enum";

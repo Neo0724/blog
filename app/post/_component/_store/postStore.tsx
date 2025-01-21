@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { CreatePostFormType } from "../CreatePost";
+import { CreatePostFormType } from "../CreatePostPage";
 import { mutate } from "swr";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch } from "react";
@@ -48,7 +48,7 @@ export const postStore = create<PostAction>(() => ({
     // Action to update post
     updatePosts: async (postId, updatedPost, url, showToast) => {
       try {
-        const res = await axios.put("/api/update-post", {
+        const res = await axios.put("/api/post/update-post", {
           ...updatedPost,
           postId: postId,
         });
@@ -78,7 +78,7 @@ export const postStore = create<PostAction>(() => ({
     // Action to delete post
     deletePosts: async (postId, url, showToast) => {
       try {
-        const res = await axios.delete("/api/delete-post", {
+        const res = await axios.delete("/api/post/delete-post", {
           params: {
             post_id: postId,
           },
@@ -110,7 +110,10 @@ export const postStore = create<PostAction>(() => ({
       const newPostWithUserId = { ...newPost, user_id: userId };
       let newPostId = "";
       try {
-        const res = await axios.post("/api/create-post", newPostWithUserId);
+        const res = await axios.post(
+          "/api/post/create-post",
+          newPostWithUserId
+        );
 
         if (res.status === 200) {
           showToast({

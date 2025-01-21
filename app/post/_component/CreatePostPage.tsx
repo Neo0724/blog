@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreatePostFormSchema } from "@/app/api/create-post/route";
+import { CreatePostFormSchema } from "@/app/api/post/create-post/route";
 
 import {
   Form,
@@ -59,7 +59,7 @@ export default function CreatePost({
       form,
       setError,
       userId,
-      fetchUrl,
+      fetchUrl
     );
     addNotification({
       fromUserId: userId ?? "",

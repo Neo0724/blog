@@ -37,8 +37,9 @@ const fetchFollowing = async (
 
 export const useFollowing = (ownerId: string, queryUsername = "") => {
   const { data, isLoading, error, isValidating } = useSWR(
-    ownerId ? ["/api/get-following", ownerId] : null,
-    () => fetchFollowing("/api/get-following", ownerId, queryUsername)
+    ownerId ? ["/api/user-relation/get-following", ownerId] : null,
+    () =>
+      fetchFollowing("/api/user-relation/get-following", ownerId, queryUsername)
   );
 
   const actions = useStore(followingStore, (state) => state.actions);

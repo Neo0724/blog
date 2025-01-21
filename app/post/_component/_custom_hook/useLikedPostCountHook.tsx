@@ -22,8 +22,8 @@ const fetchPostLikeCount = async (
 };
 
 export const useLikedPostCount = (postId: string) => {
-  const { data } = useSWR(["/api/count-like-post", postId], () =>
-    fetchPostLikeCount("/api/count-like-post", postId)
+  const { data } = useSWR(["/api/post/count-like-post", postId], () =>
+    fetchPostLikeCount("/api/post/count-like-post", postId)
   );
 
   return data;

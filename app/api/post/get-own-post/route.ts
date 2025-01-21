@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getDateDifference } from "@/app/(util)/getDateDifference";
+import { getDateDifference } from "@/app/_util/getDateDifference";
 export const GET = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 

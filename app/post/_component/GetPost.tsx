@@ -5,7 +5,7 @@ import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
 import usePost from "./_custom_hook/usePostHook";
 import { Skeleton } from "@/components/ui/skeleton";
-import CreatePost from "./CreatePost";
+import CreatePost from "./CreatePostPage";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
 export type UserType = {
@@ -24,22 +24,22 @@ export type PostType = {
 
 export type GetPostProps =
   | {
-    searchPostType: SearchPostType.ALL_POST;
-    searchText?: string;
-    userId?: string;
-  }
+      searchPostType: SearchPostType.ALL_POST;
+      searchText?: string;
+      userId?: string;
+    }
   | {
-    searchPostType: SearchPostType.SEARCH_POST;
-    searchText: string;
-    userId?: string;
-  }
+      searchPostType: SearchPostType.SEARCH_POST;
+      searchText: string;
+      userId?: string;
+    }
   | {
-    searchPostType:
-    | SearchPostType.USER_POST
-    | SearchPostType.USER_FAVOURITE_POST;
-    searchText?: string;
-    userId: string;
-  };
+      searchPostType:
+        | SearchPostType.USER_POST
+        | SearchPostType.USER_FAVOURITE_POST;
+      searchText?: string;
+      userId: string;
+    };
 
 const ShowSkeleton = () => {
   return (

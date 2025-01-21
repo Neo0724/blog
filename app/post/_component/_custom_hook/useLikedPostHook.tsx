@@ -34,7 +34,7 @@ export default function useLikedPost(user_id: string | null) {
   };
 
   const { data, error, isLoading } = useSWR(
-    [user_id ? "/api/get-like-post" : null, user_id],
+    [user_id ? "/api/post/get-like-post" : null, user_id],
     ([url, user_id]) => fetchData(url, user_id)
   );
 

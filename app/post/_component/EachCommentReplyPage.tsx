@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import {
   UpdateReplyCommentSchema,
   UpdateReplyCommentType,
-} from "@/app/api/update-reply-comment/route";
+} from "@/app/api/comment-reply/update-comment-reply/route";
 import {
   Dialog,
   DialogClose,

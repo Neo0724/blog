@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getDateDifference } from "@/app/(util)/getDateDifference";
+import { getDateDifference } from "@/app/_util/getDateDifference";
 
 const prisma = new PrismaClient();
 

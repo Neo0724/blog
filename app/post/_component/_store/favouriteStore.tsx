@@ -24,7 +24,7 @@ export const favouriteStore = create<FavouriteActions>(() => ({
   actions: {
     addToFavourite: async (userId, postId, setIsFavourited, showToast) => {
       try {
-        const res = await axios.post("/api/add-favourite-post", {
+        const res = await axios.post("/api/post/add-favourite-post", {
           user_id: userId,
           post_id: postId,
         });
@@ -49,7 +49,7 @@ export const favouriteStore = create<FavouriteActions>(() => ({
       showToast
     ) => {
       try {
-        const res = await axios.delete("/api/delete-favourite-post", {
+        const res = await axios.delete("/api/post/delete-favourite-post", {
           params: {
             user_id: userId,
             post_id: postId,

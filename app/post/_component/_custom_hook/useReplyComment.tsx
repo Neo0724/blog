@@ -37,7 +37,7 @@ export default function useReplyComment(comment_id: string) {
   };
 
   const { data, isLoading, error } = useSWR(
-    ["/api/get-reply-comment", comment_id],
+    ["/api/comment-reply/get-comment-reply", comment_id],
     ([url, comment_id]) => getReplyComment(url, comment_id)
   );
 

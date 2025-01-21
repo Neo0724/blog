@@ -24,13 +24,13 @@ export const likedCommentStore = create<LikedCommentAction>(() => ({
   actions: {
     addLikeComment: async (userId, commentId, setIsLiked, showToast) => {
       try {
-        const res = await axios.post("/api/add-like-comment", {
+        const res = await axios.post("/api/comment/add-like-comment", {
           user_id: userId,
           comment_id: commentId,
         });
 
         if (res.status === 200) {
-          mutate(["/api/count-like-comment", commentId]);
+          mutate(["/api/comment/count-like-comment", commentId]);
           setIsLiked(true);
         }
       } catch (error) {
@@ -44,7 +44,7 @@ export const likedCommentStore = create<LikedCommentAction>(() => ({
     },
     removeLikeComment: async (userId, commentId, setIsLiked, showToast) => {
       try {
-        const res = await axios.delete("/api/delete-like-comment", {
+        const res = await axios.delete("/api/comment/delete-like-comment", {
           params: {
             user_id: userId,
             comment_id: commentId,
@@ -52,7 +52,7 @@ export const likedCommentStore = create<LikedCommentAction>(() => ({
         });
 
         if (res.status === 200) {
-          mutate(["/api/count-like-comment", commentId]);
+          mutate(["/api/comment/count-like-comment", commentId]);
           console.log("Deleted successfully");
           setIsLiked(false);
         }

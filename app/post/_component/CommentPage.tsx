@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { MdOutlineHeartBroken } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { CommentSchema } from "@/app/api/create-comment/route";
+import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import useNotification from "./_custom_hook/useNotificationHook";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,7 +31,7 @@ import { commentStore, CommentType } from "./_store/commentStore";
 import { useStore } from "zustand";
 import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 import { useFollowing } from "./_custom_hook/useFollowingHook";
-import { getDateDifference } from "@/app/(util)/getDateDifference";
+import { getDateDifference } from "@/app/_util/getDateDifference";
 import { NotificationType } from "./Enum";
 
 // The dialog when the user clicked on the "Comment" button, each comments in the dialog will be shown

@@ -34,7 +34,7 @@ export default function useFavourite(userId: string | null) {
     }
   };
   const { data, isLoading, error } = useSWR(
-    [userId ? "/api/get-favourite-post" : null, userId],
+    [userId ? "/api/post/get-favourite-post" : null, userId],
     ([url, userId]) => fetchData(url, userId)
   );
 

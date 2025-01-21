@@ -24,8 +24,8 @@ const fetchCommentLikeCount = async (
 };
 
 export const useLikeCommentCount = (commentId: string) => {
-  const { data } = useSWR(["/api/count-like-comment", commentId], () =>
-    fetchCommentLikeCount("/api/count-like-comment", commentId)
+  const { data } = useSWR(["/api/comment/count-like-comment", commentId], () =>
+    fetchCommentLikeCount("/api/comment/count-like-comment", commentId)
   );
 
   return data;

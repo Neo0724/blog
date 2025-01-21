@@ -35,7 +35,10 @@ export const likedCommentReplyStore = create<LikedCommentReplyAction>(() => ({
         });
 
         if (res.status === 200) {
-          mutate(["/api/count-like-replycomment", commentReplyId]);
+          mutate([
+            "/api/comment-reply/count-like-comment-reply",
+            commentReplyId,
+          ]);
           setIsLiked(true);
         }
       } catch (error) {
@@ -54,15 +57,21 @@ export const likedCommentReplyStore = create<LikedCommentReplyAction>(() => ({
       showToast
     ) => {
       try {
-        const res = await axios.delete("/api/delete-like-replycomment", {
-          params: {
-            user_id: userId,
-            comment_reply_id: commentReplyId,
-          },
-        });
+        const res = await axios.delete(
+          "/api/comment-reply/delete-like-comment-reply",
+          {
+            params: {
+              user_id: userId,
+              comment_reply_id: commentReplyId,
+            },
+          }
+        );
 
         if (res.status === 200) {
-          mutate(["/api/count-like-replycomment", commentReplyId]);
+          mutate([
+            "/api/comment-reply/count-like-comment-reply",
+            commentReplyId,
+          ]);
           setIsLiked(false);
         }
       } catch (err) {

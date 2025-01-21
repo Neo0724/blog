@@ -24,13 +24,13 @@ export const likedPostStore = create<LikedPostAction>(() => ({
   actions: {
     addLikePost: async (userId, postId, setIsLiked, showToast) => {
       try {
-        const res = await axios.post("/api/add-like-post", {
+        const res = await axios.post("/api/post/add-like-post", {
           user_id: userId,
           post_id: postId,
         });
 
         if (res.status === 200) {
-          mutate(["/api/count-like-post", postId]);
+          mutate(["/api/post/count-like-post", postId]);
           setIsLiked(true);
         }
       } catch (err) {
@@ -44,7 +44,7 @@ export const likedPostStore = create<LikedPostAction>(() => ({
     },
     removeLikePost: async (userId, postId, setIsLiked, showToast) => {
       try {
-        const res = await axios.delete("/api/delete-like-post", {
+        const res = await axios.delete("/api/post/delete-like-post", {
           params: {
             user_id: userId,
             post_id: postId,
@@ -52,7 +52,7 @@ export const likedPostStore = create<LikedPostAction>(() => ({
         });
 
         if (res.status === 200) {
-          mutate(["/api/count-like-post", postId]);
+          mutate(["/api/post/count-like-post", postId]);
           setIsLiked(false);
         }
       } catch (err) {

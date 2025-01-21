@@ -1,7 +1,7 @@
 import React from "react";
 import { NavItemsType } from "./Navbar";
 import Navitem from "./Navitem";
-import SignOut from "../(auth)/sign-in/_components/SignOut";
+import SignOut from "./SignOut";
 import SearchBar from "./searchBar";
 
 export default function NavDesktop({ navItems }: { navItems: NavItemsType[] }) {

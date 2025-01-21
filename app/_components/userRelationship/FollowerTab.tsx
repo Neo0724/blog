@@ -1,5 +1,5 @@
 "use client";
-import { useFollower } from "../post/_component/_custom_hook/useFollowerHook";
+import { useFollower } from "../../post/_component/_custom_hook/useFollowerHook";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useState, useEffect, SVGProps } from "react";
@@ -78,7 +78,7 @@ export function FollowerTab({ userId }: FollowerTabProps) {
   };
 
   useEffect(() => {
-    mutate(["/api/get-follower", userId]);
+    mutate(["/api/user-relation/get-follower", userId]);
   }, [newSearchVal, userId]);
 
   return (

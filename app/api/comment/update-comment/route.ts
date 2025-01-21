@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
 export async function PUT(request: NextRequest) {
   const { comment_id, content } = await request.json();

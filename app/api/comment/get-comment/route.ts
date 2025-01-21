@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getDateDifference } from "@/app/(util)/getDateDifference";
+import { getDateDifference } from "@/app/_util/getDateDifference";
 
 export async function GET(request: NextRequest) {
   const post_id = request.nextUrl.searchParams.get("post_id");
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 }

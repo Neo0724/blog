@@ -22,13 +22,13 @@ export const followingStore = create<FollowingAction>(() => ({
   actions: {
     addFollowing: async (ownerId, targetId, showToast) => {
       try {
-        const res = await axios.post("/api/add-following", {
+        const res = await axios.post("/api/user-relation/add-following", {
           ownerId,
           targetId,
         });
 
         if (res.status === 200) {
-          mutate(["/api/get-following", ownerId]);
+          mutate(["/api/user-relation/get-following", ownerId]);
         } else {
           showToast({
             title: "Error",
@@ -44,14 +44,14 @@ export const followingStore = create<FollowingAction>(() => ({
     },
     removeFollowing: async (ownerId, targetId, showToast) => {
       try {
-        const res = await axios.delete("/api/delete-following", {
+        const res = await axios.delete("/api/user-relation/delete-following", {
           params: {
             owner_id: ownerId,
             target_id: targetId,
           },
         });
         if (res.status === 200) {
-          mutate(["/api/get-following", ownerId]);
+          mutate(["/api/user-relation/get-following", ownerId]);
         } else {
           showToast({
             title: "Error",

@@ -24,10 +24,10 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { CreatePostFormType } from "./CreatePost";
+import { CreatePostFormType } from "./CreatePostPage";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreatePostFormSchema } from "@/app/api/create-post/route";
+import { CreatePostFormSchema } from "@/app/api/post/create-post/route";
 import { useStore } from "zustand";
 import { postStore } from "./_store/postStore";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,13 +37,13 @@ let fetchUrl: string;
 let currentUrl = window.location.href;
 
 if (currentUrl.match("all-posts")) {
-  fetchUrl = "/api/get-all-post";
+  fetchUrl = "/api/post/get-all-post";
 } else if (currentUrl.match("user")) {
-  fetchUrl = "/api/get-own-post";
+  fetchUrl = "/api/post/get-own-post";
 } else if (currentUrl.match("favourite-post")) {
-  fetchUrl = "/api/get-favourite-post";
+  fetchUrl = "/api/post/get-favourite-post";
 } else if (currentUrl.match("search-post")) {
-  fetchUrl = "/api/get-search-post";
+  fetchUrl = "/api/post/get-search-post";
 }
 
 function EditPostDialog({

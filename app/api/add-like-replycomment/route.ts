@@ -25,12 +25,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { likedCommentReply: returnedLikedCommentReply },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 },
+      { status: 500 }
     );
   }
 }

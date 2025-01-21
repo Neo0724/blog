@@ -14,13 +14,13 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json(
       { deletedCommentReply: deletedCommentReply },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.log(error);
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 },
+      { status: 500 }
     );
   }
 }

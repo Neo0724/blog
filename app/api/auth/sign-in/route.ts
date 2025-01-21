@@ -22,12 +22,12 @@ export const POST = async (request: NextRequest) => {
   if (userExist) {
     return NextResponse.json(
       { username: userExist.name, user_id: userExist.user_id },
-      { status: 200 },
+      { status: 200 }
     );
   }
 
   return NextResponse.json(
     { error: "Invalid email or password" },
-    { status: 400 },
+    { status: 500 }
   );
 };

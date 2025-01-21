@@ -22,12 +22,12 @@ export async function POST(request: NextRequest) {
   });
 
   if (userExisted) {
-    return NextResponse.json({ error: "User Existed" }, { status: 400 });
+    return NextResponse.json({ error: "User Existed" }, { status: 500 });
   }
 
   if (!validation.success) {
     return NextResponse.json(validation.error.issues[0].message, {
-      status: 400,
+      status: 500,
     });
   }
 

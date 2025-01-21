@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(allNotification ?? [], { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "An unexpected error occur!" },
-      { status: 400 }
+      { error: "Failed to fetch the notifications. Please try again later" },
+      { status: 500 }
     );
   }
 }

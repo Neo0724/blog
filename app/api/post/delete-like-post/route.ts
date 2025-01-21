@@ -23,18 +23,18 @@ export async function DELETE(request: NextRequest) {
             Post_post_id: post_id as string,
           },
         }),
-      ],
+      ]
     );
 
     return NextResponse.json(
       { totalPostLikeCount: totalPostLikeCount },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.log(error);
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 },
+      { status: 500 }
     );
   }
 }

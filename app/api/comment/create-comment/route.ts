@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(validation.error, {
-        status: 400,
+        status: 500,
       });
     }
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     console.error(err);
     return NextResponse.json(
       { error: "Unexpected error occured" },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

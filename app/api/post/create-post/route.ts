@@ -20,7 +20,7 @@ export const POST = async (request: NextRequest) => {
 
     if (!validation.success) {
       return NextResponse.json(validation.error.issues[0].message, {
-        status: 400,
+        status: 500,
       });
     }
 
@@ -46,7 +46,7 @@ export const POST = async (request: NextRequest) => {
     console.error(err);
     return NextResponse.json(
       { error: "Unexpected error occured" },
-      { status: 400 }
+      { status: 500 }
     );
   }
 };

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     console.log(error);
     return NextResponse.json(
       { error: "An unexpected error occur!" },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

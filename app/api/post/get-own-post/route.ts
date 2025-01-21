@@ -37,6 +37,9 @@ export const GET = async (req: NextRequest) => {
 
     return NextResponse.json(userPostsWithDateDiff ?? [], { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Internal Error" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Failed to fetch the user post. Please try again later" },
+      { status: 500 }
+    );
   }
 };

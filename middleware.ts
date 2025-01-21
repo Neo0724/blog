@@ -7,18 +7,19 @@ export function middleware(request: NextRequest) {
   console.log(request.nextUrl.pathname);
 
   if (!cookie || cookie?.value === "") {
-    if (request.nextUrl.pathname.startsWith("/favourite-post")) {
+    if (request.nextUrl.pathname.startsWith("/post/favourite-post")) {
       return NextResponse.redirect(
-        new URL("/sign-in?redirectUrl=favourite-post", request.url)
+        new URL("/sign-in?redirectUrl=post/favourite-post", request.url)
       );
     }
   }
 
-  if (request.nextUrl.pathname.startsWith("/")) {
+  if (request.nextUrl.pathname === "/") {
+    console.log("Inside next middleware");
     return NextResponse.redirect(new URL("/post/all-posts", request.url));
   }
 }
 
 export const config = {
-  matcher: ["/favourite-post/:userId*", "/"],
+  matcher: ["/post/favourite-post/:userId*", "/"],
 };

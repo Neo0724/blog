@@ -4,9 +4,9 @@ import React from "react";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "./Enum";
 import usePost from "./_custom_hook/usePostHook";
-import { Skeleton } from "@/components/ui/skeleton";
 import CreatePost from "./CreatePostPage";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import PostSkeleton from "./PostSkeleton";
 
 export type UserType = {
   user_id: string;
@@ -41,61 +41,6 @@ export type GetPostProps =
       userId: string;
     };
 
-const ShowSkeleton = () => {
-  return (
-    <div className="flex flex-col items-center">
-      {/* First  */}
-      <div className="max-w-[800px] w-full flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-[250px] h-6" />
-          <Skeleton className="w-9 h-9 ml-auto rounded-full" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Skeleton className="w-[50px] h-6" />
-          <Skeleton className="w-[200px] h-6" />
-          <div className="flex gap-3">
-            <Skeleton className="w-[70px] h-6" />
-            <Skeleton className="w-[70px] h-6" />
-            <Skeleton className="w-[70px] h-6" />
-          </div>
-        </div>
-      </div>
-      {/* Second  */}
-      <div className="max-w-[800px] w-full flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-[250px] h-6" />
-          <Skeleton className="w-9 h-9 ml-auto rounded-full" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Skeleton className="w-[50px] h-6" />
-          <Skeleton className="w-[200px] h-6" />
-          <div className="flex gap-3">
-            <Skeleton className="w-[70px] h-6" />
-            <Skeleton className="w-[70px] h-6" />
-            <Skeleton className="w-[70px] h-6" />
-          </div>
-        </div>
-      </div>
-      {/* Third  */}
-      <div className="max-w-[800px] w-full flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-[250px] h-6" />
-          <Skeleton className="w-9 h-9 ml-auto rounded-full" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Skeleton className="w-[50px] h-6" />
-          <Skeleton className="w-[200px] h-6" />
-          <div className="flex gap-3">
-            <Skeleton className="w-[70px] h-6" />
-            <Skeleton className="w-[70px] h-6" />
-            <Skeleton className="w-[70px] h-6" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default function GetPost({
   searchPostType,
   searchText,
@@ -115,10 +60,9 @@ export default function GetPost({
           userId={userId}
         />
       )}
-      {isLoading && <ShowSkeleton />}
+      {isLoading && <PostSkeleton />}
       {!isLoading &&
         yourPosts &&
-        yourPosts.length > 0 &&
         yourPosts.map((post: PostType) => {
           return (
             <div key={post.post_id}>

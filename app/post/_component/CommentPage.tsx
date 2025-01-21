@@ -21,7 +21,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import useComment from "./_custom_hook/useCommentHook";
 import EachCommentPage from "./EachCommentPage";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
 import { BiLike } from "react-icons/bi";
 import { IoIosHeartEmpty } from "react-icons/io";
@@ -31,8 +31,9 @@ import { commentStore, CommentType } from "./_store/commentStore";
 import { useStore } from "zustand";
 import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 import { useFollowing } from "./_custom_hook/useFollowingHook";
-import { getDateDifference } from "@/app/_util/getDateDifference";
+import { getReadableDate } from "@/app/_util/getReadableDate";
 import { NotificationType } from "./Enum";
+import { useEffect, useState } from "react";
 
 // The dialog when the user clicked on the "Comment" button, each comments in the dialog will be shown
 // in the EachCommentPage component
@@ -63,6 +64,11 @@ export default function CommentPage({
 }) {
   const router = useRouter();
   const { toast } = useToast();
+
+  // Use to search for specific comment id if user came from notification
+  const searchParams = useSearchParams();
+  // Has to open the dialog if user is coming from notification and wants to view specific comment
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [userId, _] = useLocalStorage<string>("test-userId");
   const { comments, isLoading } = useComment(postId, userId ?? null);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");
@@ -95,7 +101,10 @@ export default function CommentPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>
@@ -138,7 +147,10 @@ export default function CommentPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>
@@ -161,51 +173,22 @@ export default function CommentPage({
     }
   };
 
-  const getReadableDate = (date: string): string => {
-    let splittedDate = date.split("T")[0].split("-");
-    const curYear = new Date().getFullYear().toString();
-
-    /* 
-      If the year is same with the current year,
-      display the gap between
-     */
-    if (splittedDate[0] === curYear) {
-      return getDateDifference(new Date(date));
-    }
-
-    const dateMap = new Map([
-      [1, "January"],
-      [2, "February"],
-      [3, "March"],
-      [4, "April"],
-      [5, "May"],
-      [6, "June"],
-      [7, "July"],
-      [8, "August"],
-      [9, "September"],
-      [10, "October"],
-      [11, "November"],
-      [12, "December"],
-    ]);
-
-    splittedDate[1] = dateMap
-      .get(parseInt(splittedDate[1]))
-      ?.toString() as string;
-
-    /* 
-      Display the actual date when the year is different from 
-      current year
-    */
-    return splittedDate.reverse().join(" ");
-  };
-
   function handleAuthorProfileNavigation(user_id: string): void {
     router.push(`/user/${user_id}`);
   }
 
+  // Set dialog to open if user came from notification to view specific comment
+  useEffect(() => {
+    if (searchParams.get("commentId")) {
+      setDialogOpen(true);
+    } else {
+      setDialogOpen(false);
+    }
+  }, [searchParams.get("commentId")]);
+
   return (
     <>
-      <Dialog>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
           <Button
             variant="ghost"

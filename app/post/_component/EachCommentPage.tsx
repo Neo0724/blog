@@ -139,7 +139,7 @@ export default function EachCommentPage({
   authorId: string;
   dateDifferent: string;
 }) {
-  // TODO Move the total like to a useSwr function and zustand to have the add and remove method
+  // TODO Scroll user into the specific comment id viewport if user came from notification. Use search params to get the comment id
   const router = useRouter();
   const viewRepliesRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
@@ -210,7 +210,10 @@ export default function EachCommentPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>
@@ -240,7 +243,10 @@ export default function EachCommentPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>

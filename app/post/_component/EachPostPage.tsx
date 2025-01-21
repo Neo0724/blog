@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import React from "react";
 import CommentPage from "./CommentPage";
@@ -8,7 +10,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { useState, useEffect } from "react";
 import useLikedPost from "./_custom_hook/useLikedPostHook";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
 import { IoIosHeartEmpty } from "react-icons/io";
 import useFavourite from "./_custom_hook/useFavouriteHook";
@@ -16,7 +18,6 @@ import { MdOutlineHeartBroken } from "react-icons/md";
 import { useLikedPostCount } from "./_custom_hook/useLikedPostCountHook";
 import { useStore } from "zustand";
 import { likedPostStore } from "./_store/likedPostStore";
-import { useFollower } from "./_custom_hook/useFollowerHook";
 import { useFollowing } from "./_custom_hook/useFollowingHook";
 import { cn } from "@/lib/utils";
 import useNotification from "./_custom_hook/useNotificationHook";
@@ -77,7 +78,10 @@ export default function EachPostPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>
@@ -122,7 +126,10 @@ export default function EachPostPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>
@@ -170,7 +177,10 @@ export default function EachPostPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>

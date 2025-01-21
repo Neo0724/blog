@@ -165,7 +165,10 @@ export default function EachCommentReplyPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>
@@ -233,7 +236,10 @@ export default function EachCommentReplyPage({
         action: (
           <ToastAction
             altText="Sign in now"
-            onClick={() => router.push("sign-in")}
+            onClick={() => {
+              window.history.replaceState(null, "", "/sign-in");
+              window.location.reload();
+            }}
           >
             Sign in
           </ToastAction>

@@ -26,10 +26,10 @@ export default function UserPage({ params }: { params: { userId: string } }) {
           />
         </TabsContent>
         <TabsContent value="follower">
-          <FollowerTab userId={params.userId} />
+          <FollowerTab pageOwnerUserId={params.userId} />
         </TabsContent>
         <TabsContent value="following">
-          <FollowingTab userId={params.userId} />
+          <FollowingTab pageOwnerUserId={params.userId} />
         </TabsContent>
       </Tabs>
     </div>

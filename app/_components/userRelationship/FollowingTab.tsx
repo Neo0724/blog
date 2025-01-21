@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import { ToastAction } from "@/components/ui/toast";
 
 type FollowingTabProps = {
-  userId: string;
+  pageOwnerUserId: string;
 };
 
 const ShowSkeleton = () => {
@@ -62,22 +64,34 @@ const useSearchDebounce = (searchValue: string, delay: number) => {
   return debouncedValue;
 };
 
-export function FollowingTab({ userId }: FollowingTabProps) {
+export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   const { toast } = useToast();
   const router = useRouter();
+  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   const [searchUsername, setSearchUsername] = useState("");
-  const { allFollowing, removeFollowing, isLoading, isValidating } =
-    useFollowing(userId ?? "", searchUsername);
+  const newSearchVal = useSearchDebounce(searchUsername, 500);
 
-  const newSearchVal = useSearchDebounce(searchUsername, 1500);
+  // For the page owner
+  const {
+    allFollowing: pageOwnerFollowing,
+    isLoading,
+    isValidating,
+  } = useFollowing(pageOwnerUserId ?? "", searchUsername);
+
+  // For the currently logged in user
+  const {
+    allFollowing: loggedInFollowing,
+    removeFollowing: loggedInRemoveFollowing,
+    addFollowing: loggedInAddFollowing,
+  } = useFollowing(loggedInUserId ?? "");
 
   function handleAuthorProfileNavigation(user_id: string): void {
     router.push(`/user/${user_id}`);
   }
 
   useEffect(() => {
-    mutate(["/api/user-relation/get-following", userId]);
-  }, [newSearchVal, userId]);
+    mutate(["/api/user-relation/get-following", pageOwnerUserId]);
+  }, [newSearchVal, pageOwnerUserId]);
 
   return (
     <>
@@ -98,41 +112,89 @@ export function FollowingTab({ userId }: FollowingTabProps) {
         )}
       </div>
       {/* Following is fetching and loading */}
-      {userId && isLoading && <ShowSkeleton />}
-      {/* User has following and content has finished loading*/}
-      {userId &&
+      {pageOwnerUserId && isLoading && <ShowSkeleton />}
+      {/* Page owner has following and content has finished loading*/}
+      {pageOwnerUserId &&
         !isLoading &&
-        allFollowing &&
-        allFollowing.length > 0 &&
-        allFollowing?.map((following) => (
-          <div
-            key={following.createdAt}
-            className="flex justify-between items-center mb-3"
-          >
-            <Button
-              variant="link"
-              className="p-0 h-auto text-base leading-none"
-              onClick={() =>
-                handleAuthorProfileNavigation(following.UserFollowing.user_id)
-              }
+        pageOwnerFollowing &&
+        pageOwnerFollowing.length > 0 &&
+        pageOwnerFollowing?.map((ownerFollowing) => {
+          // Check if the current logged in user is following the current user
+          const currentUserIsFollowing = !loggedInUserId
+            ? false
+            : loggedInFollowing?.find(
+                (loggedInUserFollowing) =>
+                  loggedInUserFollowing.UserFollowing.user_id ===
+                  ownerFollowing.UserFollowing.user_id
+              );
+          return (
+            <div
+              key={ownerFollowing.createdAt}
+              className="flex justify-between items-center mb-3"
             >
-              {following.UserFollowing.name}
-            </Button>
-            <Button
-              variant="ghost"
-              className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
-              onClick={() =>
-                removeFollowing(userId, following.UserFollowing.user_id, toast)
-              }
-            >
-              Unfollow
-            </Button>
-          </div>
-        ))}
+              <Button
+                variant="link"
+                className="p-0 h-auto text-base leading-none"
+                onClick={() =>
+                  handleAuthorProfileNavigation(
+                    ownerFollowing.UserFollowing.user_id
+                  )
+                }
+              >
+                {ownerFollowing.UserFollowing.name}
+              </Button>
+              {/* We only care about the currently logged in user as they are the one who will be interacting with this follow and unfollow button*/}
+              <Button
+                variant="ghost"
+                className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
+                onClick={() => {
+                  // User is not logged in
+                  if (!loggedInUserId) {
+                    toast({
+                      title: "Error",
+                      description: "Please sign in to follow",
+                      action: (
+                        <ToastAction
+                          altText="Sign in now"
+                          onClick={() => router.push("sign-in")}
+                        >
+                          Sign in
+                        </ToastAction>
+                      ),
+                    });
+                    return;
+                  }
+
+                  // Current user is logged in
+                  // Remove the user from following
+                  if (currentUserIsFollowing) {
+                    loggedInRemoveFollowing(
+                      loggedInUserId,
+                      ownerFollowing.UserFollowing.user_id,
+                      toast
+                    );
+                  } else {
+                    // Add the current user to following
+                    loggedInAddFollowing(
+                      loggedInUserId,
+                      ownerFollowing.UserFollowing.user_id,
+                      toast
+                    );
+                  }
+                }}
+              >
+                {!currentUserIsFollowing || !loggedInUserId
+                  ? "Follow"
+                  : "Unfollow"}
+              </Button>
+            </div>
+          );
+        })}
       {/* Current user does not have followings */}
-      {userId && !isLoading && allFollowing && allFollowing.length === 0 && (
-        <div>No following</div>
-      )}
+      {pageOwnerUserId &&
+        !isLoading &&
+        pageOwnerFollowing &&
+        pageOwnerFollowing.length === 0 && <div>No following</div>}
     </>
   );
 }

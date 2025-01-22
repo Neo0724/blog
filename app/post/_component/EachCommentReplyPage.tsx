@@ -257,7 +257,7 @@ export default function EachCommentReplyPage({
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
-        {/* Delete comment reply button */}
+        {/* Delete and edit comment reply button */}
         {userId === user?.user_id && (
           <>
             <Button

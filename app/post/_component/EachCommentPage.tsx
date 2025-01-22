@@ -211,7 +211,7 @@ export default function EachCommentPage({
   useEffect(() => {
     const commentIdToScroll = searchParams.get("commentId");
 
-    if (commentId === commentIdToScroll) {
+    if (commentBoxRef.current && commentId === commentIdToScroll) {
       commentBoxRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
@@ -222,10 +222,13 @@ export default function EachCommentPage({
 
   // Open the view replies block when user came from notification and want to view specific comment reply
   useEffect(() => {
-    if (searchParams.get("commentReplyId")) {
+    if (
+      searchParams.get("commentReplyId") &&
+      commentId === searchParams.get("commentId")
+    ) {
       setViewReplies(true);
     }
-  }, [searchParams]);
+  }, [commentId, searchParams]);
 
   return (
     <div className="flex flex-col ml-[7px]" ref={commentBoxRef}>
@@ -328,7 +331,7 @@ export default function EachCommentPage({
 
         <div
           className={cn(
-            "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
+            "min-h-[150px] max-h-[350px] overflow-y-scroll",
             !viewReplies && "hidden"
           )}
           ref={viewRepliesRef}

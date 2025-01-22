@@ -31,7 +31,7 @@ const fetchNotification = async (
 
 export default function useNotification(userId: string) {
   const { data, isLoading, error } = useSWR(
-    userId ? ["notification", userId] : null,
+    userId ? "/api/notification/get-notification" : null,
     () => fetchNotification("/api/notification/get-notification", userId)
   );
   const actions = useStore(notificationStore, (state) => state.actions);

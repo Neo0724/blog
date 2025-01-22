@@ -2,6 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 import { NotificationType } from "../Enum";
 import { UserType } from "../GetPost";
+import { mutate } from "swr";
 
 type NewNotificationType = {
   targetUserId: string[];
@@ -16,13 +17,30 @@ type DeleteNotificationType = Omit<NewNotificationType, "targetUserId"> & {
 
 export type ReturnedNotificationType = {
   notification_id: string;
-  type: NotificationType;
-  resourceId: string;
   hasViewed: boolean;
   createdAt: string;
   TargetUser: UserType;
   FromUser: UserType;
-};
+} & (
+  | {
+      type: NotificationType.FOLLOW;
+      resource: { followerUserId: string };
+    }
+  | {
+      type: NotificationType.POST | NotificationType.LIKE_POST;
+      resource: { postId: string };
+    }
+  | {
+      type: NotificationType.COMMENT | NotificationType.LIKE_COMMENT;
+      resource: { postId: string; commentId: string };
+    }
+  | {
+      type:
+        | NotificationType.COMMENT_REPLY
+        | NotificationType.LIKE_REPLY_COMMENT;
+      resource: { postId: string; commentId: string; commentReplyId: string };
+    }
+);
 
 type NotificationAction = {
   actions: {
@@ -53,12 +71,12 @@ export const notificationStore = create<NotificationAction>(() => ({
     },
     readNotification: async (notificationId) => {
       try {
-        const res = await axios.patch("/api/notification/read-notification", {
+        const res = await axios.put("/api/notification/read-notification", {
           notification_id: notificationId,
         });
 
         if (res.status === 200) {
-          console.log("Read successful");
+          mutate("/api/notification/get-notification");
         }
       } catch (err) {
         console.log(err);

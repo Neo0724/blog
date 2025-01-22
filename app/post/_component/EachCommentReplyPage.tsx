@@ -10,118 +10,11 @@ import useLikedReplyComment from "./_custom_hook/useLikedReplyCommentHook";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {
-  UpdateReplyCommentSchema,
-  UpdateReplyCommentType,
-} from "@/app/api/comment-reply/update-comment-reply/route";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "@/components/ui/form";
-import { useStore } from "zustand";
-import { replyCommentStore, ReplyData } from "./_store/replyCommentStore";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLikedReplyCommentCount } from "./_custom_hook/useLikedReplyCommentCountHook";
 import useNotification from "./_custom_hook/useNotificationHook";
 import { NotificationType } from "./Enum";
-import useSWRMutation from "swr/mutation";
-import axios from "axios";
-
-function EditCommentDialog({
-  content,
-  commentReplyId,
-  commentId,
-}: {
-  content: string;
-  commentReplyId: string;
-  commentId: string;
-}) {
-  const { toast } = useToast();
-
-  const updateReplyComment = useStore(
-    replyCommentStore,
-    (state) => state.actions.updateReplyComment
-  );
-
-  const form = useForm<UpdateReplyCommentType>({
-    resolver: zodResolver(UpdateReplyCommentSchema),
-    defaultValues: {
-      content,
-      comment_reply_id: commentReplyId,
-      comment_id: commentId,
-    },
-  });
-
-  const onSubmit = (formData: UpdateReplyCommentType) => {
-    updateReplyComment(formData, toast);
-  };
-
-  const onInvalid = () => {
-    console.log("Invalid");
-  };
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <span className="hover:opacity-75 flex gap-3 items-center transition-opacity duration-150 justify-left">
-          Edit
-        </span>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Editing comment</DialogTitle>
-          <DialogDescription>
-            Make changes to your comment here. Click save when you are done.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4 justify-items-center">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-              className="flex flex-col min-w-[25%] w-[85%] max-w-[700px] space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Content</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className="min-h-[150px] max-h-[250px] h-[50vh]"
-                        placeholder="Enter content..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogClose className="ml-auto">
-                <Button type="submit">Save changes</Button>
-              </DialogClose>
-            </form>
-          </Form>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
+import EditCommentReplyDialog from "./EditCommentReplyDialog";
 
 export default function EachCommentReplyPage({
   content,
@@ -144,6 +37,7 @@ export default function EachCommentReplyPage({
 }) {
   const router = useRouter();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
@@ -154,6 +48,7 @@ export default function EachCommentReplyPage({
   const { createReplyComments, deleteReplyComments } =
     useReplyComment(comment_id);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");
+  const commentReplyBoxRef = useRef<HTMLDivElement | null>(null);
 
   const openReplyRef = useRef<HTMLDivElement | null>(null);
 
@@ -305,8 +200,21 @@ export default function EachCommentReplyPage({
     }
   }, [openReplyRef, openReply]);
 
+  // Scroll user into the specific comment reply box if user came from notification
+  useEffect(() => {
+    const commentReplyIdToScroll = searchParams.get("commentReplyId");
+
+    if (comment_reply_id === commentReplyIdToScroll) {
+      commentReplyBoxRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [comment_reply_id, searchParams]);
+
   return (
-    <div className="ml-[3px]">
+    <div className="ml-[3px]" ref={commentReplyBoxRef}>
       <hr className="h-px mb-[5px] bg-gray-200 border-0 dark:bg-gray-700" />
       <div className="font-bold">
         <Button
@@ -360,7 +268,7 @@ export default function EachCommentReplyPage({
               Delete
             </Button>
             <Button variant="link" className="px-0">
-              <EditCommentDialog
+              <EditCommentReplyDialog
                 content={content}
                 commentId={comment_id}
                 commentReplyId={comment_reply_id}

@@ -8,7 +8,6 @@ import { NotificationType } from "../post/_component/Enum";
 import axios from "axios";
 
 // Function to fetch for specific postId
-
 const fetchPostId = async (commentId: string): Promise<string | null> => {
   let postId: string | null = null;
   try {
@@ -28,11 +27,43 @@ const fetchPostId = async (commentId: string): Promise<string | null> => {
   }
 };
 
+type ReturnedPostIdAndCommentIdType = {
+  postId: string;
+  commentId: string;
+};
+
+// Function to fetch for specific postId and commentId given commentReplyId
+const fetchPostIdAndCommentId = async (
+  commentReplyId: string
+): Promise<ReturnedPostIdAndCommentIdType | null> => {
+  let postIdAndCommentId: ReturnedPostIdAndCommentIdType | null = null;
+  try {
+    const res = await axios.get(
+      "/api/comment-reply/get-comment-reply-id-by-post-comment-id",
+      {
+        params: {
+          comment_reply_id: commentReplyId,
+        },
+      }
+    );
+
+    if (res.status === 200) {
+      postIdAndCommentId = {
+        postId: res.data.post_id,
+        commentId: res.data.comment_id,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    return postIdAndCommentId;
+  }
+};
+
 export default function NotificationPage() {
   const [userId] = useLocalStorage<string | null>("test-userId");
   const { allNotification, isLoading } = useNotification(userId ?? "");
 
-  // TODO Handle navigation of all notification type
   const handleViewNotification = async (
     notificationType: NotificationType,
     resourceId: string
@@ -51,6 +82,8 @@ export default function NotificationPage() {
         window.location.reload();
         break;
 
+      // Redirect to the post that has the comment
+      case NotificationType.LIKE_COMMENT:
       case NotificationType.COMMENT:
         // Need to first get the post id
         const postId = await fetchPostId(resourceId);
@@ -61,11 +94,17 @@ export default function NotificationPage() {
         );
         window.location.reload();
         break;
-      case NotificationType.LIKE_COMMENT:
-        break;
-      case NotificationType.LIKE_REPLY_COMMENT:
-        break;
+
+      // Redirect to the post that has the comment reply
       case NotificationType.COMMENT_REPLY:
+      case NotificationType.LIKE_REPLY_COMMENT:
+        const res = await fetchPostIdAndCommentId(resourceId);
+        window.history.replaceState(
+          null,
+          "",
+          `/post/${res?.postId}?commentId=${res?.commentId}&commentReplyId=${resourceId}`
+        );
+        window.location.reload();
         break;
     }
   };

@@ -294,7 +294,7 @@ export default function CommentPage({
                   return (
                     <EachCommentPage
                       key={c.comment_id}
-                      comment_id={c.comment_id}
+                      commentId={c.comment_id}
                       user={c.User}
                       content={c.content}
                       post_id={postId}

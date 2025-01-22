@@ -10,129 +10,25 @@ import { cn } from "@/lib/utils";
 import useLikedComment from "./_custom_hook/useLikedCommentHook";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useComment from "./_custom_hook/useCommentHook";
-import { DialogHeader } from "@/components/ui/dialog";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
-import { useStore } from "zustand";
-import { commentStore, CommentType } from "./_store/commentStore";
-import { CommentSchema } from "@/app/api/comment/create-comment/route";
-import { Form } from "@/components/ui/form";
 import { useLikeCommentCount } from "./_custom_hook/useLikedCommentCountHook";
 import { NotificationType } from "./Enum";
-import { useFollower } from "./_custom_hook/useFollowerHook";
+import EditCommentDialog from "./EditCommentDialog";
 
 /*
  * The page when the user click "Comment" button on the post
  *
  * */
-
-function EditCommentDialog({
-  commentId,
-  content,
-  userId,
-  postId,
-}: {
-  commentId: string;
-  content: string;
-  userId: string;
-  postId: string;
-}) {
-  const { toast } = useToast();
-  const updateComments = useStore(
-    commentStore,
-    (state) => state.actions.updateComments
-  );
-  const form = useForm<CommentType>({
-    resolver: zodResolver(CommentSchema),
-    defaultValues: {
-      content,
-      user_id: userId ?? "",
-      post_id: postId,
-    },
-  });
-
-  const onSubmit = (formData: CommentType) => {
-    updateComments(commentId, formData, toast);
-  };
-
-  const onInvalid = () => {
-    console.log("Invalid");
-  };
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <span className="hover:opacity-75 flex gap-3 items-center transition-opacity duration-150 justify-left">
-          <button>Edit</button>
-        </span>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Editing comment</DialogTitle>
-          <DialogDescription>
-            Make changes to your comment here. Click save when you are done.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4 justify-items-center">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-              className="flex flex-col min-w-[25%] w-[85%] max-w-[700px] space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Content</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className="min-h-[150px] max-h-[250px] h-[50vh]"
-                        placeholder="Enter content..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogClose className="ml-auto">
-                <Button type="submit">Save changes</Button>
-              </DialogClose>
-            </form>
-          </Form>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export default function EachCommentPage({
-  comment_id,
+  commentId,
   user,
   content,
   post_id,
   authorId,
   dateDifferent,
 }: {
-  comment_id: string;
+  commentId: string;
   user: UserType;
   content: string;
   post_id: string;
@@ -141,21 +37,23 @@ export default function EachCommentPage({
 }) {
   // TODO Scroll user into the specific comment id viewport if user came from notification. Use search params to get the comment id
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const commentBoxRef = useRef<HTMLDivElement | null>(null);
   const viewRepliesRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { replyComments, isLoading } = useReplyComment(comment_id);
+  const { replyComments, isLoading } = useReplyComment(commentId);
   const { likedComment, addLikeComment, removeLikeComment } = useLikedComment(
     userId,
     post_id
   );
   const [isLiked, setIsLiked] = useState<boolean>();
   const { deleteComments } = useComment(post_id, userId);
-  const { createReplyComments } = useReplyComment(comment_id);
-  const commentLikeCount = useLikeCommentCount(comment_id);
+  const { createReplyComments } = useReplyComment(commentId);
+  const commentLikeCount = useLikeCommentCount(commentId);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
@@ -164,7 +62,7 @@ export default function EachCommentPage({
       content: replyContent,
       user_id: userId,
       target_user_id: user.user_id,
-      comment_id: comment_id,
+      comment_id: commentId,
     };
 
     // Add the reply comment
@@ -194,12 +92,12 @@ export default function EachCommentPage({
         fromUserId: userId,
         targetUserId: authorId,
         type: NotificationType.COMMENT,
-        resourceId: comment_id,
+        resourceId: commentId,
       });
     }
 
     // Delete the comment
-    deleteComments(comment_id, post_id, userId, toast);
+    deleteComments(commentId, post_id, userId, toast);
   };
 
   const handleOpenReply = () => {
@@ -261,12 +159,12 @@ export default function EachCommentPage({
           fromUserId: userId,
           targetUserId: user.user_id,
           type: NotificationType.LIKE_COMMENT,
-          resourceId: comment_id,
+          resourceId: commentId,
         });
       }
 
       // Remove the like
-      removeLikeComment(userId, comment_id, setIsLiked, toast);
+      removeLikeComment(userId, commentId, setIsLiked, toast);
     } else {
       // Only send notification if the user who liked is not the author
       if (userId !== user.user_id) {
@@ -274,12 +172,12 @@ export default function EachCommentPage({
           fromUserId: userId,
           targetUserId: [user.user_id],
           type: NotificationType.LIKE_COMMENT,
-          resourceId: comment_id,
+          resourceId: commentId,
         });
       }
 
       // Add the like
-      addLikeComment(userId, comment_id, setIsLiked, toast);
+      addLikeComment(userId, commentId, setIsLiked, toast);
     }
   };
 
@@ -290,13 +188,13 @@ export default function EachCommentPage({
   useEffect(() => {
     if (likedComment && likedComment.length > 0) {
       const userLiked = likedComment.find(
-        (item) => item.Comment_comment_id === comment_id
+        (item) => item.Comment_comment_id === commentId
       )
         ? true
         : false;
       setIsLiked(userLiked);
     }
-  }, [comment_id, likedComment]);
+  }, [commentId, likedComment]);
 
   // Scroll user to the view replies block to improve user experience
   useEffect(() => {
@@ -309,8 +207,28 @@ export default function EachCommentPage({
     }
   }, [viewReplies]);
 
+  // Scroll user into the specific comment if user came from notification
+  useEffect(() => {
+    const commentIdToScroll = searchParams.get("commentId");
+
+    if (commentId === commentIdToScroll) {
+      commentBoxRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [commentBoxRef, commentId, searchParams]);
+
+  // Open the view replies block when user came from notification and want to view specific comment reply
+  useEffect(() => {
+    if (searchParams.get("commentReplyId")) {
+      setViewReplies(true);
+    }
+  }, [searchParams]);
+
   return (
-    <div className="flex flex-col ml-[7px]">
+    <div className="flex flex-col ml-[7px]" ref={commentBoxRef}>
       <div className="font-bold">
         <Button
           variant="link"
@@ -361,7 +279,7 @@ export default function EachCommentPage({
             </Button>
             <Button variant="link" className="px-0">
               <EditCommentDialog
-                commentId={comment_id}
+                commentId={commentId}
                 content={content}
                 userId={userId}
                 postId={post_id}
@@ -407,6 +325,7 @@ export default function EachCommentPage({
           </div>
         )}
         {/* All the comments' replies */}
+
         <div
           className={cn(
             "min-h-[150px] max-h-[350px] h-[80vh] overflow-y-scroll",
@@ -417,10 +336,10 @@ export default function EachCommentPage({
           {replyComments &&
             replyComments.length > 0 &&
             viewReplies &&
-            replyComments.map((c) => {
+            replyComments.map((c, idx) => {
               return (
                 <EachCommentReplyPage
-                  comment_id={comment_id}
+                  comment_id={commentId}
                   comment_reply_id={c.comment_reply_id}
                   user={c.User}
                   target_user={c.Target_user}

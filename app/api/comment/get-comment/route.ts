@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const prisma = new PrismaClient();
 
   try {
+    // Fetch the user comment first then only the rest to put user comments on top of others
     const commentsByLoggedInUser = await prisma.post.findUnique({
       where: {
         post_id: post_id as string,

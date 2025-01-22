@@ -30,6 +30,8 @@ type CommentAction = {
       userId: string,
       showToast: ({ title, description }: ToastProp) => void
     ) => Promise<void>;
+
+    // It will return the newly created comment ID
     createComment: (
       newComment: CommentType,
       form: UseFormReturn<{

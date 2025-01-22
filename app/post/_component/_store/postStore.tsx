@@ -28,6 +28,8 @@ type PostAction = {
       url: string,
       showToast: ({ title, description }: ToastProp) => void
     ) => Promise<void>;
+
+    // It will return the newly created post ID
     createPost: (
       newPost: CreatePostFormType,
       showToast: ({ title, description }: ToastProp) => void,

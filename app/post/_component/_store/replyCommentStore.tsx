@@ -13,6 +13,7 @@ export type ReplyData = {
 
 type ReplyCommentAction = {
   actions: {
+    // It will return the newly created comment reply ID
     createReplyComments: (
       replyData: ReplyData,
       setViewReplies: React.Dispatch<boolean>,

@@ -12,7 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 export default function NotificationDialog() {
   const [userId] = useLocalStorage<string | null>("test-userId");
-  const { allNotification, isLoading } = useNotification(userId ?? "");
+  const { allNotification, notViewedCount, isLoading } = useNotification(
+    userId ?? "",
+  );
 
   return (
     <Popover>
@@ -24,8 +26,10 @@ export default function NotificationDialog() {
           Notification
           {/* Show red dot if there are notifications */}
           {/* TODO Try to add a unread notification count on api so that the red dot will only appear if there are any unread notification only */}
-          {!isLoading && allNotification && (
-            <span className="absolute top-0 right-[-5px] w-3 h-3 rounded-full bg-red-800"></span>
+          {!isLoading && (notViewedCount as number) > 0 && (
+            <span className="flex justify-center items-center absolute top-[-5px] right-[-5px] w-6 h-6 bg-gray-200 rounded-full border-2 border-red-800">
+              {notViewedCount}
+            </span>
           )}
         </Button>
       </PopoverTrigger>

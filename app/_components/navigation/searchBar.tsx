@@ -16,7 +16,7 @@ export default function SearchBar() {
     setSearchText(e.target.value);
   };
   return (
-    <div className="mr-auto flex gap-5 max-w-[600px] min-w-[250px] flex-1">
+    <div className="mr-auto flex gap-5 max-w-[350px] min-w-[250px] w-full flex-1">
       <Input
         type="text"
         placeholder="Search for post..."

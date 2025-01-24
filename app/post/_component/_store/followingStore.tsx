@@ -8,12 +8,12 @@ type FollowingAction = {
     addFollowing: (
       ownerId: string,
       targetId: string,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast: ({ title, description }: ToastProp) => void,
     ) => Promise<void>;
     removeFollowing: (
       ownerId: string,
       targetId: string,
-      showToast: ({ title, description }: ToastProp) => void
+      showToast: ({ title, description }: ToastProp) => void,
     ) => Promise<void>;
   };
 };

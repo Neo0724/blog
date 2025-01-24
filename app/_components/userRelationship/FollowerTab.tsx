@@ -12,6 +12,8 @@ import { useFollowing } from "@/app/post/_component/_custom_hook/useFollowingHoo
 import { ToastAction } from "@/components/ui/toast";
 import ShowSpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
+import { NotificationType } from "@/app/post/_component/Enum";
+import useNotification from "@/app/post/_component/_custom_hook/useNotificationHook";
 
 type FollowerTabProps = {
   pageOwnerUserId: string;
@@ -39,7 +41,9 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
-
+  const { addNotification, deleteNotification } = useNotification(
+    loggedInUserId ?? "",
+  );
   // For the page owner
   const {
     allFollower: pageOwnerFollower,
@@ -92,10 +96,10 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
           const currentUserIsFollowing = !loggedInUserId
             ? false
             : loggedInFollowing?.find(
-                (loggedInUserFollowing) =>
-                  loggedInUserFollowing.UserFollowing.user_id ===
-                  ownerFollower.UserFollower.user_id
-              );
+              (loggedInUserFollowing) =>
+                loggedInUserFollowing.UserFollowing.user_id ===
+                ownerFollower.UserFollower.user_id,
+            );
 
           return (
             <div
@@ -107,7 +111,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                 className="p-0 h-auto text-base leading-none"
                 onClick={() =>
                   handleAuthorProfileNavigation(
-                    ownerFollower.UserFollower.user_id
+                    ownerFollower.UserFollower.user_id,
                   )
                 }
               >
@@ -123,7 +127,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                     pageOwnerRemoveFollower(
                       pageOwnerUserId,
                       ownerFollower.UserFollower.user_id,
-                      toast
+                      toast,
                     )
                   }
                 >
@@ -131,8 +135,9 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                 </Button>
               )}
 
-              {/* Current logged in user is different from the page owner */}
-              {pageOwnerUserId !== loggedInUserId && (
+              {/* We only care about the currently logged in user as they are the one who will be interacting with this follow and unfollow button*/}
+              {/* Only show the button if the currently logged in user is not the current following user list*/}
+              {ownerFollower.UserFollower.user_id !== loggedInUserId && (
                 <Button
                   variant="ghost"
                   className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
@@ -161,15 +166,28 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                       loggedInRemoveFollowing(
                         loggedInUserId,
                         ownerFollower.UserFollower.user_id,
-                        toast
-                      );
+                        toast,
+                      ); // Delete the follow notification
+                      deleteNotification({
+                        fromUserId: loggedInUserId,
+                        targetUserId: ownerFollower.UserFollower.user_id,
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      });
                     } else {
                       // Add the current user to following
                       loggedInAddFollowing(
                         loggedInUserId,
                         ownerFollower.UserFollower.user_id,
-                        toast
+                        toast,
                       );
+                      // Send notification to the target user that someone started following him or her
+                      addNotification({
+                        fromUserId: loggedInUserId,
+                        targetUserId: [ownerFollower.UserFollower.user_id],
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      });
                     }
                   }}
                 >

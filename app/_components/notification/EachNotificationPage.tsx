@@ -10,10 +10,10 @@ import React from "react";
 // Verify if the notification belongs the notificationType as different notificationType has different resource object shape
 const checkNotificationType = <
   TObj extends ReturnedNotificationType,
-  TType extends NotificationType
+  TType extends NotificationType,
 >(
   notification: TObj,
-  notificationType: TType
+  notificationType: TType,
 ): notification is TObj & { type: TType } => {
   return notification.type === notificationType;
 };
@@ -24,7 +24,7 @@ export default function EachNotificationPage({
   notification: ReturnedNotificationType;
 }) {
   const [loggedInUserId] = useLocalStorage<string>("test-userId");
-  const { readNotification } = useNotification(loggedInUserId);
+  const { readNotification, addNotification } = useNotification(loggedInUserId);
   const { allFollowing, addFollowing } = useFollowing(loggedInUserId);
   const { toast } = useToast();
 
@@ -49,7 +49,7 @@ export default function EachNotificationPage({
     ) {
       // Redirect to the post that has the comment
       window.location.replace(
-        `/post/${notification.resource.postId}?commentId=${notification.resource.commentId}`
+        `/post/${notification.resource.postId}?commentId=${notification.resource.commentId}`,
       );
     } else if (
       checkNotificationType(notification, NotificationType.COMMENT_REPLY) ||
@@ -57,13 +57,19 @@ export default function EachNotificationPage({
     ) {
       // Redirect to the post that has the comment reply
       window.location.replace(
-        `/post/${notification.resource.postId}?commentId=${notification.resource.commentId}&commentReplyId=${notification.resource.commentReplyId}`
+        `/post/${notification.resource.postId}?commentId=${notification.resource.commentId}&commentReplyId=${notification.resource.commentReplyId}`,
       );
     }
   };
 
   const handleFollowBack = () => {
     addFollowing(loggedInUserId, notification.FromUser.user_id, toast);
+    addNotification({
+      fromUserId: loggedInUserId,
+      targetUserId: [notification.FromUser.user_id],
+      type: NotificationType.FOLLOW,
+      resourceId: loggedInUserId,
+    });
   };
   return (
     <div
@@ -76,30 +82,31 @@ export default function EachNotificationPage({
           {notification.type === NotificationType.COMMENT
             ? " just commented on your post"
             : notification.type === NotificationType.COMMENT_REPLY
-            ? " just replied to your comment"
-            : notification.type === NotificationType.FOLLOW
-            ? " just follow you"
-            : notification.type === NotificationType.LIKE_COMMENT
-            ? " just liked your comment"
-            : notification.type === NotificationType.LIKE_POST
-            ? " just liked your post"
-            : notification.type === NotificationType.LIKE_REPLY_COMMENT
-            ? " just liked your reply"
-            : notification.type === NotificationType.POST
-            ? " just created a new post"
-            : ""}
+              ? " just replied to your comment"
+              : notification.type === NotificationType.FOLLOW
+                ? " just follow you"
+                : notification.type === NotificationType.LIKE_COMMENT
+                  ? " just liked your comment"
+                  : notification.type === NotificationType.LIKE_POST
+                    ? " just liked your post"
+                    : notification.type === NotificationType.LIKE_REPLY_COMMENT
+                      ? " just liked your reply"
+                      : notification.type === NotificationType.POST
+                        ? " just created a new post"
+                        : ""}
         </span>
       </div>
       <Button
         variant="ghost"
         className="rounded-xl bg-gray-200 hover:text-blue-800 active:text-blue-800"
-        onClick={() => handleViewNotification()}
+        onClick={handleViewNotification}
       >
         {notification.hasViewed ? "View" : "Read"}
       </Button>
       {notification.type === NotificationType.FOLLOW &&
         !allFollowing?.find(
-          (following) => following.UserFollowing.user_id === loggedInUserId
+          (following) =>
+            following.UserFollowing.user_id === notification.FromUser.user_id,
         ) && (
           <Button
             variant="ghost"

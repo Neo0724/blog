@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { ToastAction } from "@/components/ui/toast";
+import useNotification from "@/app/post/_component/_custom_hook/useNotificationHook";
+import { NotificationType } from "@/app/post/_component/Enum";
 
 type FollowingTabProps = {
   pageOwnerUserId: string;
@@ -70,6 +72,9 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
+  const { addNotification, deleteNotification } = useNotification(
+    loggedInUserId ?? "",
+  );
 
   // For the page owner
   const {
@@ -123,10 +128,10 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
           const currentUserIsFollowing = !loggedInUserId
             ? false
             : loggedInFollowing?.find(
-                (loggedInUserFollowing) =>
-                  loggedInUserFollowing.UserFollowing.user_id ===
-                  ownerFollowing.UserFollowing.user_id
-              );
+              (loggedInUserFollowing) =>
+                loggedInUserFollowing.UserFollowing.user_id ===
+                ownerFollowing.UserFollowing.user_id,
+            );
           return (
             <div
               key={ownerFollowing.createdAt}
@@ -137,58 +142,75 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                 className="p-0 h-auto text-base leading-none"
                 onClick={() =>
                   handleAuthorProfileNavigation(
-                    ownerFollowing.UserFollowing.user_id
+                    ownerFollowing.UserFollowing.user_id,
                   )
                 }
               >
                 {ownerFollowing.UserFollowing.name}
               </Button>
               {/* We only care about the currently logged in user as they are the one who will be interacting with this follow and unfollow button*/}
-              <Button
-                variant="ghost"
-                className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
-                onClick={() => {
-                  // User is not logged in
-                  if (!loggedInUserId) {
-                    toast({
-                      title: "Error",
-                      description: "Please sign in to follow",
-                      action: (
-                        <ToastAction
-                          altText="Sign in now"
-                          onClick={() => {
-                            window.location.replace("/sign-in");
-                          }}
-                        >
-                          Sign in
-                        </ToastAction>
-                      ),
-                    });
-                    return;
-                  }
+              {/* Only show the button if the currently logged in user is not the current following user list*/}
+              {loggedInUserId !== ownerFollowing.UserFollowing.user_id && (
+                <Button
+                  variant="ghost"
+                  className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
+                  onClick={() => {
+                    // User is not logged in
+                    if (!loggedInUserId) {
+                      toast({
+                        title: "Error",
+                        description: "Please sign in to follow",
+                        action: (
+                          <ToastAction
+                            altText="Sign in now"
+                            onClick={() => {
+                              window.location.replace("/sign-in");
+                            }}
+                          >
+                            Sign in
+                          </ToastAction>
+                        ),
+                      });
+                      return;
+                    }
 
-                  // Current user is logged in
-                  // Remove the user from following
-                  if (currentUserIsFollowing) {
-                    loggedInRemoveFollowing(
-                      loggedInUserId,
-                      ownerFollowing.UserFollowing.user_id,
-                      toast
-                    );
-                  } else {
-                    // Add the current user to following
-                    loggedInAddFollowing(
-                      loggedInUserId,
-                      ownerFollowing.UserFollowing.user_id,
-                      toast
-                    );
-                  }
-                }}
-              >
-                {!currentUserIsFollowing || !loggedInUserId
-                  ? "Follow"
-                  : "Unfollow"}
-              </Button>
+                    // Current user is logged in
+                    // Remove the user from following
+                    if (currentUserIsFollowing) {
+                      loggedInRemoveFollowing(
+                        loggedInUserId,
+                        ownerFollowing.UserFollowing.user_id,
+                        toast,
+                      );
+                      // Delete the follow notification
+                      deleteNotification({
+                        fromUserId: loggedInUserId,
+                        targetUserId: ownerFollowing.UserFollowing.user_id,
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      });
+                    } else {
+                      // Add the current user to following
+                      loggedInAddFollowing(
+                        loggedInUserId,
+                        ownerFollowing.UserFollowing.user_id,
+                        toast,
+                      );
+                      // Send notification to the target user that someone started following him or her
+                      addNotification({
+                        fromUserId: loggedInUserId,
+                        targetUserId: [ownerFollowing.UserFollowing.user_id],
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      });
+                    }
+                  }}
+                >
+                  {!currentUserIsFollowing || !loggedInUserId
+                    ? "Follow"
+                    : "Unfollow"}
+                </Button>
+              )}
             </div>
           );
         })}

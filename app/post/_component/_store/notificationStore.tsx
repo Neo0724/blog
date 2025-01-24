@@ -22,32 +22,32 @@ export type ReturnedNotificationType = {
   TargetUser: UserType;
   FromUser: UserType;
 } & (
-  | {
+    | {
       type: NotificationType.FOLLOW;
       resource: { followerUserId: string };
     }
-  | {
+    | {
       type: NotificationType.POST | NotificationType.LIKE_POST;
       resource: { postId: string };
     }
-  | {
+    | {
       type: NotificationType.COMMENT | NotificationType.LIKE_COMMENT;
       resource: { postId: string; commentId: string };
     }
-  | {
+    | {
       type:
-        | NotificationType.COMMENT_REPLY
-        | NotificationType.LIKE_REPLY_COMMENT;
+      | NotificationType.COMMENT_REPLY
+      | NotificationType.LIKE_REPLY_COMMENT;
       resource: { postId: string; commentId: string; commentReplyId: string };
     }
-);
+  );
 
 type NotificationAction = {
   actions: {
     addNotification: (newNotification: NewNotificationType) => Promise<void>;
     readNotification: (notificationId: string) => Promise<void>;
     deleteNotification: (
-      deleteNotification: DeleteNotificationType
+      deleteNotification: DeleteNotificationType,
     ) => Promise<void>;
   };
 };
@@ -62,7 +62,7 @@ export const notificationStore = create<NotificationAction>(() => ({
               await axios.post("/api/notification/add-notification", {
                 ...newNotification,
                 targetUserId: userId,
-              })
+              }),
           ),
         ]);
       } catch (err) {

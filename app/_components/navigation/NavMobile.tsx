@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import NotificationDialog from "../notification/NotificationDialog";
 
 export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
   const pathname = usePathname();
@@ -21,12 +22,13 @@ export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
       <div
         className={cn(
           sidebarOpen &&
-            "fixed top-0 right-0 left-0 bottom-0 backdrop-blur z-[100]"
+          "fixed top-0 right-0 left-0 bottom-0 backdrop-blur z-[100]",
         )}
       ></div>
       <div className="overflow-scroll md:hidden flex fixed top-0 left-0 right-0 items-center justify-between p-5 shadow-md bg-zinc-500">
         <div className="mr-5 text-white">Blog</div>
         <SearchBar />
+        <NotificationDialog />
         <Button
           onClick={() => {
             setSidebarOpen(true);
@@ -39,7 +41,7 @@ export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
       <div
         className={cn(
           "z-[100] md:hidden fixed shadow-2xl overflow-y-scroll flex flex-col gap-5 top-0 right-0 bg-zinc-500 h-full w-[30%] transition-transform duration-300 ease-in-out",
-          sidebarOpen ? "translate-x-0" : "translate-x-full"
+          sidebarOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
         <Button

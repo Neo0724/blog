@@ -15,7 +15,6 @@ export function middleware(request: NextRequest) {
   }
 
   if (request.nextUrl.pathname === "/") {
-    console.log("Inside next middleware");
     return NextResponse.redirect(new URL("/post/all-posts", request.url));
   }
 }

@@ -34,12 +34,6 @@ export default function Navbar() {
       icon: <FaHeart />,
     },
     {
-      name: "Notification",
-      href: "/notification",
-      active: false,
-      icon: <FaBell />,
-    },
-    {
       name: "Sign Up",
       href: "/sign-up",
       active: false,

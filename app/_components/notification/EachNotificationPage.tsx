@@ -1,7 +1,10 @@
+import { useFollowing } from "@/app/post/_component/_custom_hook/useFollowingHook";
 import useNotification from "@/app/post/_component/_custom_hook/useNotificationHook";
 import { ReturnedNotificationType } from "@/app/post/_component/_store/notificationStore";
 import { NotificationType } from "@/app/post/_component/Enum";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import React from "react";
 
 // Verify if the notification belongs the notificationType as different notificationType has different resource object shape
@@ -20,7 +23,10 @@ export default function EachNotificationPage({
 }: {
   notification: ReturnedNotificationType;
 }) {
-  const { readNotification } = useNotification(notification.TargetUser.user_id);
+  const [loggedInUserId] = useLocalStorage<string>("test-userId");
+  const { readNotification } = useNotification(loggedInUserId);
+  const { allFollowing, addFollowing } = useFollowing(loggedInUserId);
+  const { toast } = useToast();
 
   const handleViewNotification = async () => {
     if (!notification.hasViewed) {
@@ -30,67 +36,60 @@ export default function EachNotificationPage({
     // Handle different notification type
     if (checkNotificationType(notification, NotificationType.FOLLOW)) {
       // Redirect user to the target follower profile
-      window.history.replaceState(
-        null,
-        "",
-        `/user/${notification.resource.followerUserId}`
-      );
-      window.location.replace(window.location.href);
+      window.location.replace(`/user/${notification.resource.followerUserId}`);
     } else if (
       checkNotificationType(notification, NotificationType.LIKE_POST) ||
       checkNotificationType(notification, NotificationType.POST)
     ) {
       // Redirect user to the post
-      window.history.replaceState(
-        null,
-        "",
-        `/post/${notification.resource.postId}`
-      );
-      window.location.reload();
+      window.location.replace(`/post/${notification.resource.postId}`);
     } else if (
       checkNotificationType(notification, NotificationType.LIKE_COMMENT) ||
       checkNotificationType(notification, NotificationType.COMMENT)
     ) {
       // Redirect to the post that has the comment
-      window.history.replaceState(
-        null,
-        "",
+      window.location.replace(
         `/post/${notification.resource.postId}?commentId=${notification.resource.commentId}`
       );
-      window.location.reload();
     } else if (
       checkNotificationType(notification, NotificationType.COMMENT_REPLY) ||
       checkNotificationType(notification, NotificationType.LIKE_REPLY_COMMENT)
     ) {
       // Redirect to the post that has the comment reply
-      window.history.replaceState(
-        null,
-        "",
+      window.location.replace(
         `/post/${notification.resource.postId}?commentId=${notification.resource.commentId}&commentReplyId=${notification.resource.commentReplyId}`
       );
-      window.location.reload();
     }
   };
+
+  const handleFollowBack = () => {
+    addFollowing(loggedInUserId, notification.FromUser.user_id, toast);
+  };
   return (
-    <div key={notification.notification_id} className="flex gap-3">
-      <span>{notification.FromUser.name}</span>
-      <span>
-        {notification.type === NotificationType.COMMENT
-          ? " just commented on your post"
-          : notification.type === NotificationType.COMMENT_REPLY
-          ? " just replied to your comment"
-          : notification.type === NotificationType.FOLLOW
-          ? " just follow you"
-          : notification.type === NotificationType.LIKE_COMMENT
-          ? " just liked your comment"
-          : notification.type === NotificationType.LIKE_POST
-          ? " just liked your post"
-          : notification.type === NotificationType.LIKE_REPLY_COMMENT
-          ? " just liked your reply"
-          : notification.type === NotificationType.POST
-          ? " just created a new post"
-          : ""}
-      </span>
+    <div
+      key={notification.notification_id}
+      className="flex gap-3 justify-between items-center"
+    >
+      <div>
+        <span>{notification.FromUser.name}</span>
+        <span>
+          {notification.type === NotificationType.COMMENT
+            ? " just commented on your post"
+            : notification.type === NotificationType.COMMENT_REPLY
+            ? " just replied to your comment"
+            : notification.type === NotificationType.FOLLOW
+            ? " just follow you"
+            : notification.type === NotificationType.LIKE_COMMENT
+            ? " just liked your comment"
+            : notification.type === NotificationType.LIKE_POST
+            ? " just liked your post"
+            : notification.type === NotificationType.LIKE_REPLY_COMMENT
+            ? " just liked your reply"
+            : notification.type === NotificationType.POST
+            ? " just created a new post"
+            : ""}
+        </span>
+      </div>
       <Button
         variant="ghost"
         className="rounded-xl bg-gray-200 hover:text-blue-800 active:text-blue-800"
@@ -98,6 +97,18 @@ export default function EachNotificationPage({
       >
         {notification.hasViewed ? "View" : "Read"}
       </Button>
+      {notification.type === NotificationType.FOLLOW &&
+        !allFollowing?.find(
+          (following) => following.UserFollowing.user_id === loggedInUserId
+        ) && (
+          <Button
+            variant="ghost"
+            className="rounded-xl bg-gray-200 hover:text-blue-800 active:text-blue-800"
+            onClick={handleFollowBack}
+          >
+            Follow back
+          </Button>
+        )}
     </div>
   );
 }

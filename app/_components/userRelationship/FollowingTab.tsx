@@ -157,8 +157,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                         <ToastAction
                           altText="Sign in now"
                           onClick={() => {
-                            window.history.replaceState(null, "", "/sign-in");
-                            window.location.reload();
+                            window.location.replace("/sign-in");
                           }}
                         >
                           Sign in

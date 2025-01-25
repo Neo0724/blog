@@ -7,15 +7,13 @@ import { ChangeEvent } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useReplyComment from "./custom_hook/useReplyComment";
 import useLikedReplyComment from "./custom_hook/useLikedReplyCommentHook";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLikedReplyCommentCount } from "./custom_hook/useLikedReplyCommentCountHook";
-import useNotification from "./custom_hook/useNotificationHook";
 import { NotificationType } from "./Enum";
 import EditCommentReplyDialog from "./EditCommentReplyDialog";
 import LikeCommentReplyButton from "./commentReplyComponent/LikeCommentReplyButton";
+import useNotification from "./custom_hook/useNotificationHook";
 
 export default function EachCommentReplyPage({
   content,
@@ -45,7 +43,6 @@ export default function EachCommentReplyPage({
   const { likedReply, addLikeCommentReply, removeLikeCommentReply } =
     useLikedReplyComment(userId, comment_id);
   const [isLiked, setIsLiked] = useState<boolean>();
-  const replyCommentLikeCount = useLikedReplyCommentCount(comment_reply_id);
   const { createReplyComments, deleteReplyComments } =
     useReplyComment(comment_id);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");

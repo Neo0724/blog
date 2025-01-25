@@ -7,14 +7,11 @@ const fetchReplyCommentLikeCount = async (
 ): Promise<number> => {
   let fetchedReplyCommentLikeCount = 0;
   try {
-    const response = await axios.get(
-      "/api/comment-reply/count-like-comment-reply",
-      {
-        params: {
-          comment_reply_id: commentReplyId,
-        },
-      }
-    );
+    const response = await axios.get(url, {
+      params: {
+        comment_reply_id: commentReplyId,
+      },
+    });
 
     if (response.status === 200) {
       fetchedReplyCommentLikeCount = response.data;

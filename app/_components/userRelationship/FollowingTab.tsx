@@ -5,65 +5,17 @@ import { useFollowing } from "../../post/_component/custom_hook/useFollowingHook
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { ToastAction } from "@/components/ui/toast";
 import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
 import { NotificationType } from "@/app/post/_component/Enum";
+import useSearchDebounce from "./customHook/useSearchDebounce";
+import SpinnerSkeleton from "./SpinnerSkeleton";
+import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
 
 type FollowingTabProps = {
   pageOwnerUserId: string;
-};
-
-const ShowSkeleton = () => {
-  return (
-    <div className="flex items-center space-x-4 w-full">
-      <Skeleton className="h-12 rounded-lg flex-[7]" />
-      <Skeleton className="h-12 flex-1" />
-    </div>
-  );
-};
-
-const ShowSpinner = () => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150">
-      <path
-        fill="none"
-        stroke="#000000"
-        stroke-width="15"
-        stroke-linecap="round"
-        stroke-dasharray="300 385"
-        stroke-dashoffset="0"
-        d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z"
-      >
-        <animate
-          attributeName="stroke-dashoffset"
-          calcMode="spline"
-          dur="2"
-          values="685;-685"
-          keySplines="0 0 1 1"
-          repeatCount="indefinite"
-        ></animate>
-      </path>
-    </svg>
-  );
-};
-
-const useSearchDebounce = (searchValue: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(searchValue);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(searchValue);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchValue, delay]);
-
-  return debouncedValue;
 };
 
 export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
@@ -112,12 +64,12 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
         {/* Show loading spinner when user filtering username */}
         {isValidating && (
           <span className="absolute right-3 top-[0.6rem] border-red-600 w-10">
-            <ShowSpinner />
+            <SpinnerSkeleton />
           </span>
         )}
       </div>
       {/* Following is fetching and loading */}
-      {pageOwnerUserId && isLoading && <ShowSkeleton />}
+      {pageOwnerUserId && isLoading && <FollowingFollowerSkeleton />}
       {/* Page owner has following and content has finished loading*/}
       {pageOwnerUserId &&
         !isLoading &&

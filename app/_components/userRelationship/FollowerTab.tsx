@@ -5,34 +5,18 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState, useEffect } from "react";
 import { mutate } from "swr";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useFollowing } from "@/app/post/_component/custom_hook/useFollowingHook";
 import { ToastAction } from "@/components/ui/toast";
-import ShowSpinnerSkeleton from "./SpinnerSkeleton";
+import SpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
 import { NotificationType } from "@/app/post/_component/Enum";
 import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
+import useSearchDebounce from "./customHook/useSearchDebounce";
 
 type FollowerTabProps = {
   pageOwnerUserId: string;
-};
-
-const useSearchDebounce = (searchValue: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(searchValue);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(searchValue);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchValue, delay]);
-
-  return debouncedValue;
 };
 
 export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
@@ -81,7 +65,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
         {/* Show loading spinner when user filtering username */}
         {isValidating && (
           <span className="absolute right-3 top-[0.6rem] border-red-600 w-10">
-            <ShowSpinnerSkeleton />
+            <SpinnerSkeleton />
           </span>
         )}
       </div>

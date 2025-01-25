@@ -1,4 +1,3 @@
-import React from "react";
 import { NavItemsType } from "./Navbar";
 import Navitem from "./Navitem";
 import SignOut from "./SignOut";

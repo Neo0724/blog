@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import PostComment from "./PostComment";
 import PostOption from "./PostOption";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LikePostButton from "@/app/_components/userInteraction/LikePostButton";
 import FavouritePostButton from "@/app/_components/userInteraction/FavouritePostButton";

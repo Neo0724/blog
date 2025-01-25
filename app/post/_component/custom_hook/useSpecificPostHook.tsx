@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { PostType } from "../GetPost";
+import { PostType } from "../postComponent/RenderPost";
 import axios from "axios";
 
 const fetchSpecificPost = async (

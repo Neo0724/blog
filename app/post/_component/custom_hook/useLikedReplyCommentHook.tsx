@@ -1,7 +1,7 @@
 import axios from "axios";
 import useSwr from "swr";
 import { useStore } from "zustand";
-import { likedCommentReplyStore } from "../_store/likedCommentReplyStore";
+import { likedCommentReplyStore } from "../store/likedCommentReplyStore";
 
 export type GetBackLikedReplyCommentType = {
   CommentReply_comment_reply_id: string;

@@ -1,7 +1,7 @@
 import axios from "axios";
-import { UserType } from "../GetPost";
+import { UserType } from "../postComponent/RenderPost";
 import useSWR from "swr";
-import { commentStore } from "../_store/commentStore";
+import { commentStore } from "../store/commentStore";
 import { useStore } from "zustand";
 
 export type GetBackCommentType = {

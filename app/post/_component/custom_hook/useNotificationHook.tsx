@@ -3,7 +3,7 @@ import useSWR from "swr";
 import {
   notificationStore,
   ReturnedNotificationType,
-} from "../_store/notificationStore";
+} from "../store/notificationStore";
 import { useStore } from "zustand";
 import axios from "axios";
 
@@ -14,7 +14,7 @@ type ReturnedNotificationTypeWithNotViewedCount = {
 
 const fetchNotification = async (
   apiUrl: string,
-  userId: string,
+  userId: string
 ): Promise<ReturnedNotificationTypeWithNotViewedCount> => {
   let fetchedNotification: ReturnedNotificationType[] = [];
   let notViewedCount: number = 0;
@@ -39,7 +39,7 @@ const fetchNotification = async (
 export default function useNotification(userId: string) {
   const { data, isLoading, error } = useSWR(
     userId ? "/api/notification/get-notification" : null,
-    () => fetchNotification("/api/notification/get-notification", userId),
+    () => fetchNotification("/api/notification/get-notification", userId)
   );
   const actions = useStore(notificationStore, (state) => state.actions);
 

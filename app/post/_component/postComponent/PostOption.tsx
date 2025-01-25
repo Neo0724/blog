@@ -4,20 +4,19 @@ import { BsThreeDots } from "react-icons/bs";
 import { MdDeleteForever } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import { useStore } from "zustand";
-import { postStore } from "./_store/postStore";
+import { postStore } from "../store/postStore";
 import { useToast } from "@/components/ui/use-toast";
 import { usePathname } from "next/navigation";
 import EditPostDialogPage from "./EditPostDialogPage";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
-export default function PostOptionComponent({
-  userId,
+export default function PostOption({
   authorId,
   postId,
   title,
   content,
   styleProperty,
 }: {
-  userId: string;
   authorId: string;
   postId: string;
   title: string;
@@ -28,6 +27,7 @@ export default function PostOptionComponent({
   const { toast } = useToast();
   const menuRef = useRef<HTMLDivElement>(null);
   const currentUrl = usePathname();
+  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
 
   const deletePosts = useStore(postStore, (state) => state.actions.deletePosts);
 
@@ -92,7 +92,7 @@ export default function PostOptionComponent({
         </button>
         {/* TODO: Add a confirmation for deletion */}
         {/* Delete post button */}
-        {userId === authorId ? (
+        {loggedInUserId === authorId ? (
           <div
             className={cn(
               "bg-gray-800 border-2 border-gray-500 p-3 rounded-md mt-2 transition-transform duration-150 text-white",

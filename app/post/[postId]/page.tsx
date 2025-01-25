@@ -1,7 +1,7 @@
 "use client";
-import EachPostPage from "../_component/EachPostPage";
-import PostSkeleton from "../_component/PostSkeleton";
-import useSpecificPostHook from "../_component/_custom_hook/useSpecificPostHook";
+import EachPostPage from "../_component/postComponent/EachPostPage";
+import PostSkeleton from "../_component/postComponent/PostSkeleton";
+import useSpecificPostHook from "../_component/custom_hook/useSpecificPostHook";
 
 export default function SpecificPostPage({
   params,

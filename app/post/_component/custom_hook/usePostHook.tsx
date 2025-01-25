@@ -1,11 +1,11 @@
 "use client";
 import useSWR from "swr";
-import { postStore } from "../_store/postStore";
+import { postStore } from "../store/postStore";
 import { SearchPostType } from "../Enum";
 import { GetBackFavouritePost } from "./useFavouriteHook";
 import axios from "axios";
 import { useStore } from "zustand";
-import { PostType } from "../GetPost";
+import { PostType } from "../postComponent/RenderPost";
 
 const fetchPost = async (
   apiUrl: string,

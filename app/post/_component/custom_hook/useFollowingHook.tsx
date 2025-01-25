@@ -1,8 +1,8 @@
 import useSWR from "swr";
 import { useStore } from "zustand";
-import { followingStore } from "../_store/followingStore";
+import { followingStore } from "../store/followingStore";
 import axios from "axios";
-import { UserType } from "../GetPost";
+import { UserType } from "../postComponent/RenderPost";
 
 type AllFollowing = {
   UserFollowing: UserType;

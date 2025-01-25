@@ -1,8 +1,8 @@
 import useSWR from "swr";
 import { useStore } from "zustand";
 import axios from "axios";
-import { UserType } from "../GetPost";
-import { followerStore } from "../_store/followerStore";
+import { UserType } from "../postComponent/RenderPost";
+import { followerStore } from "../store/followerStore";
 
 type UserFollower = {
   UserFollower: UserType;

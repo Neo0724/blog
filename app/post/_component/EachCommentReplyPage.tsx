@@ -1,20 +1,21 @@
 import React, { useRef } from "react";
-import { UserType } from "./GetPost";
+import { UserType } from "./postComponent/RenderPost";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useReplyComment from "./_custom_hook/useReplyComment";
-import useLikedReplyComment from "./_custom_hook/useLikedReplyCommentHook";
+import useReplyComment from "./custom_hook/useReplyComment";
+import useLikedReplyComment from "./custom_hook/useLikedReplyCommentHook";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLikedReplyCommentCount } from "./_custom_hook/useLikedReplyCommentCountHook";
-import useNotification from "./_custom_hook/useNotificationHook";
+import { useLikedReplyCommentCount } from "./custom_hook/useLikedReplyCommentCountHook";
+import useNotification from "./custom_hook/useNotificationHook";
 import { NotificationType } from "./Enum";
 import EditCommentReplyDialog from "./EditCommentReplyDialog";
+import LikeCommentReplyButton from "./commentReplyComponent/LikeCommentReplyButton";
 
 export default function EachCommentReplyPage({
   content,
@@ -244,14 +245,14 @@ export default function EachCommentReplyPage({
       </span>
       <div className="flex space-x-3 mt-[-5px] items-center">
         {/* Like and reply button */}
-        <Button
+        <LikeCommentReplyButton
           variant="link"
-          className={cn("px-0", isLiked ? "text-red-500" : "")}
-          onClick={handleLikeReplyComment}
-        >
-          {isLiked ? "Dislike" : "Like"}
-          {"  " + (replyCommentLikeCount ?? 0)}
-        </Button>
+          className="px-0"
+          commentReplyOwnerId={user.user_id}
+          commentReplyId={comment_reply_id}
+          commentId={comment_id}
+          key={comment_reply_id}
+        />
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
           {openReply ? "Cancel reply" : "Reply"}
         </Button>

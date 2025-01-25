@@ -2,8 +2,8 @@
 
 import React from "react";
 import EachPostPage from "./EachPostPage";
-import { SearchPostType } from "./Enum";
-import usePost from "./_custom_hook/usePostHook";
+import { SearchPostType } from "../Enum";
+import usePost from "../custom_hook/usePostHook";
 import CreatePost from "./CreatePostPage";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import PostSkeleton from "./PostSkeleton";
@@ -41,7 +41,7 @@ export type GetPostProps =
       userId: string;
     };
 
-export default function GetPost({
+export default function RenderPost({
   searchPostType,
   searchText,
   userId,

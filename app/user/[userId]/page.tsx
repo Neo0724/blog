@@ -1,5 +1,5 @@
 import { SearchPostType } from "@/app/post/_component/Enum";
-import GetPost from "@/app/post/_component/GetPost";
+import RenderPost from "@/app/post/_component/postComponent/RenderPost";
 import { FollowerTab } from "@/app/_components/userRelationship/FollowerTab";
 import { FollowingTab } from "@/app/_components/userRelationship/FollowingTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,7 +20,7 @@ export default function UserPage({ params }: { params: { userId: string } }) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="post">
-          <GetPost
+          <RenderPost
             searchPostType={SearchPostType.USER_POST}
             userId={params.userId}
           />

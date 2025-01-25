@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { useFollowing } from "../../post/_component/_custom_hook/useFollowingHook";
+import { useFollowing } from "../../post/_component/custom_hook/useFollowingHook";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { ToastAction } from "@/components/ui/toast";
-import useNotification from "@/app/post/_component/_custom_hook/useNotificationHook";
+import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
 import { NotificationType } from "@/app/post/_component/Enum";
 
 type FollowingTabProps = {
@@ -73,7 +73,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
   const { addNotification, deleteNotification } = useNotification(
-    loggedInUserId ?? "",
+    loggedInUserId ?? ""
   );
 
   // For the page owner
@@ -128,10 +128,10 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
           const currentUserIsFollowing = !loggedInUserId
             ? false
             : loggedInFollowing?.find(
-              (loggedInUserFollowing) =>
-                loggedInUserFollowing.UserFollowing.user_id ===
-                ownerFollowing.UserFollowing.user_id,
-            );
+                (loggedInUserFollowing) =>
+                  loggedInUserFollowing.UserFollowing.user_id ===
+                  ownerFollowing.UserFollowing.user_id
+              );
           return (
             <div
               key={ownerFollowing.createdAt}
@@ -142,7 +142,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                 className="p-0 h-auto text-base leading-none"
                 onClick={() =>
                   handleAuthorProfileNavigation(
-                    ownerFollowing.UserFollowing.user_id,
+                    ownerFollowing.UserFollowing.user_id
                   )
                 }
               >
@@ -180,7 +180,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                       loggedInRemoveFollowing(
                         loggedInUserId,
                         ownerFollowing.UserFollowing.user_id,
-                        toast,
+                        toast
                       );
                       // Delete the follow notification
                       deleteNotification({
@@ -194,7 +194,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                       loggedInAddFollowing(
                         loggedInUserId,
                         ownerFollowing.UserFollowing.user_id,
-                        toast,
+                        toast
                       );
                       // Send notification to the target user that someone started following him or her
                       addNotification({

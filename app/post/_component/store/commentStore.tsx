@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { UserType } from "../GetPost";
+import { UserType } from "../_postComponent/RenderPost";
 import { z } from "zod";
 import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import { ToastProp } from "./postStore";

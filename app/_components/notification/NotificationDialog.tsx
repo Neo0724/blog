@@ -2,7 +2,7 @@
 
 import { useLocalStorage } from "@uidotdev/usehooks";
 import React from "react";
-import useNotification from "@/app/post/_component/_custom_hook/useNotificationHook";
+import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
 import EachNotificationPage from "./EachNotificationPage";
 import {
   Popover,
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 export default function NotificationDialog() {
   const [userId] = useLocalStorage<string | null>("test-userId");
   const { allNotification, notViewedCount, isLoading } = useNotification(
-    userId ?? "",
+    userId ?? ""
   );
 
   return (

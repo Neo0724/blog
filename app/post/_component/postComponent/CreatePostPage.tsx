@@ -20,10 +20,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import usePost from "./_custom_hook/usePostHook";
-import { NotificationType, SearchPostType } from "./Enum";
-import { useFollower } from "./_custom_hook/useFollowerHook";
-import useNotification from "./_custom_hook/useNotificationHook";
+import usePost from "../custom_hook/usePostHook";
+import { NotificationType, SearchPostType } from "../Enum";
+import { useFollower } from "../custom_hook/useFollowerHook";
+import useNotification from "../custom_hook/useNotificationHook";
 
 export type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 

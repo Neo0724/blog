@@ -1,6 +1,6 @@
 "use client";
 
-import GetPost from "../_component/GetPost";
+import RenderPost from "../_component/postComponent/RenderPost";
 import { SearchPostType } from "../_component/Enum";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
@@ -9,7 +9,10 @@ export default function AllPostsPage() {
 
   return (
     <>
-      <GetPost searchPostType={SearchPostType.ALL_POST} userId={userId ?? ""} />
+      <RenderPost
+        searchPostType={SearchPostType.ALL_POST}
+        userId={userId ?? ""}
+      />
     </>
   );
 }

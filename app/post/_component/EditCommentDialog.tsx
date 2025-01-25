@@ -22,7 +22,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useStore } from "zustand";
-import { commentStore, CommentType } from "./_store/commentStore";
+import { commentStore, CommentType } from "./store/commentStore";
 
 export default function EditCommentDialog({
   commentId,

@@ -1,5 +1,5 @@
 "use client";
-import { useFollower } from "../../post/_component/_custom_hook/useFollowerHook";
+import { useFollower } from "../../post/_component/custom_hook/useFollowerHook";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useState, useEffect } from "react";
@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useFollowing } from "@/app/post/_component/_custom_hook/useFollowingHook";
+import { useFollowing } from "@/app/post/_component/custom_hook/useFollowingHook";
 import { ToastAction } from "@/components/ui/toast";
 import ShowSpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
 import { NotificationType } from "@/app/post/_component/Enum";
-import useNotification from "@/app/post/_component/_custom_hook/useNotificationHook";
+import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
 
 type FollowerTabProps = {
   pageOwnerUserId: string;
@@ -42,7 +42,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
   const { addNotification, deleteNotification } = useNotification(
-    loggedInUserId ?? "",
+    loggedInUserId ?? ""
   );
   // For the page owner
   const {
@@ -96,10 +96,10 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
           const currentUserIsFollowing = !loggedInUserId
             ? false
             : loggedInFollowing?.find(
-              (loggedInUserFollowing) =>
-                loggedInUserFollowing.UserFollowing.user_id ===
-                ownerFollower.UserFollower.user_id,
-            );
+                (loggedInUserFollowing) =>
+                  loggedInUserFollowing.UserFollowing.user_id ===
+                  ownerFollower.UserFollower.user_id
+              );
 
           return (
             <div
@@ -111,7 +111,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                 className="p-0 h-auto text-base leading-none"
                 onClick={() =>
                   handleAuthorProfileNavigation(
-                    ownerFollower.UserFollower.user_id,
+                    ownerFollower.UserFollower.user_id
                   )
                 }
               >
@@ -127,7 +127,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                     pageOwnerRemoveFollower(
                       pageOwnerUserId,
                       ownerFollower.UserFollower.user_id,
-                      toast,
+                      toast
                     )
                   }
                 >
@@ -166,7 +166,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                       loggedInRemoveFollowing(
                         loggedInUserId,
                         ownerFollower.UserFollower.user_id,
-                        toast,
+                        toast
                       ); // Delete the follow notification
                       deleteNotification({
                         fromUserId: loggedInUserId,
@@ -179,7 +179,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                       loggedInAddFollowing(
                         loggedInUserId,
                         ownerFollower.UserFollower.user_id,
-                        toast,
+                        toast
                       );
                       // Send notification to the target user that someone started following him or her
                       addNotification({

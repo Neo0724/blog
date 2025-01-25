@@ -1,20 +1,19 @@
-import { UserType } from "./GetPost";
+import { UserType } from "./postComponent/RenderPost";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import useNotification from "./_custom_hook/useNotificationHook";
+import useNotification from "./custom_hook/useNotificationHook";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useReplyComment from "./_custom_hook/useReplyComment";
+import useReplyComment from "./custom_hook/useReplyComment";
 import EachCommentReplyPage from "./EachCommentReplyPage";
 import { cn } from "@/lib/utils";
-import useLikedComment from "./_custom_hook/useLikedCommentHook";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import useComment from "./_custom_hook/useCommentHook";
-import { useLikeCommentCount } from "./_custom_hook/useLikedCommentCountHook";
+import useComment from "./custom_hook/useCommentHook";
 import { NotificationType } from "./Enum";
 import EditCommentDialog from "./EditCommentDialog";
+import LikeCommentButton from "./commentComponent/LikeCommentButton";
 
 /*
  * The page when the user click "Comment" button on the post
@@ -42,18 +41,12 @@ export default function EachCommentPage({
   const viewRepliesRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
   const [userId, _] = useLocalStorage("test-userId", "");
-  const [openReply, setOpenReply] = useState(false);
+  const [openUserReplyBox, setOpenUserReplyBox] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, isLoading } = useReplyComment(commentId);
-  const { likedComment, addLikeComment, removeLikeComment } = useLikedComment(
-    userId,
-    post_id
-  );
-  const [isLiked, setIsLiked] = useState<boolean>();
   const { deleteComments } = useComment(post_id, userId);
   const { createReplyComments } = useReplyComment(commentId);
-  const commentLikeCount = useLikeCommentCount(commentId);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
@@ -70,7 +63,7 @@ export default function EachCommentPage({
       replyData,
       setViewReplies,
       setReplyContent,
-      setOpenReply,
+      setOpenUserReplyBox,
       toast
     );
 
@@ -117,7 +110,7 @@ export default function EachCommentPage({
         ),
       });
     } else {
-      setOpenReply((prev) => !prev);
+      setOpenUserReplyBox((prev) => !prev);
     }
   };
 
@@ -131,68 +124,9 @@ export default function EachCommentPage({
     }
   };
 
-  const handleLikeComment = async () => {
-    // User not logged in
-    if (!userId) {
-      toast({
-        title: "Error",
-        description: "Please sign in to like",
-        action: (
-          <ToastAction
-            altText="Sign in now"
-            onClick={() => {
-              window.location.replace("/sign-in");
-            }}
-          >
-            Sign in
-          </ToastAction>
-        ),
-      });
-      return;
-    }
-    if (isLiked) {
-      // Remove the notification from the target user
-      if (userId !== user.user_id) {
-        deleteNotification({
-          fromUserId: userId,
-          targetUserId: user.user_id,
-          type: NotificationType.LIKE_COMMENT,
-          resourceId: commentId,
-        });
-      }
-
-      // Remove the like
-      removeLikeComment(userId, commentId, setIsLiked, toast);
-    } else {
-      // Only send notification if the user who liked is not the author
-      if (userId !== user.user_id) {
-        addNotification({
-          fromUserId: userId,
-          targetUserId: [user.user_id],
-          type: NotificationType.LIKE_COMMENT,
-          resourceId: commentId,
-        });
-      }
-
-      // Add the like
-      addLikeComment(userId, commentId, setIsLiked, toast);
-    }
-  };
-
   function handleAuthorProfileNavigation(user_id: string): void {
     router.push(`/user/${user_id}`);
   }
-
-  useEffect(() => {
-    if (likedComment && likedComment.length > 0) {
-      const userLiked = likedComment.find(
-        (item) => item.Comment_comment_id === commentId
-      )
-        ? true
-        : false;
-      setIsLiked(userLiked);
-    }
-  }, [commentId, likedComment]);
 
   // Scroll user to the view replies block to improve user experience
   useEffect(() => {
@@ -255,18 +189,19 @@ export default function EachCommentPage({
       <span className="mt-[5px] text-sm text-black opacity-70 font-normal">
         {dateDifferent}
       </span>
-      {/* Like and reply button */}
+      {/* Like and reply comment button */}
       <div className="flex space-x-3 mt-[-5px]">
-        <Button
+        {/* Like comment button */}
+        <LikeCommentButton
+          className="px-0"
+          commentId={commentId}
+          commentOwnerId={user.user_id}
+          postId={post_id}
           variant="link"
-          className={cn("px-0", isLiked ? "text-red-500" : "")}
-          onClick={handleLikeComment}
-        >
-          {isLiked ? "Dislike" : "Like"}
-          {"  " + (commentLikeCount ?? 0)}
-        </Button>
+          key={commentId}
+        />
         <Button variant="link" className="px-0" onClick={handleOpenReply}>
-          {openReply ? "Cancel reply" : "Reply"}
+          {openUserReplyBox ? "Cancel reply" : "Reply"}
         </Button>
         {/* Delete comment button and edit button */}
         {userId === user?.user_id && (
@@ -301,13 +236,13 @@ export default function EachCommentPage({
             : replyComments && replyComments.length > 0
             ? viewReplies
               ? "Hide replies"
-              : "View replies (" + replyComments.length.toString() + ")"
+              : `View replies (${replyComments.length.toString()})`
             : "No replies"}
         </span>
       </button>
       {/* Reply textarea for user to enter */}
       <div className="ml-8 mb-5">
-        {openReply && (
+        {openUserReplyBox && (
           <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">
             <span className="opacity-70">Replying to {user.name} :</span>
             <div className="flex gap-3 justify-center items-center">
@@ -325,8 +260,8 @@ export default function EachCommentPage({
             </div>
           </div>
         )}
-        {/* All the comments' replies */}
 
+        {/* All the comments' replies */}
         <div
           className={cn(
             "min-h-[150px] max-h-[350px] overflow-y-scroll",

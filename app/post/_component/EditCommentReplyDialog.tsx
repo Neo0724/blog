@@ -25,7 +25,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useStore } from "zustand";
-import { replyCommentStore } from "./_store/replyCommentStore";
+import { replyCommentStore } from "./store/replyCommentStore";
 
 export default function EditCommentReplyDialog({
   content,

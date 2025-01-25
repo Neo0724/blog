@@ -24,7 +24,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdEdit } from "react-icons/md";
 import { useStore } from "zustand";
-import { postStore } from "./_store/postStore";
+import { postStore } from "../store/postStore";
 import { CreatePostFormType } from "./CreatePostPage";
 import { usePathname } from "next/navigation";
 

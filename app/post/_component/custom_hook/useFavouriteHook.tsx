@@ -1,8 +1,8 @@
 import useSWR from "swr";
 import axios from "axios";
-import { PostType } from "../GetPost";
+import { PostType } from "../postComponent/RenderPost";
 import { useStore } from "zustand";
-import { favouriteStore } from "../_store/favouriteStore";
+import { favouriteStore } from "../store/favouriteStore";
 
 export type GetBackFavouritePost = {
   Post: PostType;

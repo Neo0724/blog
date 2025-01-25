@@ -1,5 +1,7 @@
 import axios from "axios";
 import useSWR from "swr";
+import { useStore } from "zustand";
+import { likedPostStore } from "../store/likedPostStore";
 
 export type GetBackLikedPostType = {
   Post_post_id: string;
@@ -38,9 +40,12 @@ export default function useLikedPost(user_id: string | null) {
     ([url, user_id]) => fetchData(url, user_id)
   );
 
+  const actions = useStore(likedPostStore, (state) => state.actions);
+
   return {
     likedPost: data,
     likedPostError: error,
     likedPostLoading: isLoading,
+    ...actions,
   };
 }

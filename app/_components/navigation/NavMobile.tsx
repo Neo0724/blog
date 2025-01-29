@@ -9,6 +9,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import NotificationDialog from "../notification/NotificationDialog";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { IoIosCloseCircle } from "react-icons/io";
 
 export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
   const pathname = usePathname();
@@ -30,11 +32,12 @@ export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
         <SearchBar />
         <NotificationDialog />
         <Button
+          variant="ghost"
           onClick={() => {
             setSidebarOpen(true);
           }}
         >
-          Hamburger
+          <GiHamburgerMenu className="text-lg" />
         </Button>
       </div>
       {/* Sidebar */}
@@ -50,7 +53,7 @@ export default function NavMobile({ navItems }: { navItems: NavItemsType[] }) {
           }}
           className="w-full mt-5 bg-zinc-500"
         >
-          Close
+          <IoIosCloseCircle className="text-lg" />
         </Button>
         <div className="flex flex-col items-center gap-3">
           {navItems.map((navItem) => {

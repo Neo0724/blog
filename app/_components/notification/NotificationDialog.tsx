@@ -10,20 +10,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { IoNotifications } from "react-icons/io5";
+
 export default function NotificationDialog() {
   const [userId] = useLocalStorage<string | null>("test-userId");
   const { allNotification, notViewedCount, isLoading } = useNotification(
-    userId ?? ""
+    userId ?? "",
   );
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative rounded-xl bg-gray-200 hover:text-blue-800 active:text-blue-800"
-        >
-          Notification
+        <Button variant="outline" className="relative rounded-xl bg-none">
+          <IoNotifications />
           {/* Show red dot if there are notifications */}
           {/* TODO Try to add a unread notification count on api so that the red dot will only appear if there are any unread notification only */}
           {!isLoading && (notViewedCount as number) > 0 && (

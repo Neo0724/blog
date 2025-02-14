@@ -22,8 +22,15 @@ export default function SearchBar() {
         placeholder="Search for post..."
         value={searchText}
         onChange={(e) => handleTextChange(e)}
+        className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)] text-white"
       />
-      <Button onClick={handleSearch}>Search</Button>
+      <Button
+        onClick={handleSearch}
+        variant="ghost"
+        className="min-w-fit rounded-xl bg-[rgb(58,59,60)] text-white"
+      >
+        Search
+      </Button>
     </div>
   );
 }

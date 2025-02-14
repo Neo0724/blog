@@ -2,8 +2,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -67,7 +65,7 @@ export function AppSidebar() {
           <SidebarMenuItem key="SignOut">
             <SidebarMenuButton
               className={cn(
-                "text-white border-0 rounded-lg justify-start cursor-pointer w-[80%] mx-auto",
+                "text-white border-0 rounded-lg justify-start cursor-pointer w-[80%] mx-auto h-10",
                 !userId && "hidden"
               )}
               onClick={handleSignOut}
@@ -77,7 +75,7 @@ export function AppSidebar() {
                 <span>
                   <FaSignOutAlt />
                 </span>
-                <span>Sign Out</span>
+                <span className="font-bold">Sign Out</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

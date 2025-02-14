@@ -74,7 +74,7 @@ export default function EachNotificationPage({
   return (
     <div
       key={notification.notification_id}
-      className="flex gap-3 justify-between items-center"
+      className="flex gap-3 justify-between items-center text-white"
     >
       <div>
         <span>{notification.FromUser.name}</span>
@@ -98,7 +98,7 @@ export default function EachNotificationPage({
       </div>
       <Button
         variant="ghost"
-        className="rounded-xl bg-gray-200 hover:text-blue-800 active:text-blue-800"
+        className="rounded-xl bg-[rgb(58,59,60)] hover:text-blue-800 active:text-blue-800 text-white"
         onClick={handleViewNotification}
       >
         {notification.hasViewed ? "View" : "Read"}
@@ -110,7 +110,7 @@ export default function EachNotificationPage({
         ) && (
           <Button
             variant="ghost"
-            className="rounded-xl bg-gray-200 hover:text-blue-800 active:text-blue-800"
+            className="rounded-xl bg-[rgb(36,37,38)] border-[rgb(58,59,60)] text-white hover:text-blue-800 active:text-blue-800"
             onClick={handleFollowBack}
           >
             Follow back

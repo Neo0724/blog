@@ -7,7 +7,6 @@ import { mutate } from "swr";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useFollowing } from "@/app/post/_component/custom_hook/useFollowingHook";
 import SpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
 import useSearchDebounce from "./customHook/useSearchDebounce";
@@ -29,11 +28,6 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
     isLoading,
     isValidating,
   } = useFollower(pageOwnerUserId ?? "", searchUsername);
-
-  // For the currently logged in user
-  const { allFollowing: loggedInFollowing } = useFollowing(
-    loggedInUserId ?? ""
-  );
 
   const handleAuthorProfileNavigation = (user_id: string) => {
     router.push(`/user/${user_id}`);
@@ -69,15 +63,6 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
         pageOwnerFollower &&
         pageOwnerFollower.length > 0 &&
         pageOwnerFollower?.map((ownerFollower) => {
-          // Check if the current logged in user is following the current user
-          const currentUserIsFollowing = !loggedInUserId
-            ? false
-            : loggedInFollowing?.find(
-                (loggedInUserFollowing) =>
-                  loggedInUserFollowing.UserFollowing.user_id ===
-                  ownerFollower.UserFollower.user_id
-              );
-
           return (
             <div
               key={ownerFollower.createdAt}

@@ -11,10 +11,8 @@ import { useRouter } from "next/navigation";
 export default function SignOut() {
   const router = useRouter();
   const [userId, setUserId] = useLocalStorage<string | null>("test-userId");
-  const [username, setUsername] = useLocalStorage<string | null>(
-    "test-username"
-  );
-  const [_, setUserToken, __] = useCookie("userId", undefined);
+  const [_, setUsername] = useLocalStorage<string | null>("test-username");
+  const [__, setUserToken, ___] = useCookie("userId", undefined);
 
   const handleSignOut = () => {
     setUserId(null);
@@ -24,15 +22,15 @@ export default function SignOut() {
   };
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       asChild
       className={cn(
-        "w-full hover:underline text-white border-none bg-zinc-500",
+        "w-[11.5rem] text-white font-bold border-0 rounded-lg justify-start cursor-pointer",
         !userId ? "hidden" : ""
       )}
       onClick={handleSignOut}
     >
-      <div className="flex flex-col md:flex-row md:gap-3 hover:cursor-pointer">
+      <div className="flex flex-col md:flex-row md:gap-3">
         <span>
           <FaSignOutAlt />
         </span>

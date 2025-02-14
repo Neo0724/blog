@@ -39,7 +39,7 @@ const SignInPage = () => {
 
   const [toastMessage, setToastMessage] = useState({ msg: "", error: false });
 
-  const waitClearToast = new Promise((resolve, reject) => {
+  const waitClearToast = new Promise((resolve, _) => {
     setTimeout(() => {
       setToastMessage({ msg: "", error: false });
       resolve(true);

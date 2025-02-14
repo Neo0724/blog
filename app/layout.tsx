@@ -3,6 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./_components/navigation/Navbar";
 import { Toaster } from "@/components/ui/toaster";
+import { ListOfNavItems } from "./_components/navigation/ListOfNavItem";
+import Navitem from "./_components/navigation/Navitem";
+import SignOut from "./_components/navigation/SignOut";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./_components/navigation/AppSidebar";
+import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,15 +23,36 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="p-10">
-      <body className={inter.className}>
-        <main className="flex flex-col justify-center">
+      <body className={cn(inter.className, "bg-[rgb(36,37,38)]")}>
+        <SidebarProvider>
           <Navbar />
-          <div className="mt-20 flex items-center justify-center">
+          <AppSidebar />
+          <main className="mt-[4rem] mx-auto text-white">
             {children}
-          </div>
-          <Toaster />
-        </main>
+            <Toaster />
+          </main>
+        </SidebarProvider>
       </body>
     </html>
   );
+}
+
+{
+  /* Sidebar */
+}
+{
+  /* <div className="hidden md:flex fixed top-[5.9rem] left-0 bottom-0 flex-col items-center w-[15rem] justify-betweem gap-8 bg-gray-500">
+  {ListOfNavItems.map((navItem) => {
+    return (
+      <Navitem
+        key={navItem.href}
+        name={navItem.name}
+        href={navItem.href}
+        active={navItem.active}
+        icon={navItem.icon}
+      />
+    );
+  })}
+  <SignOut />
+</div> */
 }

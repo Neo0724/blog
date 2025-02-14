@@ -167,40 +167,44 @@ export default function EachCommentPage({
       <div className="font-bold">
         <Button
           variant="link"
-          className="p-0 h-auto text-base leading-none font-bold"
+          className="p-0 h-auto text-base leading-none font-bold text-white"
           onClick={() => handleAuthorProfileNavigation(user.user_id)}
         >
           {user.name}
         </Button>
         {/* The comment is created by the logged in user */}
         {user?.user_id === userId && (
-          <span className="ml-1 text-black opacity-70 font-normal">
+          <span className="ml-1 text-white opacity-70 font-normal">
             ( Self )
           </span>
         )}
         {/* The comment is created by the author */}
         {user?.user_id !== userId && user?.user_id === authorId && (
-          <span className="ml-1 text-black opacity-70 font-normal">
+          <span className="ml-1 text-white opacity-70 font-normal">
             ( Author )
           </span>
         )}
       </div>
       <div>{content}</div>
-      <span className="mt-[5px] text-sm text-black opacity-70 font-normal">
+      <span className="mt-[5px] text-sm text-white opacity-70 font-normal">
         {dateDifferent}
       </span>
       {/* Like and reply comment button */}
       <div className="flex space-x-3 mt-[-5px]">
         {/* Like comment button */}
         <LikeCommentButton
-          className="px-0"
+          className="px-0 text-white"
           commentId={commentId}
           commentOwnerId={user.user_id}
           postId={post_id}
           variant="link"
           key={commentId}
         />
-        <Button variant="link" className="px-0" onClick={handleOpenReply}>
+        <Button
+          variant="link"
+          className="px-0 text-white"
+          onClick={handleOpenReply}
+        >
           {openUserReplyBox ? "Cancel reply" : "Reply"}
         </Button>
         {/* Delete comment button and edit button */}
@@ -208,12 +212,12 @@ export default function EachCommentPage({
           <>
             <Button
               variant="link"
-              className="px-0"
+              className="px-0 text-white"
               onClick={handleDeleteComment}
             >
               Delete
             </Button>
-            <Button variant="link" className="px-0">
+            <Button variant="link" className="px-0 text-white">
               <EditCommentDialog
                 commentId={commentId}
                 content={content}
@@ -230,7 +234,7 @@ export default function EachCommentPage({
         onClick={handleViewReply}
       >
         <hr className="w-64 h-px bg-gray-200 border-0 dark:bg-gray-700" />
-        <span className="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">
+        <span className="absolute px-3 font-medium -translate-x-1/2 left-1/2  bg-[rgb(36,37,38)] text-white">
           {isLoading
             ? "Loading..."
             : replyComments && replyComments.length > 0

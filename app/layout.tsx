@@ -27,8 +27,8 @@ export default function RootLayout({
         <SidebarProvider>
           <Navbar />
           <AppSidebar />
-          <main className="mt-[4rem] mx-auto text-white">
-            {children}
+          <main className="mt-[4rem] mx-auto text-white flex flex-col min-h-screen w-full justify-center items-center">
+            <div className="flex-1 w-full max-w-[800px]">{children}</div>
             <Toaster />
           </main>
         </SidebarProvider>

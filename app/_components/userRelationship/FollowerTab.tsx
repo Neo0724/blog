@@ -8,11 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useFollowing } from "@/app/post/_component/custom_hook/useFollowingHook";
-import { ToastAction } from "@/components/ui/toast";
 import SpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
-import { NotificationType } from "@/app/post/_component/Enum";
-import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
 import useSearchDebounce from "./customHook/useSearchDebounce";
 
 type FollowerTabProps = {
@@ -25,9 +22,6 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
-  const { addNotification, deleteNotification } = useNotification(
-    loggedInUserId ?? ""
-  );
   // For the page owner
   const {
     allFollower: pageOwnerFollower,
@@ -37,11 +31,9 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
   } = useFollower(pageOwnerUserId ?? "", searchUsername);
 
   // For the currently logged in user
-  const {
-    allFollowing: loggedInFollowing,
-    removeFollowing: loggedInRemoveFollowing,
-    addFollowing: loggedInAddFollowing,
-  } = useFollowing(loggedInUserId ?? "");
+  const { allFollowing: loggedInFollowing } = useFollowing(
+    loggedInUserId ?? ""
+  );
 
   const handleAuthorProfileNavigation = (user_id: string) => {
     router.push(`/user/${user_id}`);
@@ -61,6 +53,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
           onChange={(e) => {
             setSearchUsername(e.target.value);
           }}
+          className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
         />
         {/* Show loading spinner when user filtering username */}
         {isValidating && (
@@ -92,7 +85,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
             >
               <Button
                 variant="link"
-                className="p-0 h-auto text-base leading-none"
+                className="p-0 h-auto text-base leading-none text-white"
                 onClick={() =>
                   handleAuthorProfileNavigation(
                     ownerFollower.UserFollower.user_id
@@ -106,7 +99,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
               {pageOwnerUserId === loggedInUserId && (
                 <Button
                   variant="ghost"
-                  className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
+                  className="rounded-xl hover:text-red-800 active:text-red-800 bg-[rgb(58,59,60)]"
                   onClick={() =>
                     pageOwnerRemoveFollower(
                       pageOwnerUserId,
@@ -116,68 +109,6 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                   }
                 >
                   Remove
-                </Button>
-              )}
-
-              {/* We only care about the currently logged in user as they are the one who will be interacting with this follow and unfollow button*/}
-              {/* Only show the button if the currently logged in user is not the current following user list*/}
-              {ownerFollower.UserFollower.user_id !== loggedInUserId && (
-                <Button
-                  variant="ghost"
-                  className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
-                  onClick={() => {
-                    // User is not logged in
-                    if (!loggedInUserId) {
-                      toast({
-                        title: "Error",
-                        description: "Please sign in to follow",
-                        action: (
-                          <ToastAction
-                            altText="Sign in now"
-                            onClick={() => {
-                              window.location.replace("/sign-in");
-                            }}
-                          >
-                            Sign in
-                          </ToastAction>
-                        ),
-                      });
-                      return;
-                    }
-                    // Current user is logged in
-                    // Remove the user from following
-                    if (currentUserIsFollowing) {
-                      loggedInRemoveFollowing(
-                        loggedInUserId,
-                        ownerFollower.UserFollower.user_id,
-                        toast
-                      ); // Delete the follow notification
-                      deleteNotification({
-                        fromUserId: loggedInUserId,
-                        targetUserId: ownerFollower.UserFollower.user_id,
-                        type: NotificationType.FOLLOW,
-                        resourceId: loggedInUserId,
-                      });
-                    } else {
-                      // Add the current user to following
-                      loggedInAddFollowing(
-                        loggedInUserId,
-                        ownerFollower.UserFollower.user_id,
-                        toast
-                      );
-                      // Send notification to the target user that someone started following him or her
-                      addNotification({
-                        fromUserId: loggedInUserId,
-                        targetUserId: [ownerFollower.UserFollower.user_id],
-                        type: NotificationType.FOLLOW,
-                        resourceId: loggedInUserId,
-                      });
-                    }
-                  }}
-                >
-                  {!currentUserIsFollowing || !loggedInUserId
-                    ? "Follow"
-                    : "Unfollow"}
                 </Button>
               )}
             </div>

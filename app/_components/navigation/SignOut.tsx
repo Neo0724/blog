@@ -34,7 +34,7 @@ export default function SignOut() {
         <span>
           <FaSignOutAlt />
         </span>
-        <Link href="/" className="text-xs md:text-sm">
+        <Link href="/" className="text-xs md:text-sm font-bold">
           Sign Out
         </Link>
       </div>

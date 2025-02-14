@@ -75,7 +75,7 @@ export default function CreatePost({
   };
 
   return (
-    <div className="flex items-start w-full mx-auto justify-center flex-col border-2 rounded-md p-5 mb-4 max-w-[800px]">
+    <div className="flex items-start w-full mx-auto justify-center flex-col border-2 rounded-md p-5 mb-4 max-w-[800px] border-[rgb(58,59,60)]">
       <span className="w-[85%] font-bold text-xl">
         What&apos;s on your mind, {username}?
       </span>

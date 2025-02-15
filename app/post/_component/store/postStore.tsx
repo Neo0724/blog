@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { CreatePostFormType } from "../_postComponent/CreatePostPage";
+import { CreatePostFormType } from "../postComponent/CreatePostPage";
 import { mutate } from "swr";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch } from "react";

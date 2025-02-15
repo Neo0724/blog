@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./_components/navigation/Navbar";
 import { Toaster } from "@/components/ui/toaster";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "./_components/navigation/AppSidebar";
+import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,14 +20,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="p-10">
-      <body className={inter.className}>
-        <main className="flex flex-col justify-center">
+      <body className={cn(inter.className, "bg-[rgb(36,37,38)]")}>
+        <SidebarProvider>
           <Navbar />
-          <div className="mt-20 flex items-center justify-center">
-            {children}
-          </div>
-          <Toaster />
-        </main>
+          <AppSidebar />
+          <main className="mt-[4rem] mx-auto text-white flex flex-col min-h-screen w-full justify-center items-center">
+            <div className="flex-1 w-full max-w-[800px]">{children}</div>
+            <Toaster />
+          </main>
+        </SidebarProvider>
       </body>
     </html>
   );

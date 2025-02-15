@@ -88,7 +88,7 @@ export default function FollowButton({
       {/* Current user is not the author and has not follow the author */}
       {loggedInUserId !== authorId && !isFollowing && (
         <div className="mr-[30px]">
-          <span className="text-black opacity-80 mr-2">&#x2022;</span>
+          <span className="text-white opacity-80 mr-2">&#x2022;</span>
           <Button
             variant={variant}
             onClick={handleFollow}
@@ -101,7 +101,7 @@ export default function FollowButton({
       {/* Current user is not the author and has already follwed the author */}
       {loggedInUserId !== authorId && isFollowing && (
         <>
-          <span className="text-black opacity-80">&#x2022;</span>
+          <span className="text-white opacity-80">&#x2022;</span>
           <Button
             variant={variant}
             onClick={handleUnfollow}

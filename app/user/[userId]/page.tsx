@@ -8,7 +8,7 @@ export default function UserPage({ params }: { params: { userId: string } }) {
   return (
     <div>
       <Tabs defaultValue="post" className="max-w-[800px]">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 bg-[rgb(36,37,38)] text-white">
           <TabsTrigger className="font-bold" value="post">
             Posts
           </TabsTrigger>

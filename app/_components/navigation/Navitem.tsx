@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { NavItemsType } from "./Navbar";
+import { NavItemsType } from "./ListOfNavItem";
 
 export default function Navitem({ name, href, active, icon }: NavItemsType) {
   const [userId, _] = useLocalStorage<string | null>("test-userId");
@@ -19,17 +19,18 @@ export default function Navitem({ name, href, active, icon }: NavItemsType) {
   return (
     <>
       {/* Vertical line */}
-      <div className="hidden md:block bg-white w-[1px] h-10"></div>
+      {/* <div className="hidden md:block bg-white w-[1px] h-10"></div> */}
       {/* Link button */}
       <Button
         variant="ghost"
         asChild
         className={cn(
-          "hover:underline md:w-23 w-full bg-zinc-500 text-white border-0 rounded-lg",
-          userId && href === "/sign-up" ? "hidden" : ""
+          "w-[11.5rem] text-white border-0 rounded-lg justify-start cursor-pointer",
+          userId && href === "/sign-up" ? "hidden" : "",
+          name === "Home" && "mt-[1.7rem]"
         )}
       >
-        <div className="flex flex-col md:flex-row md:gap-3 hover:cursor-pointer">
+        <div className="flex flex-col md:flex-row md:gap-3">
           <span>{icon}</span>
           <Link
             href={

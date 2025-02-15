@@ -75,7 +75,7 @@ export default function CreatePost({
   };
 
   return (
-    <div className="flex items-start w-full mx-auto justify-center flex-col border-2 rounded-md p-5 mb-4 max-w-[800px]">
+    <div className="flex items-start w-full mx-auto justify-center flex-col border-2 rounded-md p-5 mb-4 max-w-[800px] border-[rgb(58,59,60)]">
       <span className="w-[85%] font-bold text-xl">
         What&apos;s on your mind, {username}?
       </span>
@@ -91,7 +91,11 @@ export default function CreatePost({
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter title..." {...field} />
+                  <Input
+                    placeholder="Enter title..."
+                    {...field}
+                    className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -105,7 +109,7 @@ export default function CreatePost({
                 <FormLabel>Content</FormLabel>
                 <FormControl>
                   <Textarea
-                    className="h-[3svh]"
+                    className="h-[3svh] bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
                     placeholder="Enter content..."
                     {...field}
                   />
@@ -117,7 +121,7 @@ export default function CreatePost({
           <Button
             type="submit"
             variant="ghost"
-            className="flex gap-2 w-min self-start rounded-xl bg-gray-200"
+            className="flex gap-2 w-min self-start rounded-xl bg-[rgb(58,59,60)]"
           >
             Create post
           </Button>

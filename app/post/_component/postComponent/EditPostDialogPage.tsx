@@ -81,7 +81,7 @@ export default function EditPostDialogPage({
           Edit post
         </span>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-[rgb(36,37,38)] text-white border-[rgb(58,59,60)]">
         <DialogHeader>
           <DialogTitle>Editing post</DialogTitle>
           <DialogDescription>
@@ -101,7 +101,11 @@ export default function EditPostDialogPage({
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter title..." {...field} />
+                      <Input
+                        placeholder="Enter title..."
+                        {...field}
+                        className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -115,7 +119,7 @@ export default function EditPostDialogPage({
                     <FormLabel>Content</FormLabel>
                     <FormControl>
                       <Textarea
-                        className="min-h-[150px] max-h-[250px] h-[50vh]"
+                        className="min-h-[150px] max-h-[250px] h-[50vh] bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
                         placeholder="Enter content..."
                         {...field}
                       />
@@ -124,7 +128,11 @@ export default function EditPostDialogPage({
                   </FormItem>
                 )}
               />
-              <Button className="ml-auto" type="submit">
+              <Button
+                variant="ghost"
+                className="ml-auto bg-[rgb(58,59,60)]"
+                type="submit"
+              >
                 Save changes
               </Button>
             </form>

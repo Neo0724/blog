@@ -15,14 +15,17 @@ import { IoNotifications } from "react-icons/io5";
 export default function NotificationDialog() {
   const [userId] = useLocalStorage<string | null>("test-userId");
   const { allNotification, notViewedCount, isLoading } = useNotification(
-    userId ?? "",
+    userId ?? ""
   );
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="relative rounded-xl bg-none">
-          <IoNotifications />
+        <Button
+          variant="ghost"
+          className="relative rounded-xl bg-[rgb(58,59,60)] text-black border-[rgb(58,59,60)] group"
+        >
+          <IoNotifications className="text-white group-hover:text-black" />
           {/* Show red dot if there are notifications */}
           {/* TODO Try to add a unread notification count on api so that the red dot will only appear if there are any unread notification only */}
           {!isLoading && (notViewedCount as number) > 0 && (
@@ -32,7 +35,7 @@ export default function NotificationDialog() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="max-w-[400px] w-full">
+      <PopoverContent className="max-w-[400px] w-full bg-[rgb(36,37,38)] border-[rgb(58,59,60)]">
         <div className="flex flex-col gap-3">
           {/* Notification is loading */}
           {isLoading && <div>Loading ...</div>}

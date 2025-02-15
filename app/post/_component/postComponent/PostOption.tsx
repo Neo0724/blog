@@ -15,13 +15,13 @@ export default function PostOption({
   postId,
   title,
   content,
-  styleProperty,
+  className,
 }: {
   authorId: string;
   postId: string;
   title: string;
   content: string;
-  styleProperty?: string;
+  className?: string;
 }) {
   const [toolbar, setToolbar] = useState(false);
   const { toast } = useToast();
@@ -79,7 +79,7 @@ export default function PostOption({
       <div
         className={cn(
           "flex z-10 flex-col items-end absolute right-5",
-          styleProperty
+          className
         )}
         ref={menuRef}
       >

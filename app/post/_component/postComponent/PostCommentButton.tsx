@@ -30,15 +30,17 @@ type PostCommentPageProps = {
   authorName: string;
   authorId: string;
   createdAt: string;
+  className: string;
 };
 
-export default function PostComment({
+export default function PostCommentButton({
   postId,
   title,
   content,
   authorName,
   authorId,
   createdAt,
+  className,
 }: PostCommentPageProps) {
   const router = useRouter();
 
@@ -66,21 +68,18 @@ export default function PostComment({
     <>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex gap-2 min-w-fit rounded-xl bg-gray-200"
-          >
+          <Button variant="ghost" className={className}>
             <BiComment />
             Comments {comments ? comments.length.toString() : ""}{" "}
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="bg-[rgb(36,37,38)] text-white border-[rgb(58,59,60)]">
           <PostOption
             postId={postId}
             authorId={authorId}
             title={title}
             content={content}
-            styleProperty={"top-[10px] right-[40px]"}
+            className="top-[10px] right-[40px]"
           />
           <DialogHeader>
             <DialogTitle>
@@ -88,7 +87,7 @@ export default function PostComment({
                 {/* Author profile link button */}
                 <Button
                   variant="link"
-                  className="p-0 h-auto text-base leading-none font-bold"
+                  className="p-0 h-auto text-base leading-none font-bold text-white"
                   onClick={() => handleAuthorProfileNavigation(authorId)}
                 >
                   {authorName}
@@ -107,7 +106,7 @@ export default function PostComment({
                 <span>{title}</span>
               </div>
               <span className="overflow-y-scroll max-h-[125px]">{content}</span>
-              <span className="text-sm text-black opacity-70 font-normal">
+              <span className="text-sm text-white opacity-70 font-normal">
                 {getReadableDate(createdAt)}
               </span>
             </div>
@@ -115,20 +114,20 @@ export default function PostComment({
               {/* Like button  */}
               <LikePostButton
                 authorId={authorId}
-                className="flex gap-2 min-w-fit rounded-xl bg-gray-200"
+                className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
                 postId={postId}
                 variant="ghost"
                 key={postId}
               />
               {/* Favourite button  */}
               <FavouritePostButton
-                className="flex gap-2 min-w-fit rounded-xl bg-gray-200"
+                className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
                 postId={postId}
                 variant="ghost"
                 key={postId}
               />
             </div>
-            <div className="overflow-y-scroll border-solid border-2 border-black-500 p-3 rounded-lg h-[50svh]">
+            <div className="overflow-y-scroll border-2 border-[rgb(58,59,60)] p-3 rounded-lg h-[50svh]">
               {isLoading && <div>Comments are loading...</div>}
               {!isLoading &&
                 comments &&

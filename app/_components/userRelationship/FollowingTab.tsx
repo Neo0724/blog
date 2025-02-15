@@ -53,13 +53,14 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   return (
     <>
       {/* Search bar */}
-      <div className="flex my-3 relative">
+      <div className="flex my-3 relative bg-[rgb(58,59,60)]">
         <Input
           placeholder="Search"
           value={searchUsername}
           onChange={(e) => {
             setSearchUsername(e.target.value);
           }}
+          className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
         />
         {/* Show loading spinner when user filtering username */}
         {isValidating && (
@@ -91,7 +92,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
             >
               <Button
                 variant="link"
-                className="p-0 h-auto text-base leading-none"
+                className="p-0 h-auto text-base leading-none text-white"
                 onClick={() =>
                   handleAuthorProfileNavigation(
                     ownerFollowing.UserFollowing.user_id
@@ -105,7 +106,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
               {loggedInUserId !== ownerFollowing.UserFollowing.user_id && (
                 <Button
                   variant="ghost"
-                  className="rounded-xl bg-gray-200 hover:text-red-800 active:text-red-800"
+                  className="rounded-xl hover:text-red-800 active:text-red-800 bg-[rgb(58,59,60)]"
                   onClick={() => {
                     // User is not logged in
                     if (!loggedInUserId) {

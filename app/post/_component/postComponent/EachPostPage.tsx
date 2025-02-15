@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
-import PostComment from "./PostComment";
+import React, { useRef } from "react";
+import PostCommentButton from "./PostCommentButton";
 import PostOption from "./PostOption";
 import { useRouter } from "next/navigation";
 import LikePostButton from "@/app/_components/userInteraction/LikePostButton";
@@ -29,29 +29,44 @@ export default function EachPostPage({
 }: EachPostProps) {
   const router = useRouter();
 
+  const postRef = useRef<HTMLDivElement>(null);
+
   const handleAuthorProfileNavigation = (authorId: string) => {
     router.push("/user/" + authorId);
   };
 
+  const handleScrollToPost = () => {
+    if (postRef.current) {
+      postRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "end",
+      });
+    }
+  };
+
   return (
-    <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5 max-w-[800px] mx-auto">
+    <div
+      className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5 max-w-[800px] mx-auto border-[rgb(58,59,60)]"
+      ref={postRef}
+    >
       <PostOption
         authorId={authorId}
         postId={postId}
         title={title}
         content={content}
       />
-      <div className="flex flex-row gap-2 border-b-2 pb-5 flex-wrap items-center">
+      <div className="flex flex-row gap-2 pb-3 flex-wrap items-center">
         <span>
           <Button
             variant="link"
             onClick={() => handleAuthorProfileNavigation(authorId)}
-            className="font-bold p-0 h-0 text-lg"
+            className="font-bold p-0 h-0 text-lg text-white"
           >
             {author}
           </Button>
         </span>
-        <span className="opacity-80">&#x2022;</span>
+        <span className="opacity-80 text-white">&#x2022;</span>
         <span className="opacity-80">{dateDifferent}</span>
         {/* Follow button */}
         <FollowButton
@@ -65,29 +80,34 @@ export default function EachPostPage({
         <h1 className="font-bold">{title}</h1>
       </div>
       <div className="flex flex-row gap-4 pb-2">
-        <PostContent content={content} key={postId} />
+        <PostContent
+          content={content}
+          key={postId}
+          handleScrollToPost={handleScrollToPost}
+        />
       </div>
       <div className="flex items-center flex-wrap gap-2 max-w-[40rem] w-full">
         {/* Like button  */}
         <LikePostButton
           authorId={authorId}
-          className="flex gap-2 min-w-fit rounded-xl bg-gray-200"
+          className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
           postId={postId}
           variant="ghost"
           key={postId}
         />
         {/* Comment button */}
-        <PostComment
+        <PostCommentButton
           postId={postId}
           authorId={authorId}
           title={title}
           content={content}
           authorName={author}
           createdAt={createdAt}
+          className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
         />
         {/* Favourite button  */}
         <FavouritePostButton
-          className="flex gap-2 min-w-fit rounded-xl bg-gray-200"
+          className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
           postId={postId}
           variant="ghost"
           key={postId}

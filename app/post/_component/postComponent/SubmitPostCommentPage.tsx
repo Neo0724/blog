@@ -84,14 +84,14 @@ export default function SubmitPostCommentPage({
                 <Textarea
                   placeholder="Write a comment ......"
                   {...field}
-                  className="w-[90%] mx-auto m-0"
+                  className="w-[90%] mx-auto m-0 border-[rgb(58,59,60)] bg-[rgb(36,37,38)]"
                 />
               </FormControl>
             </FormItem>
           )}
         />
         <Button
-          className="ml-auto flex gap-2 min-w-fit rounded-xl bg-gray-200"
+          className="ml-auto flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
           type="submit"
           variant="ghost"
         >

@@ -27,6 +27,8 @@ import { useStore } from "zustand";
 import { postStore } from "../store/postStore";
 import { CreatePostFormType } from "./CreatePostPage";
 import { usePathname } from "next/navigation";
+import usePost from "../custom_hook/usePostHook";
+import { SearchPostType } from "../Enum";
 
 export default function EditPostDialogPage({
   postId,
@@ -39,6 +41,28 @@ export default function EditPostDialogPage({
 }) {
   const { toast } = useToast();
   const updatePost = useStore(postStore, (state) => state.actions.updatePosts);
+  // Testing purpose
+
+  const getCorrectSearchPostType = (): SearchPostType => {
+    // Get url key for mutation
+    let postType: SearchPostType = SearchPostType.ALL_POST;
+
+    if (currentUrl.match("all-posts")) {
+      postType = SearchPostType.ALL_POST;
+    } else if (currentUrl.match("user")) {
+      postType = SearchPostType.USER_POST;
+    } else if (currentUrl.match("favourite-post")) {
+      postType = SearchPostType.USER_FAVOURITE_POST;
+    } else if (currentUrl.match("search-post")) {
+      postType = SearchPostType.SEARCH_POST;
+    } else if (currentUrl.match("post")) {
+      postType = SearchPostType.SPECIFIC_POST;
+    }
+
+    return postType;
+  };
+
+  const { mutate } = usePost(getCorrectSearchPostType());
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const currentUrl = usePathname();
 
@@ -52,20 +76,20 @@ export default function EditPostDialogPage({
 
   const onSubmit = (formData: CreatePostFormType) => {
     // Get url key for mutation
-    let fetchUrl: string = "";
+    // let fetchUrl: string = "";
 
-    if (currentUrl.match("all-posts")) {
-      fetchUrl = "/api/post/get-all-post";
-    } else if (currentUrl.match("user")) {
-      fetchUrl = "/api/post/get-own-post";
-    } else if (currentUrl.match("favourite-post")) {
-      fetchUrl = "/api/post/get-favourite-post";
-    } else if (currentUrl.match("search-post")) {
-      fetchUrl = "/api/post/get-search-post";
-    } else if (currentUrl.match("post")) {
-      fetchUrl = "/api/post/get-specific-post";
-    }
-    updatePost(postId, formData, fetchUrl, toast);
+    // if (currentUrl.match("all-posts")) {
+    //   fetchUrl = "/api/post/get-all-post";
+    // } else if (currentUrl.match("user")) {
+    //   fetchUrl = "/api/post/get-own-post";
+    // } else if (currentUrl.match("favourite-post")) {
+    //   fetchUrl = "/api/post/get-favourite-post";
+    // } else if (currentUrl.match("search-post")) {
+    //   fetchUrl = "/api/post/get-search-post";
+    // } else if (currentUrl.match("post")) {
+    //   fetchUrl = "/api/post/get-specific-post";
+    // }
+    mutate(updatePost(postId, formData, toast), {});
     setDialogOpen(false);
   };
 

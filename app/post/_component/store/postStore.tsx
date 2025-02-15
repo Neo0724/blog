@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import axios from "axios";
 import { CreatePostFormType } from "../postComponent/CreatePostPage";
-import { mutate } from "swr";
+import { KeyedMutator } from "swr";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch } from "react";
+import { PostType } from "../postComponent/RenderPost";
 
 export type UserType = {
   user_id: string;
@@ -15,20 +16,25 @@ export type ToastProp = {
   description: string;
 };
 
+type PostAttribute = {
+  attributes: {
+    posts: PostType[] | [];
+  };
+};
+
 type PostAction = {
   actions: {
+    setPosts: (retrivedPosts: PostType[] | []) => void;
     updatePosts: (
       postId: string,
       updatedPost: CreatePostFormType,
-      url: string,
       showToast: ({ title, description }: ToastProp) => void
-    ) => Promise<void>;
+    ) => Promise<PostType[]>;
     deletePosts: (
       postId: string,
       url: string,
       showToast: ({ title, description }: ToastProp) => void
     ) => Promise<void>;
-
     // It will return the newly created post ID
     createPost: (
       newPost: CreatePostFormType,
@@ -44,11 +50,16 @@ type PostAction = {
   };
 };
 
-export const postStore = create<PostAction>(() => ({
-  // Store all action
+export const postStore = create<PostAttribute & PostAction>((set, get) => ({
+  attributes: {
+    posts: [],
+  },
   actions: {
+    // Store all action
+    setPosts: (retrivedPosts) => set({ attributes: { posts: retrivedPosts } }),
     // Action to update post
-    updatePosts: async (postId, updatedPost, url, showToast) => {
+    updatePosts: async (postId, updatedPost, showToast) => {
+      let successfullyUpdatedPost: PostType | null = null;
       try {
         const res = await axios.put("/api/post/update-post", {
           ...updatedPost,
@@ -56,11 +67,11 @@ export const postStore = create<PostAction>(() => ({
         });
 
         if (res.status === 200) {
-          mutate(url);
           showToast({
             title: "Success",
             description: "Post has updated successfully",
           });
+          successfullyUpdatedPost = res.data.updatedPost;
         } else {
           showToast({
             title: "Error",
@@ -74,6 +85,10 @@ export const postStore = create<PostAction>(() => ({
           title: "Error",
           description: "Unexpected error occured. Please try updating it later",
         });
+      } finally {
+        return successfullyUpdatedPost
+          ? [...get().attributes.posts, successfullyUpdatedPost]
+          : [...get().attributes.posts];
       }
     },
 
@@ -85,7 +100,6 @@ export const postStore = create<PostAction>(() => ({
             post_id: postId,
           },
         });
-        mutate(url);
         if (res.status === 200) {
           showToast({
             title: "Success",
@@ -122,7 +136,6 @@ export const postStore = create<PostAction>(() => ({
             title: "Success!",
             description: "Post is successfully created!",
           });
-          mutate(url);
           form.reset({
             title: "",
             content: "",

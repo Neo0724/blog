@@ -31,6 +31,11 @@ const fetchPost = async (
         );
 
         returnedPosts = favouritePosts;
+        postStore.setState(() => ({
+          attributes: {
+            posts: returnedPosts,
+          },
+        }));
       }
     }
   } catch (err) {
@@ -61,11 +66,18 @@ export default function usePost(
       break;
   }
 
-  const { data, error, isLoading } = useSWR(apiUrl, () =>
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, () =>
     fetchPost(apiUrl, searchText, userId)
   );
 
   const actions = useStore(postStore, (state) => state.actions);
 
-  return { isLoading, error, yourPosts: data, ...actions, fetchUrl: apiUrl };
+  return {
+    isLoading,
+    error,
+    mutate,
+    yourPosts: data,
+    ...actions,
+    fetchUrl: apiUrl,
+  };
 }

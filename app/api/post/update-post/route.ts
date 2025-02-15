@@ -15,14 +15,9 @@ export async function PUT(request: NextRequest) {
         title: title as string,
         content: content as string,
       },
-      select: {
-        post_id: true,
-        title: true,
-        content: true,
-      },
     });
 
-    return NextResponse.json({ ...updatedPost }, { status: 200 });
+    return NextResponse.json({ updatedPost }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

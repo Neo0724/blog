@@ -21,11 +21,17 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    const [returnedLikedPost] = await prisma.$transaction([
+    const [returnedLikedPost, totalPostLikeCount] = await prisma.$transaction([
       prisma.likedPost.create({ data: likedPost }),
+      prisma.likedPost.count({
+        where: {
+          Post_post_id: body.post_id as string,
+        },
+      }),
     ]);
 
-    return NextResponse.json({ likedPost: returnedLikedPost }, { status: 200 });
+    // return NextResponse.json({ likedPost: returnedLikedPost }, { status: 200 });
+    return NextResponse.json({ totalPostLikeCount }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

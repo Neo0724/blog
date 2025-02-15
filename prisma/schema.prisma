@@ -14,20 +14,22 @@ datasource db {
 }
 
 model User {
-    user_id            String              @id @default(uuid())
-    name               String
-    email              String              @unique
-    password           String
-    created_post       Post[]
-    favourited_post    FavouritePost[]
-    liked_post         LikedPost[]
-    commented_post     Comment[]
-    liked_comment      LikedComment[]
-    CommentReplyOwner  CommentReply[]      @relation(name: "owner")
-    CommentReplyTarget CommentReply[]      @relation(name: "target")
-    LikedCommentReply  LikedCommentReply[]
-    owner              Follower[]          @relation(name: "UserOwner")
-    following          Follower[]          @relation(name: "UserFollowing")
+    user_id              String              @id @default(uuid())
+    name                 String
+    email                String              @unique
+    password             String
+    created_post         Post[]
+    favourited_post      FavouritePost[]
+    liked_post           LikedPost[]
+    commented_post       Comment[]
+    liked_comment        LikedComment[]
+    CommentReplyOwner    CommentReply[]      @relation(name: "owner")
+    CommentReplyTarget   CommentReply[]      @relation(name: "target")
+    LikedCommentReply    LikedCommentReply[]
+    owner                Follower[]          @relation(name: "UserOwner")
+    following            Follower[]          @relation(name: "UserFollowing")
+    ReceivedNotification Notification[]      @relation(name: "TargetUser")
+    SentNotification     Notification[]      @relation(name: "FromUser")
 }
 
 // User_owner_id is like a whole person and User_following_id is the people that 
@@ -40,6 +42,28 @@ model Follower {
     createdAt         DateTime @default(now())
 
     @@id([User_owner_id, User_following_id])
+}
+
+model Notification {
+    notification_id String           @id @default(uuid())
+    TargetUser      User             @relation(fields: [TargetUserId], references: [user_id], name: "TargetUser")
+    TargetUserId    String
+    FromUser        User             @relation(fields: [FromUserId], references: [user_id], name: "FromUser")
+    FromUserId      String
+    type            NotificationType
+    resourceId      String
+    hasViewed       Boolean          @default(false)
+    createdAt       DateTime         @default(now())
+}
+
+enum NotificationType {
+    LIKE_POST
+    LIKE_COMMENT
+    LIKE_REPLY_COMMENT
+    POST
+    COMMENT
+    COMMENT_REPLY
+    FOLLOW
 }
 
 model Post {

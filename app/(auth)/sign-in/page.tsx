@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useState } from "react";
-import { SignInSchema } from "@/app/api/sign-in/route";
+import { SignInSchema } from "@/app/api/auth/sign-in/route";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useCookie from "react-use-cookie";
@@ -48,7 +48,7 @@ const SignInPage = () => {
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
-      const res = await axios.post("api/sign-in", formData);
+      const res = await axios.post("/api/auth/sign-in", formData);
       saveUserId(res.data.user_id);
       saveUserName(res.data.username);
       setUserToken(res.data.user_id);

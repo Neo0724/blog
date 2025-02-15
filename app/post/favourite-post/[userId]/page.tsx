@@ -1,4 +1,4 @@
-import GetPost from "../../_component/GetPost";
+import RenderPost from "../../_component/postComponent/RenderPost";
 import { SearchPostType } from "../../_component/Enum";
 
 export default function FavouritePostPage({
@@ -8,7 +8,7 @@ export default function FavouritePostPage({
 }) {
   return (
     <>
-      <GetPost
+      <RenderPost
         searchPostType={SearchPostType.USER_FAVOURITE_POST}
         userId={params.userId}
       />

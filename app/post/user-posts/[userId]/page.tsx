@@ -1,5 +1,5 @@
 "use client";
-import GetPost from "../../_component/GetPost";
+import RenderPost from "../../_component/postComponent/RenderPost";
 import { SearchPostType } from "../../_component/Enum";
 
 export default function YourPostsPage({
@@ -9,7 +9,7 @@ export default function YourPostsPage({
 }) {
   return (
     <>
-      <GetPost
+      <RenderPost
         searchPostType={SearchPostType.USER_POST}
         userId={params.userId}
       />

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useRef } from "react";
 import PostCommentButton from "./PostCommentButton";
 import PostOption from "./PostOption";
 import { useRouter } from "next/navigation";
@@ -29,19 +29,34 @@ export default function EachPostPage({
 }: EachPostProps) {
   const router = useRouter();
 
+  const postRef = useRef<HTMLDivElement>(null);
+
   const handleAuthorProfileNavigation = (authorId: string) => {
     router.push("/user/" + authorId);
   };
 
+  const handleScrollToPost = () => {
+    if (postRef.current) {
+      postRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "end",
+      });
+    }
+  };
+
   return (
-    <div className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5 max-w-[800px] mx-auto border-[rgb(58,59,60)]">
+    <div
+      className="flex max-h[70%] z-10 relative flex-col gap-4 border-2 p-5 rounded-md mb-5 max-w-[800px] mx-auto border-[rgb(58,59,60)]"
+      ref={postRef}
+    >
       <PostOption
         authorId={authorId}
         postId={postId}
         title={title}
         content={content}
       />
-      <div className="flex flex-row gap-2 border-b-2 pb-5 flex-wrap items-center">
+      <div className="flex flex-row gap-2 pb-3 flex-wrap items-center">
         <span>
           <Button
             variant="link"
@@ -65,7 +80,11 @@ export default function EachPostPage({
         <h1 className="font-bold">{title}</h1>
       </div>
       <div className="flex flex-row gap-4 pb-2">
-        <PostContent content={content} key={postId} />
+        <PostContent
+          content={content}
+          key={postId}
+          handleScrollToPost={handleScrollToPost}
+        />
       </div>
       <div className="flex items-center flex-wrap gap-2 max-w-[40rem] w-full">
         {/* Like button  */}

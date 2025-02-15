@@ -278,7 +278,7 @@ export default function EachCommentReplyPage({
         )}
       </div>
       {openReply && (
-        <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3">
+        <div className="flex flex-col border-solid border-2 border-black-500 p-5 pt-2 rounded-lg gap-2 mb-3 border-[rgb(58,59,60)]">
           <span className="opacity-70">Replying to {user.name} :</span>
           <div
             className="flex gap-3 justify-center items-center"
@@ -289,7 +289,7 @@ export default function EachCommentReplyPage({
               id="replyComment"
               title="replyComment"
               value={replyContent}
-              className="min-h-[10px]"
+              className="min-h-[10px] border-[rgb(58,59,60)] bg-[rgb(36,37,38)]"
               onChange={(e) => handleContentChange(e)}
             ></Textarea>
             <Button className="w-[25%] mx-auto" onClick={handleSubmitReply}>

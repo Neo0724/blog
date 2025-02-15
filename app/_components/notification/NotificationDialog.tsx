@@ -23,9 +23,9 @@ export default function NotificationDialog() {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="relative rounded-xl bg-[rgb(58,59,60)] text-black border-[rgb(58,59,60)]"
+          className="relative rounded-xl bg-[rgb(58,59,60)] text-black border-[rgb(58,59,60)] group"
         >
-          <IoNotifications className="text-white" />
+          <IoNotifications className="text-white group-hover:text-black" />
           {/* Show red dot if there are notifications */}
           {/* TODO Try to add a unread notification count on api so that the red dot will only appear if there are any unread notification only */}
           {!isLoading && (notViewedCount as number) > 0 && (

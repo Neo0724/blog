@@ -2,9 +2,13 @@ import { useState } from "react";
 
 type PostContentComponentProps = {
   content: string;
+  handleScrollToPost: () => void;
 };
 
-export default function PostContent({ content }: PostContentComponentProps) {
+export default function PostContent({
+  content,
+  handleScrollToPost,
+}: PostContentComponentProps) {
   const [readMore, setReadMore] = useState(false);
   return (
     <>
@@ -14,7 +18,13 @@ export default function PostContent({ content }: PostContentComponentProps) {
           <button
             className="text-blue-600 hover:opacity-75"
             onClick={() => {
-              setReadMore((prev) => !prev);
+              setReadMore((prev) => {
+                if (prev) {
+                  handleScrollToPost();
+                }
+
+                return !prev;
+              });
             }}
           >
             {readMore ? "Read less" : "Read more"}

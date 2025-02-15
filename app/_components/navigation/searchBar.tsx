@@ -16,7 +16,7 @@ export default function SearchBar() {
     setSearchText(e.target.value);
   };
   return (
-    <div className="mr-auto flex gap-5 max-w-[350px] min-w-[250px] w-full flex-1">
+    <div className="mr-auto flex gap-5 max-w-[500px] min-w-[250px] w-full flex-1">
       <Input
         type="text"
         placeholder="Search for post..."
@@ -27,7 +27,7 @@ export default function SearchBar() {
       <Button
         onClick={handleSearch}
         variant="ghost"
-        className="min-w-fit rounded-xl bg-[rgb(58,59,60)] text-white"
+        className="min-w-fit rounded-xl bg-[rgb(58,59,60)] text-white mr-5"
       >
         Search
       </Button>

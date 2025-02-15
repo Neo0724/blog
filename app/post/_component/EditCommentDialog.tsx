@@ -64,7 +64,7 @@ export default function EditCommentDialog({
           <button>Edit</button>
         </span>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-[rgb(36,37,38)] text-white">
+      <DialogContent className="sm:max-w-[425px] bg-[rgb(36,37,38)] text-white border-[rgb(58,59,60)]">
         <DialogHeader>
           <DialogTitle>Editing comment</DialogTitle>
           <DialogDescription>
@@ -85,7 +85,7 @@ export default function EditCommentDialog({
                     <FormLabel>Content</FormLabel>
                     <FormControl>
                       <Textarea
-                        className="min-h-[150px] max-h-[250px] h-[50vh] bg-[rgb(58,59,60)"
+                        className="min-h-[150px] max-h-[250px] h-[50vh] bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
                         placeholder="Enter content..."
                         {...field}
                       />

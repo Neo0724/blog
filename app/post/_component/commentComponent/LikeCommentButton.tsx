@@ -31,11 +31,16 @@ export default function LikeCommentButton({
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
-  const { likedComment, addLikeComment, removeLikeComment } = useLikedComment(
-    loggedInUserId ?? "",
-    postId
-  );
-  const commentLikeCount = useLikeCommentCount(commentId);
+  const {
+    likedComment,
+    addLikeComment,
+    removeLikeComment,
+    likedCommentMutate,
+    likedCommentLoading,
+  } = useLikedComment(loggedInUserId ?? "", postId);
+
+  const { commentLikeCount, fetchCommentLikeCount, commentLikeCountMutate } =
+    useLikeCommentCount(commentId);
 
   const handleLikeComment = async () => {
     // User not logged in
@@ -68,10 +73,25 @@ export default function LikeCommentButton({
     }
 
     // Add the like
-    addLikeComment(loggedInUserId, commentId, setIsLiked, toast);
+    await likedCommentMutate(
+      addLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+      {
+        optimisticData: [...(likedComment ?? []), commentId],
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
+    setIsLiked(true);
+    commentLikeCountMutate(fetchCommentLikeCount(commentId), {
+      optimisticData: (commentLikeCount ?? 0) + 1,
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
-  const handleDislikeComment = () => {
+  const handleDislikeComment = async () => {
     // User not logged in
     if (!loggedInUserId) {
       toast({
@@ -101,20 +121,37 @@ export default function LikeCommentButton({
     }
 
     // Remove the like
-    removeLikeComment(loggedInUserId, commentId, setIsLiked, toast);
+    await likedCommentMutate(
+      removeLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+      {
+        optimisticData: likedComment?.filter(
+          (comment_id) => comment_id !== commentId
+        ),
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
+    setIsLiked(false);
+    commentLikeCountMutate(fetchCommentLikeCount(commentId), {
+      optimisticData: (commentLikeCount ?? 1) - 1,
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   // Initialize the like button to be like or dislike
   useEffect(() => {
-    if (likedComment && likedComment.length > 0) {
+    if (!likedCommentLoading && likedComment && likedComment.length > 0) {
       const userLiked = likedComment.find(
-        (item) => item.Comment_comment_id === commentId
+        (comment_id) => comment_id === commentId
       )
         ? true
         : false;
       setIsLiked(userLiked);
     }
-  }, [commentId, likedComment]);
+  }, [likedCommentLoading]);
   return (
     <Button
       variant={variant}

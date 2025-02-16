@@ -143,7 +143,7 @@ export default function LikePostButton({
         toast
       ),
       {
-        optimisticData: [...(likedPost ?? []), postId],
+        optimisticData: likedPost?.filter((post_id) => post_id !== postId),
         populateCache: true,
         revalidate: false,
         rollbackOnError: true,
@@ -165,7 +165,7 @@ export default function LikePostButton({
         : false;
       setIsLiked(liked);
     }
-  }, []);
+  }, [likedPostLoading]);
   return (
     <Button
       variant={variant}

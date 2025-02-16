@@ -2,21 +2,18 @@ import axios from "axios";
 import useSWR from "swr";
 import { useStore } from "zustand";
 import { likedCommentStore } from "../store/likedCommentStore";
-
-export type GetBackLikedCommentType = {
-  Comment_comment_id: string;
-};
+import { ToastFunctionType } from "./usePostHook";
 
 export default function useLikedComment(user_id: string, post_id: string) {
   const fetchData = async (
     url: string | null,
     user_id: string,
     post_id: string
-  ): Promise<GetBackLikedCommentType[] | []> => {
+  ): Promise<string[] | []> => {
     if (!url) {
       return [];
     }
-    let returnedLikedComment: GetBackLikedCommentType[] | [] = [];
+    let returnedLikedComment: string[] | [] = [];
     try {
       const response = await axios.get(url, {
         params: {
@@ -35,12 +32,81 @@ export default function useLikedComment(user_id: string, post_id: string) {
     }
   };
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     [user_id ? "/api/comment/get-liked-comment" : null, user_id, post_id],
     ([url, user_id, post_id]) => fetchData(url, user_id, post_id)
   );
 
-  const actions = useStore(likedCommentStore, (state) => state.actions);
+  const addLikeComment = async (
+    userId: string,
+    commentId: string,
+    setIsLiked: React.Dispatch<boolean>,
+    showToast: ToastFunctionType
+  ): Promise<string[] | []> => {
+    let newLikeCommentId: string = "";
+    try {
+      const res = await axios.post("/api/comment/add-like-comment", {
+        user_id: userId,
+        comment_id: commentId,
+      });
 
-  return { likedComment: data, error, ...actions };
+      if (res.status === 200) {
+        // mutate(["/api/comment/count-like-comment", commentId]);
+        newLikeCommentId = res.data.commentId;
+        setIsLiked(true);
+      }
+    } catch (error) {
+      console.error(error);
+      showToast({
+        title: "Error",
+        description:
+          "An error occured when liking the comment. Please try again later",
+      });
+    }
+
+    return [...(data ?? []), newLikeCommentId];
+  };
+
+  const removeLikeComment = async (
+    userId: string,
+    commentId: string,
+    setIsLiked: React.Dispatch<boolean>,
+    showToast: ToastFunctionType
+  ): Promise<string[] | []> => {
+    let removedLikeCommentId: string = "";
+    try {
+      const res = await axios.delete("/api/comment/delete-like-comment", {
+        params: {
+          user_id: userId,
+          comment_id: commentId,
+        },
+      });
+
+      if (res.status === 200) {
+        // mutate(["/api/comment/count-like-comment", commentId]);
+        removedLikeCommentId = res.data.commentId;
+        setIsLiked(false);
+      }
+    } catch (error) {
+      console.error(error);
+      showToast({
+        title: "Error",
+        description:
+          "An error occured when removing like from the comment. Please try again later",
+      });
+    }
+
+    return (
+      data?.filter((commentId) => commentId !== removedLikeCommentId) ?? []
+    );
+  };
+
+  return {
+    likedComment: data,
+    error,
+    likedCommentLoading: isLoading,
+    addLikeComment,
+    removeLikeComment,
+    likedCommentMutate: mutate,
+  };
 }

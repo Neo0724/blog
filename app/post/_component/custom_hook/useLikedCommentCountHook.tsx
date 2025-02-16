@@ -1,13 +1,10 @@
 import axios from "axios";
 import useSWR from "swr";
 
-const fetchCommentLikeCount = async (
-  url: string,
-  commentId: string
-): Promise<number> => {
+const fetchCommentLikeCount = async (commentId: string): Promise<number> => {
   let likeCount = 0;
   try {
-    const response = await axios.get(url, {
+    const response = await axios.get("/api/comment/count-like-comment", {
       params: {
         comment_id: commentId,
       },
@@ -24,9 +21,17 @@ const fetchCommentLikeCount = async (
 };
 
 export const useLikeCommentCount = (commentId: string) => {
-  const { data } = useSWR(["/api/comment/count-like-comment", commentId], () =>
-    fetchCommentLikeCount("/api/comment/count-like-comment", commentId)
+  const { data, mutate } = useSWR(
+    ["/api/comment/count-like-comment", commentId],
+    () => fetchCommentLikeCount(commentId),
+    {
+      refreshInterval: 180000,
+    }
   );
 
-  return data;
+  return {
+    commentLikeCount: data,
+    fetchCommentLikeCount,
+    commentLikeCountMutate: mutate,
+  };
 };

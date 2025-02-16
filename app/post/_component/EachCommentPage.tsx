@@ -45,7 +45,7 @@ export default function EachCommentPage({
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const { replyComments, isLoading } = useReplyComment(commentId);
-  const { deleteComments } = useComment(post_id, userId);
+  const { comments, mutate, deleteComments } = useComment(post_id, userId);
   const { createReplyComments } = useReplyComment(commentId);
   const { addNotification, deleteNotification } = useNotification(userId ?? "");
 
@@ -90,7 +90,14 @@ export default function EachCommentPage({
     }
 
     // Delete the comment
-    deleteComments(commentId, post_id, userId, toast);
+    mutate(deleteComments(commentId, post_id, userId, toast), {
+      optimisticData: comments?.filter(
+        (comment) => comment.comment_id !== commentId
+      ),
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   const handleOpenReply = () => {

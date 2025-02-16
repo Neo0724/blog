@@ -156,15 +156,16 @@ export default function useComment(post_id: string, userId: string | null) {
         //   newComment.post_id,
         //   newComment.user_id,
         // ]);
-        mutate([response.data.newComment, ...(data ?? [])]);
+        mutate((prevData) => {
+          return [response.data.newComment, ...(prevData ?? [])];
+        });
         form.reset({ ...newComment, content: "" });
-        commentId = response.data.comment_id;
+        commentId = response.data.newComment.comment_id;
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      return commentId;
     }
+    return commentId;
   };
 
   return {

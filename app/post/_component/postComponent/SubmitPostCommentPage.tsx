@@ -13,15 +13,18 @@ import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import useNotification from "../custom_hook/useNotificationHook";
+import { RefObject } from "react";
 
 type SubmitPostCommentPageProps = {
   authorId: string;
   postId: string;
+  commentBoxRef: RefObject<HTMLDivElement>;
 };
 
 export default function SubmitPostCommentPage({
   authorId,
   postId,
+  commentBoxRef,
 }: SubmitPostCommentPageProps) {
   const [userId, _] = useLocalStorage<string | null>("test-userId", null);
   const { createComment } = useComment(postId, userId);
@@ -36,7 +39,7 @@ export default function SubmitPostCommentPage({
     },
   });
 
-  const submitComment = async (data: CommentType) => {
+  const submitComment = async (formData: CommentType) => {
     if (!userId) {
       toast({
         title: "Error",
@@ -54,7 +57,7 @@ export default function SubmitPostCommentPage({
       });
     } else {
       // Add the comment
-      const commentId = await createComment(data, form);
+      const commentId = await createComment(formData, form);
 
       // Send notification to the author of the post
       // Only send notification if the user who comments is not the author
@@ -66,6 +69,12 @@ export default function SubmitPostCommentPage({
           resourceId: commentId,
         });
       }
+
+      commentBoxRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        inline: "start",
+      });
     }
   };
 

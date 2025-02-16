@@ -50,7 +50,6 @@ export default function EditCommentDialog({
   });
 
   const onSubmit = (formData: CommentType) => {
-    updateComments(commentId, formData, toast);
     mutate(updateComments(commentId, formData, toast), {
       optimisticData: comments?.map((comment) => {
         if (comment.comment_id === commentId) {

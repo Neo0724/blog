@@ -7,6 +7,8 @@ import usePost from "../custom_hook/usePostHook";
 import CreatePost from "./CreatePostPage";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import PostSkeleton from "./PostSkeleton";
+import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";
+import { usePathname } from "next/navigation";
 
 export type UserType = {
   user_id: string;
@@ -46,10 +48,15 @@ export default function RenderPost({
   searchText,
   userId,
 }: GetPostProps) {
-  const { yourPosts, isLoading } = usePost(searchPostType, searchText, userId);
+  const { yourPosts, isLoading } = usePost(
+    getCorrectSearchPostType(usePathname()),
+    searchText,
+    userId
+  );
 
   const [username] = useLocalStorage<string | null>("test-username");
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+
   return (
     <>
       {userId === loggedInUserId && username && searchPostType !== 4 && (
@@ -65,20 +72,19 @@ export default function RenderPost({
         yourPosts &&
         yourPosts.map((post: PostType) => {
           return (
-            <div key={post.post_id}>
-              <EachPostPage
-                title={post.title}
-                content={post.content}
-                createdAt={post.createdAt}
-                author={post.User.name}
-                postId={post.post_id}
-                authorId={post.User.user_id}
-                dateDifferent={post.dateDifferent}
-              />
-            </div>
+            <EachPostPage
+              key={post.post_id}
+              title={post.title}
+              content={post.content}
+              createdAt={post.createdAt}
+              author={post.User.name}
+              postId={post.post_id}
+              authorId={post.User.user_id}
+              dateDifferent={post.dateDifferent}
+            />
           );
         })}
-      {!isLoading && yourPosts?.length === 0 && (
+      {!isLoading && !yourPosts?.length && (
         <div className="max-w-[800px] w-full mx-auto">No posts found...</div>
       )}
     </>

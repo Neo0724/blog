@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useStore } from "zustand";
 import { commentStore, CommentType } from "./store/commentStore";
+import useComment from "./custom_hook/useCommentHook";
 
 export default function EditCommentDialog({
   commentId,
@@ -36,10 +37,9 @@ export default function EditCommentDialog({
   postId: string;
 }) {
   const { toast } = useToast();
-  const updateComments = useStore(
-    commentStore,
-    (state) => state.actions.updateComments
-  );
+
+  const { comments, updateComments, mutate } = useComment(postId, userId);
+
   const form = useForm<CommentType>({
     resolver: zodResolver(CommentSchema),
     defaultValues: {
@@ -51,6 +51,20 @@ export default function EditCommentDialog({
 
   const onSubmit = (formData: CommentType) => {
     updateComments(commentId, formData, toast);
+    mutate(updateComments(commentId, formData, toast), {
+      optimisticData: comments?.map((comment) => {
+        if (comment.comment_id === commentId) {
+          return {
+            ...comment,
+            content: formData.content,
+          };
+        }
+        return comment;
+      }),
+      rollbackOnError: true,
+      populateCache: true,
+      revalidate: false,
+    });
   };
 
   const onInvalid = () => {

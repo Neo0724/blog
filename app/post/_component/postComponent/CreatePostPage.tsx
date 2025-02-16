@@ -53,7 +53,7 @@ export default function CreatePost({
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
-    const postId = await createPost(
+    const newPostId = await createPost(
       formData,
       toast,
       form,
@@ -61,13 +61,16 @@ export default function CreatePost({
       userId,
       fetchUrl
     );
-    addNotification({
-      fromUserId: userId ?? "",
-      targetUserId:
-        allFollower?.map((follower) => follower.UserFollower.user_id) ?? [],
-      type: NotificationType.POST,
-      resourceId: postId,
-    });
+
+    if (newPostId) {
+      addNotification({
+        fromUserId: userId ?? "",
+        targetUserId:
+          allFollower?.map((follower) => follower.UserFollower.user_id) ?? [],
+        type: NotificationType.POST,
+        resourceId: newPostId,
+      });
+    }
   };
 
   const onInvalid = () => {

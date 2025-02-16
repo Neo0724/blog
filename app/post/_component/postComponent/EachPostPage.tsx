@@ -73,7 +73,6 @@ export default function EachPostPage({
           authorId={authorId}
           className="p-0 h-auto text-base leading-none text-blue-400"
           variant="link"
-          key={postId}
         />
       </div>
       <div className="flex flex-row gap-4 pb-1">
@@ -82,7 +81,6 @@ export default function EachPostPage({
       <div className="flex flex-row gap-4 pb-2">
         <PostContent
           content={content}
-          key={postId}
           handleScrollToPost={handleScrollToPost}
         />
       </div>
@@ -93,7 +91,6 @@ export default function EachPostPage({
           className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
           postId={postId}
           variant="ghost"
-          key={postId}
         />
         {/* Comment button */}
         <PostCommentButton
@@ -110,7 +107,6 @@ export default function EachPostPage({
           className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
           postId={postId}
           variant="ghost"
-          key={postId}
         />
       </div>
     </div>

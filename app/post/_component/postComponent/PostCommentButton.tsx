@@ -97,7 +97,6 @@ export default function PostCommentButton({
                   authorId={authorId}
                   className="p-0 h-auto text-base leading-none text-blue-400"
                   variant="link"
-                  key={postId}
                 />
               </div>
             </DialogTitle>
@@ -117,14 +116,12 @@ export default function PostCommentButton({
                 className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
                 postId={postId}
                 variant="ghost"
-                key={postId}
               />
               {/* Favourite button  */}
               <FavouritePostButton
                 className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
                 postId={postId}
                 variant="ghost"
-                key={postId}
               />
             </div>
             <div className="overflow-y-scroll border-2 border-[rgb(58,59,60)] p-3 rounded-lg h-[50svh]">

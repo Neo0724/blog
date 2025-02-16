@@ -1,22 +1,18 @@
 import axios from "axios";
 import useSWR from "swr";
-import { useStore } from "zustand";
-import { likedPostStore } from "../store/likedPostStore";
-
-export type GetBackLikedPostType = {
-  Post_post_id: string;
-};
+import { ToastFunctionType } from "./usePostHook";
+import { PostType } from "../postComponent/RenderPost";
 
 export default function useLikedPost(user_id: string | null) {
   const fetchData = async (
     url: string | null,
     user_id: string | null
-  ): Promise<GetBackLikedPostType[] | []> => {
+  ): Promise<string[] | []> => {
     if (!url || !user_id) {
       return [];
     }
 
-    let returnedLikedPost: GetBackLikedPostType[] | [] = [];
+    let returnedLikedPost: string[] | [] = [];
 
     try {
       const response = await axios.get(url, {
@@ -35,17 +31,78 @@ export default function useLikedPost(user_id: string | null) {
     }
   };
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     [user_id ? "/api/post/get-like-post" : null, user_id],
     ([url, user_id]) => fetchData(url, user_id)
   );
 
-  const actions = useStore(likedPostStore, (state) => state.actions);
+  const addLikePost = async (
+    userId: string,
+    post: PostType,
+    setIsLiked: React.Dispatch<boolean>,
+    showToast: ToastFunctionType
+  ): Promise<string[] | []> => {
+    let newLikePostId: string = "";
+    try {
+      const res = await axios.post("/api/post/add-like-post", {
+        user_id: userId,
+        post_id: post.post_id,
+      });
+
+      if (res.status === 200) {
+        newLikePostId = res.data.postId;
+        setIsLiked(true);
+      }
+    } catch (err) {
+      console.log(err);
+      showToast({
+        title: "Error",
+        description:
+          "An error occured when liking the post. Please try again later",
+      });
+    }
+
+    return [...(data ?? []), newLikePostId];
+  };
+
+  const removeLikePost = async (
+    userId: string,
+    post: PostType,
+    setIsLiked: React.Dispatch<boolean>,
+    showToast: ToastFunctionType
+  ): Promise<string[] | []> => {
+    let removedLikePostId: string = "";
+
+    try {
+      const res = await axios.delete("/api/post/delete-like-post", {
+        params: {
+          user_id: userId,
+          post_id: post.post_id,
+        },
+      });
+
+      if (res.status === 200) {
+        removedLikePostId = res.data.postId;
+        setIsLiked(false);
+      }
+    } catch (err) {
+      console.log(err);
+      showToast({
+        title: "Error",
+        description:
+          "An error occured when removing like from the post. Please try again later",
+      });
+    }
+
+    return data?.filter((postId) => postId !== removedLikePostId) ?? [];
+  };
 
   return {
     likedPost: data,
     likedPostError: error,
     likedPostLoading: isLoading,
-    ...actions,
+    likedPostMutate: mutate,
+    addLikePost,
+    removeLikePost,
   };
 }

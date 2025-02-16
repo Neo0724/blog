@@ -1,14 +1,18 @@
 "use client";
+import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";
 import { useLikedPostCount } from "@/app/post/_component/custom_hook/useLikedPostCountHook";
 import useLikedPost from "@/app/post/_component/custom_hook/useLikedPostHook";
 import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
+import usePost from "@/app/post/_component/custom_hook/usePostHook";
 import { NotificationType } from "@/app/post/_component/Enum";
+import { PostType } from "@/app/post/_component/postComponent/RenderPost";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { VariantProps } from "class-variance-authority";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { BiDislike, BiLike } from "react-icons/bi";
 
@@ -20,23 +24,37 @@ type LikePostButtonProps = {
 };
 
 export default function LikePostButton({
+  authorId,
   className,
   postId,
   variant,
-  authorId,
 }: LikePostButtonProps) {
   const { toast } = useToast();
-  const [isLiked, setIsLiked] = useState(false);
-  const postLikeCount = useLikedPostCount(postId);
   const [loggedInUserId, _] = useLocalStorage<string | null>(
     "test-userId",
     null
   );
+  const [isLiked, setIsLiked] = useState(false);
+  const { postLikeCount, postLikeCountMutate, fetchPostLikeCount } =
+    useLikedPostCount(postId);
+  const { yourPosts } = usePost(
+    getCorrectSearchPostType(usePathname()),
+    "",
+    loggedInUserId ?? ""
+  );
+
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
-  const { likedPost, likedPostLoading, addLikePost, removeLikePost } =
-    useLikedPost(loggedInUserId);
+  const currentPost = yourPosts?.find((post) => post.post_id === postId);
+
+  const {
+    likedPost,
+    likedPostLoading,
+    addLikePost,
+    removeLikePost,
+    likedPostMutate,
+  } = useLikedPost(loggedInUserId);
   const handleLikePost = async () => {
     // User is not logged in
     if (!loggedInUserId) {
@@ -69,10 +87,25 @@ export default function LikePostButton({
     }
 
     // Add the like to the post
-    addLikePost(loggedInUserId, postId, setIsLiked, toast);
+    await likedPostMutate(
+      addLikePost(loggedInUserId, currentPost as PostType, setIsLiked, toast),
+      {
+        optimisticData: [...(likedPost ?? []), postId],
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
+    setIsLiked(true);
+    postLikeCountMutate(fetchPostLikeCount(postId), {
+      optimisticData: (postLikeCount ?? 0) + 1,
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
-  const handleUnlikePost = () => {
+  const handleUnlikePost = async () => {
     // User is not logged in
     if (!loggedInUserId) {
       toast({
@@ -101,17 +134,38 @@ export default function LikePostButton({
         resourceId: postId,
       });
     }
-    removeLikePost(loggedInUserId, postId, setIsLiked, toast);
+
+    await likedPostMutate(
+      removeLikePost(
+        loggedInUserId,
+        currentPost as PostType,
+        setIsLiked,
+        toast
+      ),
+      {
+        optimisticData: [...(likedPost ?? []), postId],
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
+    setIsLiked(false);
+    postLikeCountMutate(fetchPostLikeCount(postId), {
+      optimisticData: (postLikeCount ?? 1) - 1,
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   useEffect(() => {
     if (!likedPostLoading && likedPost && likedPost.length > 0) {
-      const liked = likedPost.find((item) => item.Post_post_id === postId)
+      const liked = likedPost.find((post_id) => post_id === postId)
         ? true
         : false;
       setIsLiked(liked);
     }
-  }, [likedPost, likedPostLoading, postId]);
+  }, []);
   return (
     <Button
       variant={variant}

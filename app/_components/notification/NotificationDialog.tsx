@@ -35,7 +35,7 @@ export default function NotificationDialog() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="max-w-[400px] w-full bg-[rgb(36,37,38)] border-[rgb(58,59,60)]">
+      <PopoverContent className="overflow-y-scroll max-h-[400px] max-w-[400px] w-full bg-[rgb(36,37,38)] border-[rgb(58,59,60)]">
         <div className="flex flex-col gap-3">
           {/* Notification is loading */}
           {isLoading && <div>Loading ...</div>}

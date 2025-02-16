@@ -1,4 +1,3 @@
-"use client";
 import RenderPost from "../../_component/postComponent/RenderPost";
 import { SearchPostType } from "../../_component/Enum";
 

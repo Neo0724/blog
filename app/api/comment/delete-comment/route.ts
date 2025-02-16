@@ -10,6 +10,17 @@ export async function DELETE(request: NextRequest) {
       where: {
         comment_id: comment_id as string,
       },
+      select: {
+        comment_id: true,
+        content: true,
+        createdAt: true,
+        User: {
+          select: {
+            user_id: true,
+            name: true,
+          },
+        },
+      },
     });
     return NextResponse.json({ deletedComment }, { status: 200 });
   } catch (error) {

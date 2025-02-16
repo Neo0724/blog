@@ -1,3 +1,4 @@
+import { getDateDifference } from "@/app/_util/getDateDifference";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,10 +18,25 @@ export async function PUT(request: NextRequest) {
       select: {
         comment_id: true,
         content: true,
+        createdAt: true,
+        User: {
+          select: {
+            user_id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json(updatedComment, { status: 200 });
+    const updatedCommentWithDateDifferent = {
+      ...updatedComment,
+      dateDifferent: getDateDifference(updatedComment.createdAt),
+    };
+
+    return NextResponse.json(
+      { updatedComment: updatedCommentWithDateDifferent },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

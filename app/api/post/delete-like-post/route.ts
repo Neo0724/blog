@@ -7,27 +7,28 @@ export async function DELETE(request: NextRequest) {
 
   const prisma = new PrismaClient();
   try {
-    const [deletedLikedComment, totalPostLikeCount] = await prisma.$transaction(
-      [
-        prisma.likedPost.delete({
-          where: {
-            User_user_id_Post_post_id: {
-              Post_post_id: post_id as string,
-              User_user_id: user_id as string,
-            },
-          },
-        }),
-
-        prisma.likedPost.count({
-          where: {
+    const [deletedLikedPostId, likeCount] = await prisma.$transaction([
+      prisma.likedPost.delete({
+        where: {
+          User_user_id_Post_post_id: {
             Post_post_id: post_id as string,
+            User_user_id: user_id as string,
           },
-        }),
-      ]
-    );
+        },
+        select: {
+          Post_post_id: true,
+        },
+      }),
+
+      prisma.likedPost.count({
+        where: {
+          Post_post_id: post_id as string,
+        },
+      }),
+    ]);
 
     return NextResponse.json(
-      { totalPostLikeCount: totalPostLikeCount },
+      { postId: deletedLikedPostId.Post_post_id, likeCount },
       { status: 200 }
     );
   } catch (error) {

@@ -18,7 +18,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(likedPost ?? [], { status: 200 });
+    return NextResponse.json(
+      likedPost?.map((post) => post.Post_post_id) ?? [],
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

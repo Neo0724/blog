@@ -35,9 +35,9 @@ model User {
 // User_owner_id is like a whole person and User_following_id is the people that 
 // the "User_owner_id" follows
 model Follower {
-    UserOwner         User     @relation(fields: [User_owner_id], references: [user_id], name: "UserOwner")
+    UserOwner         User     @relation(fields: [User_owner_id], references: [user_id], name: "UserOwner", onDelete: Cascade)
     User_owner_id     String
-    UserFollowing     User     @relation(fields: [User_following_id], references: [user_id], name: "UserFollowing")
+    UserFollowing     User     @relation(fields: [User_following_id], references: [user_id], name: "UserFollowing", onDelete: Cascade)
     User_following_id String
     createdAt         DateTime @default(now())
 
@@ -46,9 +46,9 @@ model Follower {
 
 model Notification {
     notification_id String           @id @default(uuid())
-    TargetUser      User             @relation(fields: [TargetUserId], references: [user_id], name: "TargetUser")
+    TargetUser      User             @relation(fields: [TargetUserId], references: [user_id], name: "TargetUser", onDelete: Cascade)
     TargetUserId    String
-    FromUser        User             @relation(fields: [FromUserId], references: [user_id], name: "FromUser")
+    FromUser        User             @relation(fields: [FromUserId], references: [user_id], name: "FromUser", onDelete: Cascade)
     FromUserId      String
     type            NotificationType
     resourceId      String
@@ -72,7 +72,7 @@ model Post {
     content   String   @db.Text
     createdAt DateTime @default(now())
 
-    User                  User            @relation(fields: [User_user_id], references: [user_id])
+    User                  User            @relation(fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id          String
     being_favourited_post FavouritePost[]
     being_liked_post      LikedPost[]
@@ -80,10 +80,10 @@ model Post {
 }
 
 model FavouritePost {
-    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User         User   @relation(fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id String
 
-    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id], onDelete: Cascade)
     Post_post_id String
 
     createdAt DateTime @default(now())
@@ -92,10 +92,10 @@ model FavouritePost {
 }
 
 model LikedPost {
-    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User         User   @relation(fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id String
 
-    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id], onDelete: Cascade)
     Post_post_id String
 
     createdAt DateTime @default(now())
@@ -106,10 +106,10 @@ model LikedPost {
 model Comment {
     comment_id String @id @default(uuid())
 
-    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User         User   @relation(fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id String
 
-    Post         Post   @relation(fields: [Post_post_id], references: [post_id])
+    Post         Post   @relation(fields: [Post_post_id], references: [post_id], onDelete: Cascade)
     Post_post_id String
 
     createdAt DateTime @default(now())
@@ -120,10 +120,10 @@ model Comment {
 }
 
 model LikedComment {
-    User         User   @relation(fields: [User_user_id], references: [user_id])
+    User         User   @relation(fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id String
 
-    Comment            Comment @relation(fields: [Comment_comment_id], references: [comment_id])
+    Comment            Comment @relation(fields: [Comment_comment_id], references: [comment_id], onDelete: Cascade)
     Comment_comment_id String
 
     createdAt DateTime @default(now())
@@ -134,13 +134,13 @@ model LikedComment {
 model CommentReply {
     comment_reply_id String @id @default(uuid())
 
-    User         User   @relation(name: "owner", fields: [User_user_id], references: [user_id])
+    User         User   @relation(name: "owner", fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id String
 
-    Comment            Comment @relation(fields: [Comment_comment_id], references: [comment_id])
+    Comment            Comment @relation(fields: [Comment_comment_id], references: [comment_id], onDelete: Cascade)
     Comment_comment_id String
 
-    Target_user    User   @relation(name: "target", fields: [Target_user_id], references: [user_id])
+    Target_user    User   @relation(name: "target", fields: [Target_user_id], references: [user_id], onDelete: Cascade)
     Target_user_id String
 
     LikedCommentReply LikedCommentReply[]
@@ -150,9 +150,9 @@ model CommentReply {
 }
 
 model LikedCommentReply {
-    User                          User         @relation(fields: [User_user_id], references: [user_id])
+    User                          User         @relation(fields: [User_user_id], references: [user_id], onDelete: Cascade)
     User_user_id                  String
-    CommentReply                  CommentReply @relation(fields: [CommentReply_comment_reply_id], references: [comment_reply_id])
+    CommentReply                  CommentReply @relation(fields: [CommentReply_comment_reply_id], references: [comment_reply_id], onDelete: Cascade)
     CommentReply_comment_reply_id String
 
     createdAt DateTime @default(now())

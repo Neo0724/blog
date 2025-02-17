@@ -66,7 +66,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(returnedCommentReply, { status: 200 });
+    return NextResponse.json(
+      { newCommentReply: returnedCommentReply },
+      { status: 200 }
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json(

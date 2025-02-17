@@ -65,10 +65,6 @@ export default function usePost(
       break;
   }
 
-  const { data, error, isLoading, mutate } = useSWR(apiUrl, () =>
-    fetchPost(apiUrl)
-  );
-
   // Action to update post
   const updatePosts = async (
     postId: string,
@@ -189,6 +185,10 @@ export default function usePost(
       return newPostId;
     }
   };
+
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, () =>
+    fetchPost(apiUrl)
+  );
 
   return {
     isLoading,

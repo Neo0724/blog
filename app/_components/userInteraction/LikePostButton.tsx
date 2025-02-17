@@ -87,8 +87,14 @@ export default function LikePostButton({
     }
 
     // Add the like to the post
-    await likedPostMutate(
-      addLikePost(loggedInUserId, currentPost as PostType, setIsLiked, toast),
+    likedPostMutate(
+      addLikePost(
+        loggedInUserId,
+        currentPost as PostType,
+        setIsLiked,
+        toast,
+        postLikeCountMutate
+      ),
       {
         optimisticData: [...(likedPost ?? []), postId],
         populateCache: true,
@@ -96,13 +102,6 @@ export default function LikePostButton({
         rollbackOnError: true,
       }
     );
-    setIsLiked(true);
-    postLikeCountMutate(fetchPostLikeCount(postId), {
-      optimisticData: (postLikeCount ?? 0) + 1,
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   const handleUnlikePost = async () => {
@@ -135,12 +134,13 @@ export default function LikePostButton({
       });
     }
 
-    await likedPostMutate(
+    likedPostMutate(
       removeLikePost(
         loggedInUserId,
         currentPost as PostType,
         setIsLiked,
-        toast
+        toast,
+        postLikeCountMutate
       ),
       {
         optimisticData: likedPost?.filter((post_id) => post_id !== postId),
@@ -149,13 +149,6 @@ export default function LikePostButton({
         rollbackOnError: true,
       }
     );
-    setIsLiked(false);
-    postLikeCountMutate(fetchPostLikeCount(postId), {
-      optimisticData: (postLikeCount ?? 1) - 1,
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   useEffect(() => {
@@ -165,7 +158,7 @@ export default function LikePostButton({
         : false;
       setIsLiked(liked);
     }
-  }, [likedPostLoading]);
+  }, [likedPost, likedPostLoading, postId]);
   return (
     <Button
       variant={variant}

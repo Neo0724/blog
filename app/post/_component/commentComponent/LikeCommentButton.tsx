@@ -73,8 +73,14 @@ export default function LikeCommentButton({
     }
 
     // Add the like
-    await likedCommentMutate(
-      addLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+    likedCommentMutate(
+      addLikeComment(
+        loggedInUserId,
+        commentId,
+        setIsLiked,
+        toast,
+        commentLikeCountMutate
+      ),
       {
         optimisticData: [...(likedComment ?? []), commentId],
         populateCache: true,
@@ -82,13 +88,6 @@ export default function LikeCommentButton({
         rollbackOnError: true,
       }
     );
-    setIsLiked(true);
-    commentLikeCountMutate(fetchCommentLikeCount(commentId), {
-      optimisticData: (commentLikeCount ?? 0) + 1,
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   const handleDislikeComment = async () => {
@@ -121,8 +120,14 @@ export default function LikeCommentButton({
     }
 
     // Remove the like
-    await likedCommentMutate(
-      removeLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+    likedCommentMutate(
+      removeLikeComment(
+        loggedInUserId,
+        commentId,
+        setIsLiked,
+        toast,
+        commentLikeCountMutate
+      ),
       {
         optimisticData: likedComment?.filter(
           (comment_id) => comment_id !== commentId
@@ -132,13 +137,6 @@ export default function LikeCommentButton({
         rollbackOnError: true,
       }
     );
-    setIsLiked(false);
-    commentLikeCountMutate(fetchCommentLikeCount(commentId), {
-      optimisticData: (commentLikeCount ?? 1) - 1,
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   // Initialize the like button to be like or dislike
@@ -151,7 +149,7 @@ export default function LikeCommentButton({
         : false;
       setIsLiked(userLiked);
     }
-  }, [likedCommentLoading]);
+  }, [commentId, likedComment, likedCommentLoading]);
   return (
     <Button
       variant={variant}

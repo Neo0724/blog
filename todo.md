@@ -13,14 +13,15 @@
 [x] Like/Dislike comment
 [x] Comment like count
 
+[x] useCommentReplyHook
+[x] Edit reply-comment
+[x] Create reply-comment
+[x] Delete reply-comment
+[x] Like/Dislike reply-comment
+
 [] useFavouriteHook
 [] Add favourite post
 [] Delete favourite post
-
-[] Edit reply-comment
-[] Create reply-comment
-[] Delete reply-comment
-[] Like/Dislike reply-comment
 
 [] useFollowingHook
 [] useFollowerHook

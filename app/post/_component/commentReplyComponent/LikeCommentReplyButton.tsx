@@ -31,9 +31,14 @@ export default function LikeCommentReplyButton({
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
-  const { likedReply, addLikeCommentReply, removeLikeCommentReply } =
-    useLikedReplyComment(loggedInUserId ?? "", commentId);
-  const replyCommentLikeCount = useLikedReplyCommentCount(commentReplyId);
+  const {
+    likedReplyComment,
+    addLikeCommentReply,
+    removeLikeCommentReply,
+    likedCommentReplyMutate,
+  } = useLikedReplyComment(loggedInUserId ?? "", commentId);
+  const { replyCommentLikeCount, replyCommentLikeCountMutate } =
+    useLikedReplyCommentCount(commentReplyId);
 
   const handleLikeCommentReply = async () => {
     // User not logged in
@@ -66,7 +71,21 @@ export default function LikeCommentReplyButton({
     }
 
     // Add the like
-    addLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast);
+    likedCommentReplyMutate(
+      addLikeCommentReply(
+        loggedInUserId,
+        commentReplyId,
+        setIsLiked,
+        toast,
+        replyCommentLikeCountMutate
+      ),
+      {
+        optimisticData: [...(likedReplyComment ?? []), commentReplyId],
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
   };
   const handleDislikeCommentReply = () => {
     // User not logged in
@@ -99,19 +118,36 @@ export default function LikeCommentReplyButton({
     }
 
     // Remove the like
-    removeLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast);
+    likedCommentReplyMutate(
+      removeLikeCommentReply(
+        loggedInUserId,
+        commentReplyId,
+        setIsLiked,
+        toast,
+        replyCommentLikeCountMutate
+      ),
+      {
+        optimisticData:
+          likedReplyComment?.filter(
+            (comment_reply_id) => comment_reply_id !== commentReplyId
+          ) ?? [],
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
   };
 
   useEffect(() => {
-    if (likedReply && likedReply.length > 0) {
-      const userLiked = likedReply.find(
-        (item) => item.CommentReply_comment_reply_id === commentReplyId
+    if (likedReplyComment && likedReplyComment.length > 0) {
+      const userLiked = likedReplyComment.find(
+        (comment_reply_id) => comment_reply_id === commentReplyId
       )
         ? true
         : false;
       setIsLiked(userLiked);
     }
-  }, [commentReplyId, likedReply]);
+  }, [commentReplyId, likedReplyComment]);
 
   return (
     <Button

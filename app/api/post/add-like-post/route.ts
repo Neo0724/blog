@@ -35,8 +35,6 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    console.log(returnedLikedPostId);
-
     return NextResponse.json(
       { postId: returnedLikedPostId.Post_post_id, likeCount },
       { status: 200 }

@@ -49,13 +49,17 @@ export async function GET(request: NextRequest) {
             "User": {
                 "name": "Alan",
                 "user_id": "3b043e4d-3d8d-414d-8dd8-b2ce0be44c25"
-            }
+            },
+            "dateDifferent": "30 minutes ago"
         }
     }
 ] 
     Example output, returned output is an array of all favourited post 
     */
-    return NextResponse.json(allPostsWithDateDiff ?? [], { status: 200 });
+    return NextResponse.json(
+      allPostsWithDateDiff.map((allPost) => allPost.Post) ?? [],
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

@@ -19,9 +19,9 @@
 [x] Delete reply-comment
 [x] Like/Dislike reply-comment
 
-[] useFavouriteHook
-[] Add favourite post
-[] Delete favourite post
+[x] useFavouriteHook
+[x] Add favourite post
+[x] Delete favourite post
 
 [] useFollowingHook
 [] useFollowerHook

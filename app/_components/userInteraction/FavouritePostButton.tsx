@@ -31,6 +31,7 @@ export default function FavouritePostButton({
     favouritePostLoading,
     addToFavourite,
     removeFromFavourite,
+    favouritePostMutate,
   } = useFavourite(loggedInUserId);
 
   const handleFavourite = async () => {
@@ -54,9 +55,21 @@ export default function FavouritePostButton({
       return;
     }
     if (isFavourited) {
-      removeFromFavourite(loggedInUserId, postId, setIsFavourited, toast);
+      favouritePostMutate(
+        removeFromFavourite(loggedInUserId, postId, setIsFavourited, toast),
+        {
+          optimisticData: favouritedPost?.filter(
+            (post) => post.post_id !== postId
+          ),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
     } else {
-      addToFavourite(loggedInUserId, postId, setIsFavourited, toast);
+      favouritePostMutate(
+        addToFavourite(loggedInUserId, postId, setIsFavourited, toast)
+      );
     }
   };
 

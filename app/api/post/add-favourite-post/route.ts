@@ -21,10 +21,26 @@ export async function POST(request: NextRequest) {
 
     const returnedFavouritedPost = await prisma.favouritePost.create({
       data: likedPost,
+      select: {
+        Post: {
+          select: {
+            title: true,
+            content: true,
+            createdAt: true,
+            post_id: true,
+            User: {
+              select: {
+                name: true,
+                user_id: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return NextResponse.json(
-      { favouritePost: returnedFavouritedPost },
+      { newFavouritePost: returnedFavouritedPost.Post },
       { status: 200 }
     );
   } catch (error) {

@@ -25,6 +25,12 @@ export async function GET(request: NextRequest) {
             user_id: true,
           },
         },
+        UserFollowing: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
         createdAt: true,
       },
     });

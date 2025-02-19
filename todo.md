@@ -23,12 +23,12 @@
 [x] Add favourite post
 [x] Delete favourite post
 
-[] useFollowingHook
-[] useFollowerHook
-[] Add following
-[] Delete following
-[] Add follower
-[] Delete follower
+[x] useFollowingHook
+[x] Add following
+[x] Delete following
+[x] useFollowerHook
+[x] Add follower
+[x] Delete follower
 
 [] useNotificationHook
 [] Add notification

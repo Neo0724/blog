@@ -33,6 +33,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
     allFollowing: pageOwnerFollowing,
     isLoading,
     isValidating,
+    followingMutate,
   } = useFollowing(pageOwnerUserId ?? "", searchUsername);
 
   // For the currently logged in user
@@ -76,18 +77,18 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
         !isLoading &&
         pageOwnerFollowing &&
         pageOwnerFollowing.length > 0 &&
-        pageOwnerFollowing?.map((ownerFollowing) => {
+        pageOwnerFollowing?.map((eachOwnerFollowing) => {
           // Check if the current logged in user is following the current user
           const currentUserIsFollowing = !loggedInUserId
             ? false
             : loggedInFollowing?.find(
                 (loggedInUserFollowing) =>
                   loggedInUserFollowing.UserFollowing.user_id ===
-                  ownerFollowing.UserFollowing.user_id
+                  eachOwnerFollowing.UserFollowing.user_id
               );
           return (
             <div
-              key={ownerFollowing.createdAt}
+              key={eachOwnerFollowing.createdAt}
               className="flex justify-between items-center mb-3"
             >
               <Button
@@ -95,15 +96,15 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                 className="p-0 h-auto text-base leading-none text-white"
                 onClick={() =>
                   handleAuthorProfileNavigation(
-                    ownerFollowing.UserFollowing.user_id
+                    eachOwnerFollowing.UserFollowing.user_id
                   )
                 }
               >
-                {ownerFollowing.UserFollowing.name}
+                {eachOwnerFollowing.UserFollowing.name}
               </Button>
               {/* We only care about the currently logged in user as they are the one who will be interacting with this follow and unfollow button*/}
               {/* Only show the button if the currently logged in user is not the current following user list*/}
-              {loggedInUserId !== ownerFollowing.UserFollowing.user_id && (
+              {loggedInUserId !== eachOwnerFollowing.UserFollowing.user_id && (
                 <Button
                   variant="ghost"
                   className="rounded-xl hover:text-red-800 active:text-red-800 bg-[rgb(58,59,60)]"
@@ -130,29 +131,54 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                     // Current user is logged in
                     // Remove the user from following
                     if (currentUserIsFollowing) {
-                      loggedInRemoveFollowing(
-                        loggedInUserId,
-                        ownerFollowing.UserFollowing.user_id,
-                        toast
+                      followingMutate(
+                        loggedInRemoveFollowing(
+                          loggedInUserId,
+                          eachOwnerFollowing.UserFollowing.user_id,
+                          toast
+                        ),
+                        {
+                          optimisticData: loggedInFollowing?.filter(
+                            (logInFollowing) =>
+                              logInFollowing.UserFollowing.user_id !==
+                              eachOwnerFollowing.UserFollowing.user_id
+                          ),
+                          populateCache: true,
+                          revalidate: false,
+                          rollbackOnError: true,
+                        }
                       );
                       // Delete the follow notification
                       deleteNotification({
                         fromUserId: loggedInUserId,
-                        targetUserId: ownerFollowing.UserFollowing.user_id,
+                        targetUserId: eachOwnerFollowing.UserFollowing.user_id,
                         type: NotificationType.FOLLOW,
                         resourceId: loggedInUserId,
                       });
                     } else {
                       // Add the current user to following
-                      loggedInAddFollowing(
-                        loggedInUserId,
-                        ownerFollowing.UserFollowing.user_id,
-                        toast
+                      followingMutate(
+                        loggedInAddFollowing(
+                          loggedInUserId,
+                          eachOwnerFollowing.UserFollowing.user_id,
+                          toast
+                        ),
+                        {
+                          optimisticData: [
+                            eachOwnerFollowing,
+                            ...(loggedInFollowing ?? []),
+                          ],
+                          populateCache: true,
+                          revalidate: false,
+                          rollbackOnError: true,
+                        }
                       );
                       // Send notification to the target user that someone started following him or her
                       addNotification({
                         fromUserId: loggedInUserId,
-                        targetUserId: [ownerFollowing.UserFollowing.user_id],
+                        targetUserId: [
+                          eachOwnerFollowing.UserFollowing.user_id,
+                        ],
                         type: NotificationType.FOLLOW,
                         resourceId: loggedInUserId,
                       });

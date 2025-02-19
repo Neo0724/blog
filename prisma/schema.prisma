@@ -32,8 +32,7 @@ model User {
     SentNotification     Notification[]      @relation(name: "FromUser")
 }
 
-// User_owner_id is like a whole person and User_following_id is the people that 
-// the "User_owner_id" follows
+// User_following is the people that the "User_owner" follows
 model Follower {
     UserOwner         User     @relation(fields: [User_owner_id], references: [user_id], name: "UserOwner", onDelete: Cascade)
     User_owner_id     String

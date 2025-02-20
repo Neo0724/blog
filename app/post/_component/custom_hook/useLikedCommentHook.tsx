@@ -27,9 +27,8 @@ export default function useLikedComment(user_id: string, post_id: string) {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      return returnedLikedComment;
     }
+    return returnedLikedComment;
   };
 
   const { data, error, isLoading, mutate } = useSWR(

@@ -22,9 +22,8 @@ export default function useFavourite(userId: string | null) {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      return returnedFavouritePost;
     }
+    return returnedFavouritePost;
   };
 
   const addToFavourite = async (

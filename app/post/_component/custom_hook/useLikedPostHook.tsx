@@ -26,9 +26,8 @@ export default function useLikedPost(user_id: string | null) {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      return returnedLikedPost;
     }
+    return returnedLikedPost;
   };
 
   const { data, error, isLoading, mutate } = useSWR(

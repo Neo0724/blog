@@ -31,9 +31,8 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      return following;
     }
+    return following;
   };
 
   const addFollowing = async (

@@ -29,9 +29,8 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
-    } finally {
-      return returnedReplyComments;
     }
+    return returnedReplyComments;
   };
 
   const createReplyComments = async (
@@ -65,8 +64,8 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     } finally {
       setReplyContent("");
       setOpenReply(false);
-      return commentReplyId;
     }
+    return commentReplyId;
   };
 
   const deleteReplyComments = async (

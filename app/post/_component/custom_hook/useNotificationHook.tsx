@@ -31,9 +31,8 @@ const fetchNotification = async (
     }
   } catch (error) {
     console.log(error);
-  } finally {
-    return { allNotification: fetchedNotification, notViewedCount };
   }
+  return { allNotification: fetchedNotification, notViewedCount };
 };
 
 export default function useNotification(userId: string) {

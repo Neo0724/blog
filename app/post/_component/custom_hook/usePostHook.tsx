@@ -2,7 +2,6 @@
 import useSWR from "swr";
 import { postStore, ToastProp } from "../store/postStore";
 import { SearchPostType } from "../Enum";
-import { GetBackFavouritePost } from "./useFavouriteHook";
 import axios from "axios";
 import { PostType } from "../postComponent/RenderPost";
 import { CreatePostFormType } from "../postComponent/CreatePostPage";
@@ -19,26 +18,25 @@ const fetchPost = async (apiUrl: string): Promise<PostType[] | []> => {
 
     if (res.status === 200) {
       returnedPosts = res.data ?? [];
-      if (apiUrl.match("favourite")) {
-        const favouritePosts: PostType[] = res.data.map(
-          (item: GetBackFavouritePost) => {
-            return item.Post;
-          }
-        );
+      // if (apiUrl.match("favourite")) {
+      //   const favouritePosts: PostType[] = res.data.map(
+      //     (item: PostType) => {
+      //       return item.Post;
+      //     }
+      //   );
 
-        returnedPosts = favouritePosts;
-        postStore.setState(() => ({
-          attributes: {
-            posts: returnedPosts,
-          },
-        }));
-      }
+      //   returnedPosts = favouritePosts;
+      //   postStore.setState(() => ({
+      //     attributes: {
+      //       posts: returnedPosts,
+      //     },
+      //   }));
+      // }
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    return returnedPosts;
   }
+  return returnedPosts;
 };
 
 export default function usePost(
@@ -181,9 +179,8 @@ export default function usePost(
       setTimeout(() => {
         setError("");
       }, 3000);
-    } finally {
-      return newPostId;
     }
+    return newPostId;
   };
 
   const { data, error, isLoading, mutate } = useSWR(apiUrl, () =>

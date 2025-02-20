@@ -13,9 +13,8 @@ const fetchPostLikeCount = async (postId: string): Promise<number> => {
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    return fetchedLikeCount;
   }
+  return fetchedLikeCount;
 };
 
 export const useLikedPostCount = (postId: string) => {

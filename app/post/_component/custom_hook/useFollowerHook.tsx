@@ -31,9 +31,8 @@ export const useFollower = (targetId: string, queryUsername = "") => {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      return follower;
     }
+    return follower;
   };
 
   const removeFollower = async (

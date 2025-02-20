@@ -36,9 +36,8 @@ export default function useLikedReplyComment(
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      return returnedLikedReplyComment;
     }
+    return returnedLikedReplyComment;
   };
 
   const addLikeCommentReply = async (

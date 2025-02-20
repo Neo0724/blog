@@ -15,9 +15,8 @@ const fetchReplyCommentLikeCount = async (
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    return fetchedReplyCommentLikeCount;
   }
+  return fetchedReplyCommentLikeCount;
 };
 
 export const useLikedReplyCommentCount = (commentReplyId: string) => {

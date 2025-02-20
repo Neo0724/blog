@@ -33,9 +33,9 @@ export default function useComment(post_id: string, userId: string | null) {
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
-    } finally {
-      return returnedComments;
     }
+
+    return returnedComments;
   };
 
   const { data, isLoading, error, mutate } = useSWR(

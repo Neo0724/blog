@@ -15,9 +15,8 @@ const fetchCommentLikeCount = async (commentId: string): Promise<number> => {
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    return likeCount;
   }
+  return likeCount;
 };
 
 export const useLikeCommentCount = (commentId: string) => {

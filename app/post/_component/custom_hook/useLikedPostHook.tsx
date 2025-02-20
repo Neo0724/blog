@@ -6,7 +6,7 @@ import { PostType } from "../postComponent/RenderPost";
 export default function useLikedPost(user_id: string | null) {
   const fetchData = async (
     url: string | null,
-    user_id: string | null
+    user_id: string | null,
   ): Promise<string[] | []> => {
     if (!url || !user_id) {
       return [];
@@ -32,7 +32,7 @@ export default function useLikedPost(user_id: string | null) {
 
   const { data, error, isLoading, mutate } = useSWR(
     [user_id ? "/api/post/get-like-post" : null, user_id],
-    ([url, user_id]) => fetchData(url, user_id)
+    ([url, user_id]) => fetchData(url, user_id),
   );
 
   const addLikePost = async (
@@ -40,7 +40,8 @@ export default function useLikedPost(user_id: string | null) {
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
-    postLikeCountMutate: KeyedMutator<number>
+    postLikeCountMutate: KeyedMutator<number>,
+    postLikeCount: number,
   ): Promise<string[] | []> => {
     let newLikePostId: string = "";
     try {
@@ -52,6 +53,7 @@ export default function useLikedPost(user_id: string | null) {
       if (res.status === 200) {
         newLikePostId = res.data.postId;
         postLikeCountMutate((prev) => (prev ?? 0) + 1, {
+          optimisticData: postLikeCount + 1,
           revalidate: false,
           populateCache: true,
         });
@@ -74,7 +76,8 @@ export default function useLikedPost(user_id: string | null) {
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
-    postLikeCountMutate: KeyedMutator<number>
+    postLikeCountMutate: KeyedMutator<number>,
+    postLikeCount: number,
   ): Promise<string[] | []> => {
     let removedLikePostId: string = "";
 
@@ -89,6 +92,7 @@ export default function useLikedPost(user_id: string | null) {
       if (res.status === 200) {
         removedLikePostId = res.data.postId;
         postLikeCountMutate((prev) => (prev ?? 1) - 1, {
+          optimisticData: postLikeCount - 1,
           revalidate: false,
           populateCache: true,
         });

@@ -23,10 +23,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdEdit } from "react-icons/md";
-import { useStore } from "zustand";
-import { postStore } from "../store/postStore";
 import { CreatePostFormType } from "./CreatePostPage";
+import usePost from "../custom_hook/usePostHook";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import { usePathname } from "next/navigation";
+import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";
 
 export default function EditPostDialogPage({
   postId,
@@ -38,9 +39,14 @@ export default function EditPostDialogPage({
   content: string;
 }) {
   const { toast } = useToast();
-  const updatePost = useStore(postStore, (state) => state.actions.updatePosts);
+  // Edit post dialog
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const currentUrl = usePathname();
+  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const { yourPosts, mutate, updatePosts } = usePost(
+    getCorrectSearchPostType(usePathname()),
+    "",
+    loggedInUserId ?? ""
+  );
 
   const form = useForm<CreatePostFormType>({
     resolver: zodResolver(CreatePostFormSchema),
@@ -50,22 +56,22 @@ export default function EditPostDialogPage({
     },
   });
 
-  const onSubmit = (formData: CreatePostFormType) => {
-    // Get url key for mutation
-    let fetchUrl: string = "";
-
-    if (currentUrl.match("all-posts")) {
-      fetchUrl = "/api/post/get-all-post";
-    } else if (currentUrl.match("user")) {
-      fetchUrl = "/api/post/get-own-post";
-    } else if (currentUrl.match("favourite-post")) {
-      fetchUrl = "/api/post/get-favourite-post";
-    } else if (currentUrl.match("search-post")) {
-      fetchUrl = "/api/post/get-search-post";
-    } else if (currentUrl.match("post")) {
-      fetchUrl = "/api/post/get-specific-post";
-    }
-    updatePost(postId, formData, fetchUrl, toast);
+  const onSubmit = async (formData: CreatePostFormType) => {
+    mutate(updatePosts(postId, formData, toast), {
+      optimisticData: yourPosts?.map((post) => {
+        if (post.post_id === postId) {
+          return {
+            ...post,
+            content: formData.content,
+            title: formData.title,
+          };
+        }
+        return post;
+      }),
+      rollbackOnError: true,
+      populateCache: true,
+      revalidate: false,
+    });
     setDialogOpen(false);
   };
 

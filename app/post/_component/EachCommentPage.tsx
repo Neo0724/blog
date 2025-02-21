@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import useNotification from "./custom_hook/useNotificationHook";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useReplyComment from "./custom_hook/useReplyComment";
+import useReplyComment from "./custom_hook/useReplyCommentHook";
 import EachCommentReplyPage from "./EachCommentReplyPage";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
@@ -40,20 +40,27 @@ export default function EachCommentPage({
   const commentBoxRef = useRef<HTMLDivElement | null>(null);
   const viewRepliesRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
-  const [userId, _] = useLocalStorage("test-userId", "");
+  const [loggedInUserId, _] = useLocalStorage("test-userId", "");
   const [openUserReplyBox, setOpenUserReplyBox] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { replyComments, isLoading } = useReplyComment(commentId);
-  const { deleteComments } = useComment(post_id, userId);
-  const { createReplyComments } = useReplyComment(commentId);
-  const { addNotification, deleteNotification } = useNotification(userId ?? "");
+  const { replyComments, isLoading, createReplyComments } = useReplyComment(
+    commentId,
+    loggedInUserId
+  );
+  const { comments, mutate, deleteComments } = useComment(
+    post_id,
+    loggedInUserId
+  );
+  const { addNotification, deleteNotification } = useNotification(
+    loggedInUserId ?? ""
+  );
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
   const handleSubmitReply = async () => {
     const replyData = {
       content: replyContent,
-      user_id: userId,
+      user_id: loggedInUserId,
       target_user_id: user.user_id,
       comment_id: commentId,
     };
@@ -68,9 +75,9 @@ export default function EachCommentPage({
     );
 
     // Send the notification if the user is replying to other instead of himself
-    if (user.user_id !== userId) {
+    if (user.user_id !== loggedInUserId) {
       addNotification({
-        fromUserId: userId,
+        fromUserId: loggedInUserId,
         targetUserId: [user.user_id],
         type: NotificationType.COMMENT_REPLY,
         resourceId: commentReplyId,
@@ -80,9 +87,9 @@ export default function EachCommentPage({
 
   const handleDeleteComment = () => {
     // Remove the notification if user is not the author of the post
-    if (userId !== authorId) {
+    if (loggedInUserId !== authorId) {
       deleteNotification({
-        fromUserId: userId,
+        fromUserId: loggedInUserId,
         targetUserId: authorId,
         type: NotificationType.COMMENT,
         resourceId: commentId,
@@ -90,11 +97,18 @@ export default function EachCommentPage({
     }
 
     // Delete the comment
-    deleteComments(commentId, post_id, userId, toast);
+    mutate(deleteComments(commentId, post_id, loggedInUserId, toast), {
+      optimisticData: comments?.filter(
+        (comment) => comment.comment_id !== commentId
+      ),
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   const handleOpenReply = () => {
-    if (!userId) {
+    if (!loggedInUserId) {
       toast({
         title: "Error",
         description: "Please sign in to reply",
@@ -173,13 +187,13 @@ export default function EachCommentPage({
           {user.name}
         </Button>
         {/* The comment is created by the logged in user */}
-        {user?.user_id === userId && (
+        {user?.user_id === loggedInUserId && (
           <span className="ml-1 text-white opacity-70 font-normal">
             ( Self )
           </span>
         )}
         {/* The comment is created by the author */}
-        {user?.user_id !== userId && user?.user_id === authorId && (
+        {user?.user_id !== loggedInUserId && user?.user_id === authorId && (
           <span className="ml-1 text-white opacity-70 font-normal">
             ( Author )
           </span>
@@ -208,7 +222,7 @@ export default function EachCommentPage({
           {openUserReplyBox ? "Cancel reply" : "Reply"}
         </Button>
         {/* Delete comment button and edit button */}
-        {userId === user?.user_id && (
+        {loggedInUserId === user?.user_id && (
           <>
             <Button
               variant="link"
@@ -221,7 +235,7 @@ export default function EachCommentPage({
               <EditCommentDialog
                 commentId={commentId}
                 content={content}
-                userId={userId}
+                userId={loggedInUserId}
                 postId={post_id}
               />
             </Button>

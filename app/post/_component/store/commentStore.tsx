@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { UserType } from "../_postComponent/RenderPost";
+import { UserType } from "./postStore";
 import { z } from "zod";
 import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import { ToastProp } from "./postStore";
@@ -138,9 +138,8 @@ export const commentStore = create<CommentAction>(() => ({
         }
       } catch (error) {
         console.log(error);
-      } finally {
-        return commentId;
       }
+      return commentId;
     },
   },
 }));

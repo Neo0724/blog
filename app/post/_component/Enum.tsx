@@ -3,6 +3,7 @@ export enum SearchPostType {
   ALL_POST = 2,
   SEARCH_POST = 3,
   USER_FAVOURITE_POST = 4,
+  SPECIFIC_POST = 5,
 }
 
 export enum NotificationType {

@@ -1,43 +1,42 @@
 "use client";
 import useSWR from "swr";
-import { postStore } from "../store/postStore";
+import { postStore, ToastProp } from "../store/postStore";
 import { SearchPostType } from "../Enum";
-import { GetBackFavouritePost } from "./useFavouriteHook";
 import axios from "axios";
-import { useStore } from "zustand";
 import { PostType } from "../postComponent/RenderPost";
+import { CreatePostFormType } from "../postComponent/CreatePostPage";
+import { UseFormReturn } from "react-hook-form";
+import { Dispatch } from "react";
+import { usePathname } from "next/navigation";
 
-const fetchPost = async (
-  apiUrl: string,
-  searchText?: string,
-  userId?: string
-): Promise<PostType[] | []> => {
+export type ToastFunctionType = ({ title, description }: ToastProp) => void;
+
+const fetchPost = async (apiUrl: string): Promise<PostType[] | []> => {
   let returnedPosts: PostType[] | [] = [];
   try {
-    const res = await axios.get(apiUrl, {
-      params: {
-        user_id: userId ?? "",
-        searchText: searchText ?? "",
-      },
-    });
+    const res = await axios.get(apiUrl);
 
     if (res.status === 200) {
       returnedPosts = res.data ?? [];
-      if (apiUrl.match("favourite")) {
-        const favouritePosts: PostType[] = res.data.map(
-          (item: GetBackFavouritePost) => {
-            return item.Post;
-          }
-        );
+      // if (apiUrl.match("favourite")) {
+      //   const favouritePosts: PostType[] = res.data.map(
+      //     (item: PostType) => {
+      //       return item.Post;
+      //     }
+      //   );
 
-        returnedPosts = favouritePosts;
-      }
+      //   returnedPosts = favouritePosts;
+      //   postStore.setState(() => ({
+      //     attributes: {
+      //       posts: returnedPosts,
+      //     },
+      //   }));
+      // }
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    return returnedPosts;
   }
+  return returnedPosts;
 };
 
 export default function usePost(
@@ -48,24 +47,154 @@ export default function usePost(
   let apiUrl = "";
   switch (searchPostType) {
     case 1:
-      apiUrl = "/api/post/get-own-post";
+      apiUrl = `/api/post/get-own-post?user_id=${userId}`;
       break;
     case 2:
-      apiUrl = "/api/post/get-all-post";
+      apiUrl = `/api/post/get-all-post`;
       break;
     case 3:
-      apiUrl = "/api/post/get-search-post";
+      apiUrl = `/api/post/get-search-post?searchText=${searchText}`;
       break;
     case 4:
-      apiUrl = "/api/post/get-favourite-post";
+      apiUrl = `/api/post/get-favourite-post?user_id=${userId}`;
+      break;
+    default:
+      apiUrl = `/api/post/get-all-post`;
       break;
   }
 
-  const { data, error, isLoading } = useSWR(apiUrl, () =>
-    fetchPost(apiUrl, searchText, userId)
+  // Action to update post
+  const updatePosts = async (
+    postId: string,
+    updatedPost: CreatePostFormType,
+    showToast: ToastFunctionType
+  ): Promise<PostType[] | []> => {
+    let allPostsWithUpdatedPost: PostType[] = [];
+    try {
+      const res = await axios.put("/api/post/update-post", {
+        ...updatedPost,
+        postId: postId,
+      });
+
+      if (res.status === 200) {
+        showToast({
+          title: "Success",
+          description: "Post has updated successfully",
+        });
+        allPostsWithUpdatedPost =
+          data?.map((post) => {
+            if (post.post_id === postId) {
+              return {
+                ...post,
+                content: res.data.updatedPost.content,
+                title: res.data.updatedPost.title,
+              };
+            }
+            return post;
+          }) ?? [];
+      } else {
+        showToast({
+          title: "Error",
+          description: "Unexpected error occured. Please try updating it later",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      showToast({
+        title: "Error",
+        description: "Unexpected error occured. Please try updating it later",
+      });
+    }
+    return allPostsWithUpdatedPost;
+  };
+
+  // Action to delete post
+  const deletePosts = async (
+    postId: string,
+    showToast: ToastFunctionType
+  ): Promise<PostType[] | []> => {
+    let excludeDeletedPosts: PostType[] = [];
+    try {
+      const res = await axios.delete("/api/post/delete-post", {
+        params: {
+          post_id: postId,
+        },
+      });
+      if (res.status === 200) {
+        excludeDeletedPosts =
+          data?.filter((post) => post.post_id !== postId) ?? [];
+        showToast({
+          title: "Success",
+          description: "Post has deleted successfully",
+        });
+      } else {
+        showToast({
+          title: "Error",
+          description: "Unexpected error occured. Please try deleting it later",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      showToast({
+        title: "Error",
+        description: "Unexpected error occured. Please try deleting it later",
+      });
+    }
+
+    return excludeDeletedPosts;
+  };
+
+  // Action to create post
+  // Return the new post id for notification adding purpose
+  const createPost = async (
+    newPost: CreatePostFormType,
+    showToast: ToastFunctionType,
+    form: UseFormReturn<{
+      title: string;
+      content: string;
+    }>,
+    setError: Dispatch<string>,
+    userId: string,
+    url: string
+  ): Promise<string> => {
+    const newPostWithUserId = { ...newPost, user_id: userId };
+    let newPostId = "";
+    try {
+      const res = await axios.post("/api/post/create-post", newPostWithUserId);
+
+      if (res.status === 200) {
+        showToast({
+          title: "Success!",
+          description: "Post is successfully created!",
+        });
+        form.reset({
+          title: "",
+          content: "",
+        });
+        mutate([res.data.newPost, ...(data ?? [])]);
+        newPostId = res.data.newPost.post_id;
+      }
+    } catch (error) {
+      setError("An unexpected error occur");
+      setTimeout(() => {
+        setError("");
+      }, 3000);
+    }
+    return newPostId;
+  };
+
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, () =>
+    fetchPost(apiUrl)
   );
 
-  const actions = useStore(postStore, (state) => state.actions);
-
-  return { isLoading, error, yourPosts: data, ...actions, fetchUrl: apiUrl };
+  return {
+    isLoading,
+    error,
+    mutate,
+    yourPosts: data,
+    createPost,
+    updatePosts,
+    deletePosts,
+    fetchUrl: apiUrl,
+  };
 }

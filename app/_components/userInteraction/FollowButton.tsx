@@ -25,9 +25,8 @@ export default function FollowButton({
     "test-userId",
     null
   );
-  const { allFollowing, addFollowing, removeFollowing } = useFollowing(
-    loggedInUserId ?? ""
-  );
+  const { allFollowing, addFollowing, removeFollowing, followingMutate } =
+    useFollowing(loggedInUserId ?? "");
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
@@ -61,7 +60,11 @@ export default function FollowButton({
     });
 
     // Add to following
-    addFollowing(loggedInUserId, authorId, toast);
+    followingMutate(addFollowing(loggedInUserId, authorId, toast), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   const handleUnfollow = () => {
@@ -75,7 +78,14 @@ export default function FollowButton({
       });
 
       // Remove from the following
-      removeFollowing(loggedInUserId, authorId, toast);
+      followingMutate(removeFollowing(loggedInUserId, authorId, toast), {
+        optimisticData: allFollowing?.filter(
+          (following) => following.UserFollowing.user_id !== authorId
+        ),
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
     }
   };
 

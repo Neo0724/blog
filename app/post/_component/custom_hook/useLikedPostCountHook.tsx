@@ -1,13 +1,10 @@
 import axios from "axios";
 import useSWR from "swr";
 
-const fetchPostLikeCount = async (
-  url: string,
-  postId: string
-): Promise<number> => {
+const fetchPostLikeCount = async (postId: string): Promise<number> => {
   let fetchedLikeCount = 0;
   try {
-    const res = await axios.get(url, {
+    const res = await axios.get("/api/post/count-like-post", {
       params: { post_id: postId },
     });
 
@@ -16,15 +13,22 @@ const fetchPostLikeCount = async (
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    return fetchedLikeCount;
   }
+  return fetchedLikeCount;
 };
 
 export const useLikedPostCount = (postId: string) => {
-  const { data } = useSWR(["/api/post/count-like-post", postId], () =>
-    fetchPostLikeCount("/api/post/count-like-post", postId)
+  const { data, mutate } = useSWR(
+    ["/api/post/count-like-post", postId],
+    () => fetchPostLikeCount(postId),
+    {
+      refreshInterval: 180000,
+    }
   );
 
-  return data;
+  return {
+    postLikeCount: data,
+    fetchPostLikeCount,
+    postLikeCountMutate: mutate,
+  };
 };

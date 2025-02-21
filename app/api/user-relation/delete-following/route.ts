@@ -14,9 +14,24 @@ export async function DELETE(request: NextRequest) {
           User_owner_id: ownerId as string,
         },
       },
+      select: {
+        UserFollowing: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
+        UserOwner: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
+        createdAt: true,
+      },
     });
 
-    return NextResponse.json(deletedFollowing, { status: 200 });
+    return NextResponse.json({ deletedFollowing }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

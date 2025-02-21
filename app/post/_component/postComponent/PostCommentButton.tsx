@@ -14,7 +14,7 @@ import EachCommentPage from "../EachCommentPage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BiComment } from "react-icons/bi";
 import PostOption from "./PostOption";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FavouritePostButton from "@/app/_components/userInteraction/FavouritePostButton";
 import FollowButton from "@/app/_components/userInteraction/FollowButton";
 import SubmitPostCommentPage from "./SubmitPostCommentPage";
@@ -64,6 +64,19 @@ export default function PostCommentButton({
     }
   }, [searchParams]);
 
+  // Ref to scroll user to the top when they added new comment
+  const commentBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (commentBoxRef) {
+      commentBoxRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "end",
+      });
+    }
+  }, [commentBoxRef]);
+
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -97,7 +110,6 @@ export default function PostCommentButton({
                   authorId={authorId}
                   className="p-0 h-auto text-base leading-none text-blue-400"
                   variant="link"
-                  key={postId}
                 />
               </div>
             </DialogTitle>
@@ -117,17 +129,16 @@ export default function PostCommentButton({
                 className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
                 postId={postId}
                 variant="ghost"
-                key={postId}
               />
               {/* Favourite button  */}
               <FavouritePostButton
                 className="flex gap-2 min-w-fit rounded-xl bg-[rgb(58,59,60)]"
                 postId={postId}
                 variant="ghost"
-                key={postId}
               />
             </div>
             <div className="overflow-y-scroll border-2 border-[rgb(58,59,60)] p-3 rounded-lg h-[50svh]">
+              <div ref={commentBoxRef}></div>
               {isLoading && <div>Comments are loading...</div>}
               {!isLoading &&
                 comments &&
@@ -149,7 +160,11 @@ export default function PostCommentButton({
                 <div>No comments yet...</div>
               )}
             </div>
-            <SubmitPostCommentPage authorId={authorId} postId={postId} />
+            <SubmitPostCommentPage
+              authorId={authorId}
+              postId={postId}
+              commentBoxRef={commentBoxRef}
+            />
           </DialogHeader>
         </DialogContent>
       </Dialog>

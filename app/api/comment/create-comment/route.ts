@@ -1,3 +1,4 @@
+import { getDateDifference } from "@/app/_util/getDateDifference";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -36,9 +37,30 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    const returnedComment = await prisma.comment.create({ data: newComment });
+    const returnedComment = await prisma.comment.create({
+      data: newComment,
+      select: {
+        comment_id: true,
+        content: true,
+        createdAt: true,
+        User: {
+          select: {
+            user_id: true,
+            name: true,
+          },
+        },
+      },
+    });
 
-    return NextResponse.json(returnedComment, { status: 200 });
+    const returnedCommentWithDateDifferent = {
+      ...returnedComment,
+      dateDifferent: getDateDifference(returnedComment.createdAt),
+    };
+
+    return NextResponse.json(
+      { newComment: returnedCommentWithDateDifferent },
+      { status: 200 }
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json(

@@ -10,7 +10,20 @@ export async function DELETE(request: NextRequest) {
       where: {
         post_id: post_id as string,
       },
+      select: {
+        title: true,
+        content: true,
+        createdAt: true,
+        post_id: true,
+        User: {
+          select: {
+            user_id: true,
+            name: true,
+          },
+        },
+      },
     });
+
     return NextResponse.json({ deletedPost: deletedPost }, { status: 200 });
   } catch (error) {
     console.log(error);

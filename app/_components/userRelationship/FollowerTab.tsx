@@ -27,6 +27,7 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
     removeFollower: pageOwnerRemoveFollower,
     isLoading,
     isValidating,
+    followerMutate,
   } = useFollower(pageOwnerUserId ?? "", searchUsername);
 
   const handleAuthorProfileNavigation = (user_id: string) => {
@@ -62,10 +63,10 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
       {pageOwnerUserId &&
         pageOwnerFollower &&
         pageOwnerFollower.length > 0 &&
-        pageOwnerFollower?.map((ownerFollower) => {
+        pageOwnerFollower?.map((eachOwnerFollower) => {
           return (
             <div
-              key={ownerFollower.createdAt}
+              key={eachOwnerFollower.createdAt}
               className="flex justify-between items-center mb-3"
             >
               <Button
@@ -73,11 +74,11 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                 className="p-0 h-auto text-base leading-none text-white"
                 onClick={() =>
                   handleAuthorProfileNavigation(
-                    ownerFollower.UserFollower.user_id
+                    eachOwnerFollower.UserFollower.user_id
                   )
                 }
               >
-                {ownerFollower.UserFollower.name}
+                {eachOwnerFollower.UserFollower.name}
               </Button>
 
               {/* Current logged in user is the same as the page owner */}
@@ -86,10 +87,22 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
                   variant="ghost"
                   className="rounded-xl hover:text-red-800 active:text-red-800 bg-[rgb(58,59,60)]"
                   onClick={() =>
-                    pageOwnerRemoveFollower(
-                      pageOwnerUserId,
-                      ownerFollower.UserFollower.user_id,
-                      toast
+                    followerMutate(
+                      pageOwnerRemoveFollower(
+                        pageOwnerUserId,
+                        eachOwnerFollower.UserFollower.user_id,
+                        toast
+                      ),
+                      {
+                        optimisticData: pageOwnerFollower.filter(
+                          (follower) =>
+                            follower.UserFollower.user_id !==
+                            eachOwnerFollower.UserFollower.user_id
+                        ),
+                        populateCache: true,
+                        revalidate: false,
+                        rollbackOnError: true,
+                      }
                     )
                   }
                 >

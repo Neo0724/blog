@@ -24,6 +24,12 @@ export async function GET(request: NextRequest) {
             user_id: true,
           },
         },
+        UserOwner: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
         createdAt: true,
       },
     });

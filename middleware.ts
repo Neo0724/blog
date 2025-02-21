@@ -11,6 +11,11 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(
         new URL("/sign-in?redirectUrl=post/favourite-post", request.url)
       );
+    } else if (request.nextUrl.pathname.startsWith("/user")) {
+      console.log("Inside");
+      return NextResponse.redirect(
+        new URL("/sign-in?redirectUrl=user", request.url)
+      );
     }
   }
 
@@ -20,5 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/post/favourite-post/:userId*", "/"],
+  matcher: ["/post/favourite-post/:userId*", "/user/:userId*", "/"],
 };

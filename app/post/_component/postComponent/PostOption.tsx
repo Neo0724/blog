@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdDeleteForever } from "react-icons/md";
 import { cn } from "@/lib/utils";
-import { useStore } from "zustand";
-import { postStore } from "../store/postStore";
 import { useToast } from "@/components/ui/use-toast";
-import { usePathname } from "next/navigation";
 import EditPostDialogPage from "./EditPostDialogPage";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import usePost from "../custom_hook/usePostHook";
+import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";
+import { usePathname } from "next/navigation";
 
 export default function PostOption({
   authorId,
@@ -26,31 +26,25 @@ export default function PostOption({
   const [toolbar, setToolbar] = useState(false);
   const { toast } = useToast();
   const menuRef = useRef<HTMLDivElement>(null);
-  const currentUrl = usePathname();
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
 
-  const deletePosts = useStore(postStore, (state) => state.actions.deletePosts);
+  const { yourPosts, mutate, deletePosts } = usePost(
+    getCorrectSearchPostType(usePathname()),
+    "",
+    loggedInUserId ?? ""
+  );
 
   const handleOpenToolbar = () => {
     setToolbar((prev) => !prev);
   };
 
   const handleDeletePost = () => {
-    // Get url key for mutation
-    let fetchUrl: string = "";
-
-    if (currentUrl.match("all-posts")) {
-      fetchUrl = "/api/post/get-all-post";
-    } else if (currentUrl.match("user")) {
-      fetchUrl = "/api/post/get-own-post";
-    } else if (currentUrl.match("favourite-post")) {
-      fetchUrl = "/api/post/get-favourite-post";
-    } else if (currentUrl.match("search-post")) {
-      fetchUrl = "/api/post/get-search-post";
-    } else if (currentUrl.match("post")) {
-      fetchUrl = "/api/post/get-specific-post";
-    }
-    deletePosts(postId, fetchUrl, toast);
+    mutate(deletePosts(postId, toast), {
+      optimisticData: yourPosts?.filter((post) => post.post_id !== postId),
+      rollbackOnError: true,
+      populateCache: true,
+      revalidate: true,
+    });
   };
 
   // Check if user click outside of the menu

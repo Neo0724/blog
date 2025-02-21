@@ -16,7 +16,7 @@ export async function PUT(request: NextRequest) {
   const prisma = new PrismaClient();
 
   try {
-    const updatedReplyComment = await prisma.commentReply.update({
+    const updatedCommentReply = await prisma.commentReply.update({
       where: {
         comment_reply_id: replyComment.comment_reply_id as string,
       },
@@ -26,10 +26,25 @@ export async function PUT(request: NextRequest) {
       select: {
         comment_reply_id: true,
         content: true,
+        User: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
+        Target_user: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json(updatedReplyComment, { status: 200 });
+    return NextResponse.json(
+      { updatedCommentReply: updatedCommentReply },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

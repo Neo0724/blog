@@ -20,9 +20,8 @@ const fetchSpecificPost = async (
     }
   } catch (error) {
     console.log(error);
-  } finally {
-    return specificPost;
   }
+  return specificPost;
 };
 
 export default function useSpecificPostHook(postId: string) {

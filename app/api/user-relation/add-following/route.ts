@@ -22,9 +22,21 @@ export async function POST(request: NextRequest) {
 
     const returnedFollowing = await prisma.follower.create({
       data: newFollowing,
+      select: {
+        UserFollowing: {
+          select: {
+            name: true,
+            user_id: true,
+          },
+        },
+        createdAt: true,
+      },
     });
 
-    return NextResponse.json(returnedFollowing, { status: 200 });
+    return NextResponse.json(
+      { newFollowing: returnedFollowing },
+      { status: 200 }
+    );
   } catch (error) {
     console.log(error);
     return NextResponse.json(

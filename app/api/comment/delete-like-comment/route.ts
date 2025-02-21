@@ -7,7 +7,7 @@ export async function DELETE(request: NextRequest) {
 
   const prisma = new PrismaClient();
   try {
-    const [deletedComment, totalCommentLikeCount] = await prisma.$transaction([
+    const [deletedComment, likeCount] = await prisma.$transaction([
       prisma.likedComment.delete({
         where: {
           User_user_id_Comment_comment_id: {
@@ -25,7 +25,7 @@ export async function DELETE(request: NextRequest) {
     ]);
 
     return NextResponse.json(
-      { totalCommentLikeCount: totalCommentLikeCount },
+      { commentId: deletedComment.Comment_comment_id, likeCount },
       { status: 200 }
     );
   } catch (error) {

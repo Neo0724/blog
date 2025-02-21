@@ -10,59 +10,51 @@ export async function GET(request: NextRequest) {
 
   try {
     // Fetch the user comment first then only the rest to put user comments on top of others
-    const commentsByLoggedInUser = await prisma.post.findUnique({
+    const commentsByLoggedInUser = await prisma.comment.findMany({
       where: {
-        post_id: post_id as string,
+        Post_post_id: post_id as string,
         User_user_id: user_id as string,
       },
       select: {
-        being_commented_post: {
+        comment_id: true,
+        content: true,
+        createdAt: true,
+        User: {
           select: {
-            comment_id: true,
-            content: true,
-            createdAt: true,
-            User: {
-              select: {
-                name: true,
-                user_id: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "asc",
+            name: true,
+            user_id: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    const remainingComments = await prisma.post.findUnique({
+    const remainingComments = await prisma.comment.findMany({
       where: {
-        post_id: post_id as string,
+        Post_post_id: post_id as string,
         User_user_id: { not: user_id as string },
       },
       select: {
-        being_commented_post: {
+        comment_id: true,
+        content: true,
+        createdAt: true,
+        User: {
           select: {
-            comment_id: true,
-            content: true,
-            createdAt: true,
-            User: {
-              select: {
-                name: true,
-                user_id: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "asc",
+            name: true,
+            user_id: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
     const comments = [
-      ...(commentsByLoggedInUser?.being_commented_post ?? []),
-      ...(remainingComments?.being_commented_post ?? []),
+      ...(commentsByLoggedInUser ?? []),
+      ...(remainingComments ?? []),
     ];
 
     let commentsWithDateDifferent = comments?.map((comment) => {

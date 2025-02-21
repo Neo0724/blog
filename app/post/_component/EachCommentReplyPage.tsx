@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useReplyComment from "./custom_hook/useReplyComment";
+import useReplyComment from "./custom_hook/useReplyCommentHook";
 import useLikedReplyComment from "./custom_hook/useLikedReplyCommentHook";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -37,21 +37,24 @@ export default function EachCommentReplyPage({
   const router = useRouter();
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  const [userId, _] = useLocalStorage("test-userId", "");
+  const [loggedInUserId, _] = useLocalStorage("test-userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { likedReply, addLikeCommentReply, removeLikeCommentReply } =
-    useLikedReplyComment(userId, comment_id);
-  const [isLiked, setIsLiked] = useState<boolean>();
-  const { createReplyComments, deleteReplyComments } =
-    useReplyComment(comment_id);
-  const { addNotification, deleteNotification } = useNotification(userId ?? "");
+  const {
+    replyComments,
+    createReplyComments,
+    deleteReplyComments,
+    mutateReplyComment,
+  } = useReplyComment(comment_id, loggedInUserId);
+  const { addNotification, deleteNotification } = useNotification(
+    loggedInUserId ?? ""
+  );
   const commentReplyBoxRef = useRef<HTMLDivElement | null>(null);
 
   const openReplyRef = useRef<HTMLDivElement | null>(null);
 
   const handleOpenReply = () => {
-    if (!userId) {
+    if (!loggedInUserId) {
       toast({
         title: "Error",
         description: "Please sign in to reply",
@@ -78,7 +81,7 @@ export default function EachCommentReplyPage({
   const handleSubmitReply = async () => {
     const replyData = {
       content: replyContent,
-      user_id: userId,
+      user_id: loggedInUserId,
       target_user_id: user.user_id,
       comment_id: comment_id,
     };
@@ -93,9 +96,9 @@ export default function EachCommentReplyPage({
     );
 
     // Send the notification if the user is replying to other instead of himself
-    if (user.user_id !== userId) {
+    if (user.user_id !== loggedInUserId) {
       addNotification({
-        fromUserId: userId,
+        fromUserId: loggedInUserId,
         targetUserId: [user.user_id],
         type: NotificationType.COMMENT_REPLY,
         resourceId: commentReplyId,
@@ -105,9 +108,9 @@ export default function EachCommentReplyPage({
 
   const handleDeleteCommentReply = () => {
     // Remove the notification if user is not the author of the comment
-    if (userId !== target_user.user_id) {
+    if (loggedInUserId !== target_user.user_id) {
       deleteNotification({
-        fromUserId: userId,
+        fromUserId: loggedInUserId,
         // Target_user is the user that this comment is replying to
         targetUserId: target_user.user_id,
         type: NotificationType.COMMENT_REPLY,
@@ -116,74 +119,22 @@ export default function EachCommentReplyPage({
     }
 
     // Delete the reply comment
-    deleteReplyComments(comment_reply_id, toast, comment_id);
-  };
-
-  const handleLikeReplyComment = async () => {
-    // User not logged in
-    if (!userId) {
-      toast({
-        title: "Error",
-        description: "Please sign in to like",
-        action: (
-          <ToastAction
-            altText="Sign in now"
-            onClick={() => {
-              window.location.replace("/sign-in");
-            }}
-          >
-            Sign in
-          </ToastAction>
+    mutateReplyComment(
+      deleteReplyComments(comment_reply_id, toast, comment_id),
+      {
+        optimisticData: replyComments?.filter(
+          (replyComment) => replyComment.comment_reply_id !== comment_reply_id
         ),
-      });
-
-      return;
-    } else {
-      if (isLiked) {
-        // Remove the notification from the target user
-        if (userId !== user.user_id) {
-          deleteNotification({
-            fromUserId: userId,
-            targetUserId: user.user_id,
-            type: NotificationType.LIKE_REPLY_COMMENT,
-            resourceId: comment_reply_id,
-          });
-        }
-
-        // Remove the like
-        removeLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
-      } else {
-        // User wants to add the like
-        // Only send notification if the user who liked is not the author
-        if (userId !== user.user_id) {
-          addNotification({
-            fromUserId: userId,
-            targetUserId: [user.user_id],
-            type: NotificationType.LIKE_REPLY_COMMENT,
-            resourceId: comment_reply_id,
-          });
-        }
-
-        // Add the like
-        addLikeCommentReply(userId, comment_reply_id, setIsLiked, toast);
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
       }
-    }
+    );
   };
 
   function handleAuthorProfileNavigation(user_id: string): void {
     router.push(`/user/${user_id}`);
   }
-
-  useEffect(() => {
-    if (likedReply && likedReply.length > 0) {
-      const userLiked = likedReply.find(
-        (item) => item.CommentReply_comment_reply_id === comment_reply_id
-      )
-        ? true
-        : false;
-      setIsLiked(userLiked);
-    }
-  }, [comment_reply_id, likedReply]);
 
   // Scroll the reply box into user view
   useEffect(() => {
@@ -221,13 +172,13 @@ export default function EachCommentReplyPage({
           {user.name}
         </Button>
         {/* The comment is created by the logged in user */}
-        {user?.user_id === userId && (
+        {user?.user_id === loggedInUserId && (
           <span className="ml-1 text-white opacity-50 font-normal">
             ( Self )
           </span>
         )}
         {/* The comment is created by the author */}
-        {user?.user_id !== userId && user?.user_id === authorId && (
+        {user?.user_id !== loggedInUserId && user?.user_id === authorId && (
           <span className="ml-1 text-white opacity-50 font-normal">
             ( Author )
           </span>
@@ -258,7 +209,7 @@ export default function EachCommentReplyPage({
           {openReply ? "Cancel reply" : "Reply"}
         </Button>
         {/* Delete and edit comment reply button */}
-        {userId === user?.user_id && (
+        {loggedInUserId === user?.user_id && (
           <>
             <Button
               variant="link"

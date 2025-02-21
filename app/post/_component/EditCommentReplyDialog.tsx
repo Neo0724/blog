@@ -24,8 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useStore } from "zustand";
-import { replyCommentStore } from "./store/replyCommentStore";
+import useReplyComment from "./custom_hook/useReplyCommentHook";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 export default function EditCommentReplyDialog({
   content,
@@ -37,11 +37,10 @@ export default function EditCommentReplyDialog({
   commentId: string;
 }) {
   const { toast } = useToast();
+  const [loggedInUserId, _] = useLocalStorage<string>("test-userId", "");
 
-  const updateReplyComment = useStore(
-    replyCommentStore,
-    (state) => state.actions.updateReplyComment
-  );
+  const { updateReplyComment, replyComments, mutateReplyComment } =
+    useReplyComment(commentId, loggedInUserId);
 
   const form = useForm<UpdateReplyCommentType>({
     resolver: zodResolver(UpdateReplyCommentSchema),
@@ -53,7 +52,18 @@ export default function EditCommentReplyDialog({
   });
 
   const onSubmit = (formData: UpdateReplyCommentType) => {
-    updateReplyComment(formData, toast);
+    mutateReplyComment(updateReplyComment(formData, toast), {
+      optimisticData: replyComments?.map((replyComment) => {
+        if (replyComment.comment_reply_id === commentReplyId) {
+          return { ...replyComment, content: formData.content };
+        }
+
+        return replyComment;
+      }),
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   const onInvalid = () => {

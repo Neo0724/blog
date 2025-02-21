@@ -1,3 +1,4 @@
+import { getDateDifference } from "@/app/_util/getDateDifference";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -37,9 +38,27 @@ export const POST = async (request: NextRequest) => {
           },
         },
       },
+      select: {
+        title: true,
+        content: true,
+        createdAt: true,
+        post_id: true,
+        User: {
+          select: {
+            user_id: true,
+            name: true,
+          },
+        },
+      },
     });
+
+    const newPostWithDateDifferent = {
+      ...newPost,
+      dateDifferent: getDateDifference(newPost.createdAt),
+    };
+
     return NextResponse.json(
-      { message: "Success", data: newPost },
+      { message: "Success", newPost: newPostWithDateDifferent },
       { status: 200 }
     );
   } catch (err) {

@@ -41,21 +41,23 @@ export async function GET(request: NextRequest) {
     /* 
    [
     {
-        "Post": {
-            "title": "Coding help",
-            "content": "Can someone help me in next js?",
-            "createdAt": "2024-10-17T10:16:52.627Z",
-            "post_id": "20ee24c5-9d2f-440e-aab6-da49de8bc92e",
-            "User": {
-                "name": "Alan",
-                "user_id": "3b043e4d-3d8d-414d-8dd8-b2ce0be44c25"
-            }
-        }
+        "title": "Coding help",
+        "content": "Can someone help me in next js?",
+        "createdAt": "2024-10-17T10:16:52.627Z",
+        "post_id": "20ee24c5-9d2f-440e-aab6-da49de8bc92e",
+        "User": {
+            "name": "Alan",
+            "user_id": "3b043e4d-3d8d-414d-8dd8-b2ce0be44c25"
+        },
+        "dateDifferent": "30 minutes ago"
     }
 ] 
     Example output, returned output is an array of all favourited post 
     */
-    return NextResponse.json(allPostsWithDateDiff ?? [], { status: 200 });
+    return NextResponse.json(
+      allPostsWithDateDiff.map((allPost) => allPost.Post) ?? [],
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "An unexpected error occur!" },

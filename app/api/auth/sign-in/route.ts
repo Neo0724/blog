@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
 
 export const SignInSchema = z.object({
   email: z.string().email(),
@@ -10,24 +11,42 @@ export const SignInSchema = z.object({
 export const POST = async (request: NextRequest) => {
   const prisma = new PrismaClient();
 
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  const userExist = await prisma.user.findFirst({
-    where: {
-      email: body.email,
-      password: body.password,
-    },
-  });
+    const userExist = await prisma.user.findFirst({
+      where: {
+        email: body.email,
+      },
+    });
 
-  if (userExist) {
+    if (!userExist) {
+      return NextResponse.json(
+        { error: "Email does not exists" },
+        { status: 404 }
+      );
+    } else {
+      const correctPassword = await compareSync(
+        body.password,
+        userExist.password
+      );
+
+      if (correctPassword) {
+        return NextResponse.json(
+          { username: userExist.name, user_id: userExist.user_id },
+          { status: 200 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: "Password is incorrect" },
+          { status: 404 }
+        );
+      }
+    }
+  } catch (error) {
     return NextResponse.json(
-      { username: userExist.name, user_id: userExist.user_id },
-      { status: 200 }
+      { error: "Failed to sign in user" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(
-    { error: "Invalid email or password" },
-    { status: 500 }
-  );
 };

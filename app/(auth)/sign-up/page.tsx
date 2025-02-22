@@ -32,10 +32,12 @@ const SignUpPage = () => {
   const router = useRouter();
 
   const waitClearToast = new Promise((resolve, reject) => {
-    setTimeout(() => {
+    const timeOut = setTimeout(() => {
       setToastMessage({ msg: "", error: false });
       resolve(true);
-    }, 5000);
+    }, 3000);
+
+    () => clearTimeout(timeOut);
   });
 
   const handleSubmit = form.handleSubmit(async (formData) => {

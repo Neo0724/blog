@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
+import { genSaltSync, hashSync } from "bcrypt-ts";
 
 export const SignUpSchema = z.object({
   name: z.string().min(1),
@@ -31,13 +32,27 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const user = await prisma.user.create({
-    data: {
-      email: body.email,
-      name: body.name,
-      password: body.password,
-    },
-  });
+  try {
+    const salt = genSaltSync(10);
+    const hashedPassword = hashSync(body.password, salt);
 
-  return NextResponse.json(user);
+    const newUser = await prisma.user.create({
+      data: {
+        email: body.email,
+        name: body.name,
+        password: hashedPassword,
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    return NextResponse.json(newUser, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { error: "Error signing up user " },
+      { status: 500 }
+    );
+  }
 }

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { compareSync } from "bcrypt-ts";
 
-export default async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const prisma = new PrismaClient();
 
   try {

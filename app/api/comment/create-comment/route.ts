@@ -3,7 +3,7 @@ import { CommentSchema } from "@/zod_schema/schema";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 

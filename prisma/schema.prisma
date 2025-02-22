@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
     provider = "postgres"
-    url      = env("LOCAL_DATABASE_URL")
+    url      = env("DATABASE_URL")
 }
 
 model User {

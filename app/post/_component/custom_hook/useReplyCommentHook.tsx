@@ -1,9 +1,8 @@
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import useSWR from "swr";
-import { ReplyData } from "../store/replyCommentStore";
 import { ToastFunctionType } from "./usePostHook";
-import { UpdateReplyCommentType } from "@/app/api/comment-reply/update-comment-reply/route";
+import { UpdateReplyCommentType } from "../../../api/comment-reply/update-comment-reply/route";
 
 export type GetBackReplyCommentType = {
   comment_reply_id: string;
@@ -12,6 +11,13 @@ export type GetBackReplyCommentType = {
   createdAt: Date;
   dateDifferent: string;
   Target_user: UserType;
+};
+
+export type ReplyData = {
+  content: string;
+  user_id: string;
+  target_user_id: string;
+  comment_id: string;
 };
 
 export default function useReplyComment(comment_id: string, user_id: string) {
@@ -48,10 +54,6 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       );
 
       if (res.status === 200) {
-        // mutate([
-        //   "/api/comment-reply/get-comment-reply",
-        //   replyData.comment_id,
-        // ]);
         setViewReplies(true);
         commentReplyId = res.data.newCommentReply.comment_reply_id;
         mutate([res.data.newCommentReply, ...(data ?? [])]);
@@ -70,8 +72,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
 
   const deleteReplyComments = async (
     comment_reply_id: string,
-    showToast: ToastFunctionType,
-    commentId: string
+    showToast: ToastFunctionType
   ): Promise<GetBackReplyCommentType[] | []> => {
     let excludedDeletedReplyComment: GetBackReplyCommentType[] = [];
     try {
@@ -80,7 +81,6 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       );
 
       if (res.status === 200) {
-        // mutate(["/api/comment-reply/get-comment-reply", commentId]);
         showToast({
           title: "Success",
           description: "Your reply has been deleted",
@@ -118,10 +118,6 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       );
 
       if (res.status === 200) {
-        // mutate([
-        //   "/api/comment-reply/get-comment-reply",
-        //   replyComment.comment_id,
-        // ]);
         showToast({
           title: "Success",
           description: "Your reply has been updated",

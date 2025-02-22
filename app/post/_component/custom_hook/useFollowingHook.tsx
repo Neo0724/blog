@@ -48,7 +48,6 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
       });
 
       if (res.status === 200) {
-        // mutate(["/api/user-relation/get-following", ownerId]);
         newAllFollowing = [res.data.newFollowing, ...(data ?? [])];
       } else {
         showToast({
@@ -79,7 +78,6 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
         },
       });
       if (res.status === 200) {
-        // mutate(["/api/user-relation/get-following", ownerId]);
         excludeDeletedFollowing = excludeDeletedFollowing.filter(
           (following) => following.UserFollowing.user_id !== targetId
         );

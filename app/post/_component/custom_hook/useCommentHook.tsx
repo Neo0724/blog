@@ -1,9 +1,10 @@
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import useSWR from "swr";
-import { CommentType } from "../store/commentStore";
 import { ToastFunctionType } from "./usePostHook";
 import { UseFormReturn } from "react-hook-form";
+import { CommentSchema } from "@/app/api/comment/create-comment/route";
+import { z } from "zod";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -12,6 +13,8 @@ export type GetBackCommentType = {
   dateDifferent: string;
   User: UserType; // User is the one who created the comment
 };
+
+export type CommentType = z.infer<typeof CommentSchema>;
 
 export default function useComment(post_id: string, userId: string | null) {
   const getComment = async (
@@ -60,11 +63,6 @@ export default function useComment(post_id: string, userId: string | null) {
       );
 
       if (res.status === 200) {
-        // mutate([
-        //   "/api/comment/get-comment",
-        //   updatedComments.post_id,
-        //   updatedComments.user_id,
-        // ]);
         allCommentsWithUpdatedComment =
           data?.map((comment) => {
             if (comment.comment_id === commentId) {
@@ -98,8 +96,6 @@ export default function useComment(post_id: string, userId: string | null) {
 
   const deleteComments = async (
     commentId: string,
-    postId: string,
-    userId: string,
     showToast: ToastFunctionType
   ) => {
     let excludeDeletedComments: GetBackCommentType[] = [];
@@ -111,7 +107,6 @@ export default function useComment(post_id: string, userId: string | null) {
       });
 
       if (res.status === 200) {
-        // mutate(["/api/comment/get-comment", postId, userId]);
         excludeDeletedComments =
           data?.filter((comment) => comment.comment_id !== commentId) ?? [];
         showToast({
@@ -151,11 +146,6 @@ export default function useComment(post_id: string, userId: string | null) {
       );
 
       if (response.status === 200) {
-        // mutate([
-        //   "/api/comment/get-comment",
-        //   newComment.post_id,
-        //   newComment.user_id,
-        // ]);
         mutate((prevData) => {
           return [response.data.newComment, ...(prevData ?? [])];
         });

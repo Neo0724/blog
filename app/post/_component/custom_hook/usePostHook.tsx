@@ -1,15 +1,23 @@
 "use client";
 import useSWR from "swr";
-import { postStore, ToastProp } from "../store/postStore";
 import { SearchPostType } from "../Enum";
 import axios from "axios";
 import { PostType } from "../postComponent/RenderPost";
 import { CreatePostFormType } from "../postComponent/CreatePostPage";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch } from "react";
-import { usePathname } from "next/navigation";
 
 export type ToastFunctionType = ({ title, description }: ToastProp) => void;
+
+export type UserType = {
+  user_id: string;
+  name: string;
+};
+
+export type ToastProp = {
+  title: string;
+  description: string;
+};
 
 const fetchPost = async (apiUrl: string): Promise<PostType[] | []> => {
   let returnedPosts: PostType[] | [] = [];
@@ -18,20 +26,6 @@ const fetchPost = async (apiUrl: string): Promise<PostType[] | []> => {
 
     if (res.status === 200) {
       returnedPosts = res.data ?? [];
-      // if (apiUrl.match("favourite")) {
-      //   const favouritePosts: PostType[] = res.data.map(
-      //     (item: PostType) => {
-      //       return item.Post;
-      //     }
-      //   );
-
-      //   returnedPosts = favouritePosts;
-      //   postStore.setState(() => ({
-      //     attributes: {
-      //       posts: returnedPosts,
-      //     },
-      //   }));
-      // }
     }
   } catch (err) {
     console.log(err);

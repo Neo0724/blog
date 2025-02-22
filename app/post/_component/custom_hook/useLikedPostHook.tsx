@@ -6,7 +6,7 @@ import { PostType } from "../postComponent/RenderPost";
 export default function useLikedPost(user_id: string | null) {
   const fetchData = async (
     url: string | null,
-    user_id: string | null,
+    user_id: string | null
   ): Promise<string[] | []> => {
     if (!url || !user_id) {
       return [];
@@ -32,7 +32,7 @@ export default function useLikedPost(user_id: string | null) {
 
   const { data, error, isLoading, mutate } = useSWR(
     [user_id ? "/api/post/get-like-post" : null, user_id],
-    ([url, user_id]) => fetchData(url, user_id),
+    ([url, user_id]) => fetchData(url, user_id)
   );
 
   const addLikePost = async (
@@ -41,7 +41,7 @@ export default function useLikedPost(user_id: string | null) {
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
     postLikeCountMutate: KeyedMutator<number>,
-    postLikeCount: number,
+    postLikeCount: number
   ): Promise<string[] | []> => {
     let newLikePostId: string = "";
     try {
@@ -77,7 +77,7 @@ export default function useLikedPost(user_id: string | null) {
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
     postLikeCountMutate: KeyedMutator<number>,
-    postLikeCount: number,
+    postLikeCount: number
   ): Promise<string[] | []> => {
     let removedLikePostId: string = "";
 

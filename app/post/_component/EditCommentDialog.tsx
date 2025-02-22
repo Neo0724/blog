@@ -21,9 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useStore } from "zustand";
-import { commentStore, CommentType } from "./store/commentStore";
-import useComment from "./custom_hook/useCommentHook";
+import useComment, { CommentType } from "./custom_hook/useCommentHook";
 
 export default function EditCommentDialog({
   commentId,

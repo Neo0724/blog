@@ -1,21 +1,59 @@
 "use client";
 import useSWR from "swr";
-import {
-  DeleteNotificationType,
-  NewNotificationType,
-  ReturnedNotificationType,
-} from "../store/notificationStore";
 import axios from "axios";
+import { NotificationType } from "../Enum";
+import { UserType } from "./usePostHook";
 
 type ReturnedNotificationTypeWithNotViewedCount = {
   allNotification: ReturnedNotificationType[];
   notViewedCount: number;
 };
 
+export type NewNotificationType = {
+  targetUserId: string[];
+  fromUserId: string;
+  type: NotificationType;
+  resourceId: string;
+};
+
+export type DeleteNotificationType = Omit<
+  NewNotificationType,
+  "targetUserId"
+> & {
+  targetUserId: string;
+};
+
+export type ReturnedNotificationType = {
+  notification_id: string;
+  hasViewed: boolean;
+  createdAt: string;
+  TargetUser: UserType;
+  FromUser: UserType;
+} & (
+  | {
+      type: NotificationType.FOLLOW;
+      resource: { followerUserId: string };
+    }
+  | {
+      type: NotificationType.POST | NotificationType.LIKE_POST;
+      resource: { postId: string };
+    }
+  | {
+      type: NotificationType.COMMENT | NotificationType.LIKE_COMMENT;
+      resource: { postId: string; commentId: string };
+    }
+  | {
+      type:
+        | NotificationType.COMMENT_REPLY
+        | NotificationType.LIKE_REPLY_COMMENT;
+      resource: { postId: string; commentId: string; commentReplyId: string };
+    }
+);
+
 export default function useNotification(userId: string) {
   const fetchNotification = async (
     apiUrl: string,
-    userId: string,
+    userId: string
   ): Promise<ReturnedNotificationTypeWithNotViewedCount> => {
     let fetchedNotification: ReturnedNotificationType[] = [];
     let notViewedCount: number = 0;
@@ -37,7 +75,7 @@ export default function useNotification(userId: string) {
   };
 
   const addNotification = async (
-    newNotification: NewNotificationType,
+    newNotification: NewNotificationType
   ): Promise<void> => {
     try {
       await Promise.all([
@@ -46,7 +84,7 @@ export default function useNotification(userId: string) {
             await axios.post("/api/notification/add-notification", {
               ...newNotification,
               targetUserId: userId,
-            }),
+            })
         ),
       ]);
     } catch (err) {
@@ -55,7 +93,7 @@ export default function useNotification(userId: string) {
   };
 
   const readNotification = async (
-    notificationId: string,
+    notificationId: string
   ): Promise<ReturnedNotificationTypeWithNotViewedCount | undefined> => {
     let updatedNotification:
       | ReturnedNotificationTypeWithNotViewedCount
@@ -86,7 +124,7 @@ export default function useNotification(userId: string) {
   };
 
   const deleteNotification = async (
-    deleteNotification: DeleteNotificationType,
+    deleteNotification: DeleteNotificationType
   ): Promise<void> => {
     try {
       await axios.delete("/api/notification/delete-notification", {
@@ -104,7 +142,7 @@ export default function useNotification(userId: string) {
 
   const { data, isLoading, error, mutate } = useSWR(
     userId ? "/api/notification/get-notification" : null,
-    () => fetchNotification("/api/notification/get-notification", userId),
+    () => fetchNotification("/api/notification/get-notification", userId)
   );
 
   return {

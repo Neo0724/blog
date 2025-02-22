@@ -97,7 +97,7 @@ export default function EachCommentPage({
     }
 
     // Delete the comment
-    mutate(deleteComments(commentId, post_id, loggedInUserId, toast), {
+    mutate(deleteComments(commentId, toast), {
       optimisticData: comments?.filter(
         (comment) => comment.comment_id !== commentId
       ),

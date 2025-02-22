@@ -1,8 +1,6 @@
 import useSWR from "swr";
-import { useStore } from "zustand";
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
-import { followerStore } from "../store/followerStore";
 import { ToastFunctionType } from "./usePostHook";
 
 type UserFollower = {
@@ -49,7 +47,6 @@ export const useFollower = (targetId: string, queryUsername = "") => {
         },
       });
       if (res.status === 200) {
-        // mutate(["/api/user-relation/get-follower", ownerId]);
         excludeDeletedFollower =
           data?.filter(
             (follower) => follower.UserFollower.user_id !== followerId

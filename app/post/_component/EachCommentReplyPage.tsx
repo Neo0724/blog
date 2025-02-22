@@ -119,17 +119,14 @@ export default function EachCommentReplyPage({
     }
 
     // Delete the reply comment
-    mutateReplyComment(
-      deleteReplyComments(comment_reply_id, toast, comment_id),
-      {
-        optimisticData: replyComments?.filter(
-          (replyComment) => replyComment.comment_reply_id !== comment_reply_id
-        ),
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
+    mutateReplyComment(deleteReplyComments(comment_reply_id, toast), {
+      optimisticData: replyComments?.filter(
+        (replyComment) => replyComment.comment_reply_id !== comment_reply_id
+      ),
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   function handleAuthorProfileNavigation(user_id: string): void {

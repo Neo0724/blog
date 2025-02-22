@@ -1,7 +1,5 @@
 import axios from "axios";
 import useSwr, { KeyedMutator } from "swr";
-import { useStore } from "zustand";
-import { likedCommentReplyStore } from "../store/likedCommentReplyStore";
 import { ToastFunctionType } from "./usePostHook";
 
 // Get all replied comment for a single comment
@@ -55,10 +53,6 @@ export default function useLikedReplyComment(
       });
 
       if (res.status === 200) {
-        // mutate([
-        //   "/api/comment-reply/count-like-comment-reply",
-        //   commentReplyId,
-        // ]);
         newLikeCommentReplyId = res.data.commentReplyId;
         commentReplyLikeCountMutate((prev) => (prev ?? 0) + 1, {
           revalidate: false,
@@ -98,10 +92,6 @@ export default function useLikedReplyComment(
       );
 
       if (res.status === 200) {
-        // mutate([
-        //   "/api/comment-reply/count-like-comment-reply",
-        //   commentReplyId,
-        // ]);
         removedLikeCommentReplyId = res.data.commentReplyId;
         commentReplyLikeCountMutate((prev) => (prev ?? 1) - 1, {
           revalidate: false,

@@ -1,7 +1,5 @@
 import axios from "axios";
 import useSWR, { KeyedMutator } from "swr";
-import { useStore } from "zustand";
-import { likedCommentStore } from "../store/likedCommentStore";
 import { ToastFunctionType } from "./usePostHook";
 
 export default function useLikedComment(user_id: string, post_id: string) {
@@ -51,7 +49,6 @@ export default function useLikedComment(user_id: string, post_id: string) {
       });
 
       if (res.status === 200) {
-        // mutate(["/api/comment/count-like-comment", commentId]);
         newLikeCommentId = res.data.commentId;
         commentLikeCountMutate((prev) => (prev ?? 0) + 1, {
           revalidate: false,

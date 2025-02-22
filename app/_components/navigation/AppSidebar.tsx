@@ -15,7 +15,7 @@ import useCookie from "react-use-cookie";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 
-export function AppSidebar() {
+export default function AppSidebar() {
   const router = useRouter();
   const [userId, setUserId] = useLocalStorage<string | null>(
     "test-userId",

@@ -3,7 +3,7 @@ import RenderPost from "@/app/post/_component/postComponent/RenderPost";
 import { FollowerTab } from "@/app/_components/userRelationship/FollowerTab";
 import { FollowingTab } from "@/app/_components/userRelationship/FollowingTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+export const dynamic = "force-dynamic";
 export default function UserPage({ params }: { params: { userId: string } }) {
   return (
     <div>

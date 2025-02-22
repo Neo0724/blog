@@ -1,6 +1,6 @@
 import RenderPost from "../../_component/postComponent/RenderPost";
 import { SearchPostType } from "../../_component/Enum";
-
+export const dynamic = "force-dynamic";
 export default function YourPostsPage({
   params,
 }: {

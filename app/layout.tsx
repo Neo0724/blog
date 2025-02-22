@@ -6,7 +6,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
-import { AppSidebar } from "./_components/navigation/AppSidebar";
+const AppSidebar = dynamic(
+  () => import("./_components/navigation/AppSidebar"),
+  {
+    ssr: false,
+  }
+);
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

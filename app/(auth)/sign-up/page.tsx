@@ -19,14 +19,9 @@ import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { SignUpSchema } from "@/zod_schema/schema";
 
 type SignUpType = z.infer<typeof SignUpSchema>;
-
-export const SignUpSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
 
 const SignUpPage = () => {
   const form = useForm<SignUpType>({

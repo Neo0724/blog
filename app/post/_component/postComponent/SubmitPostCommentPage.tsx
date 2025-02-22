@@ -7,14 +7,12 @@ import { toast } from "@/components/ui/use-toast";
 import { NotificationType } from "../Enum";
 import { ToastAction } from "@radix-ui/react-toast";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useComment, {
-  CommentSchema,
-  CommentType,
-} from "../custom_hook/useCommentHook";
+import useComment, { CommentType } from "../custom_hook/useCommentHook";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import useNotification from "../custom_hook/useNotificationHook";
 import { RefObject } from "react";
+import { CommentSchema } from "@/zod_schema/schema";
 
 type SubmitPostCommentPageProps = {
   authorId: string;

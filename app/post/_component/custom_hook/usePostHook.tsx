@@ -6,7 +6,6 @@ import { PostType } from "../postComponent/RenderPost";
 import { CreatePostFormType } from "../postComponent/CreatePostPage";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch } from "react";
-import { z } from "zod";
 
 export type ToastFunctionType = ({ title, description }: ToastProp) => void;
 
@@ -19,17 +18,6 @@ export type ToastProp = {
   title: string;
   description: string;
 };
-
-export const CreatePostFormSchema = z.object({
-  title: z.string().min(1).max(65535),
-  content: z.string().min(1).max(65535),
-});
-
-export const CreatePostSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
-  user_id: z.string(),
-});
 
 const fetchPost = async (apiUrl: string): Promise<PostType[] | []> => {
   let returnedPosts: PostType[] | [] = [];

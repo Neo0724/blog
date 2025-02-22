@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import { CommentSchema } from "@/zod_schema/schema";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -12,11 +13,6 @@ export type GetBackCommentType = {
   dateDifferent: string;
   User: UserType; // User is the one who created the comment
 };
-export const CommentSchema = z.object({
-  content: z.string().min(1).max(65535),
-  user_id: z.string(),
-  post_id: z.string(),
-});
 
 export type CommentType = z.infer<typeof CommentSchema>;
 

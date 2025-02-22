@@ -1,5 +1,5 @@
 import { getDateDifference } from "@/app/_util/getDateDifference";
-import { CreatePostSchema } from "@/app/post/_component/custom_hook/usePostHook";
+import { CreatePostSchema } from "@/zod_schema/schema";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";

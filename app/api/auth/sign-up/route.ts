@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import { SignUpSchema } from "@/app/(auth)/sign-up/page";
+import { SignUpSchema } from "@/zod_schema/schema";
 
 export default async function POST(request: NextRequest) {
   const prisma = new PrismaClient();

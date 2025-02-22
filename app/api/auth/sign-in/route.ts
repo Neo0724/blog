@@ -1,14 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
+import { compareSync } from "bcrypt-ts";
 
-export const SignInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-export const POST = async (request: NextRequest) => {
+export default async function POST(request: NextRequest) {
   const prisma = new PrismaClient();
 
   try {
@@ -49,4 +43,4 @@ export const POST = async (request: NextRequest) => {
       { status: 500 }
     );
   }
-};
+}

@@ -2,14 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { genSaltSync, hashSync } from "bcrypt-ts";
+import { SignUpSchema } from "@/app/(auth)/sign-up/page";
 
-export const SignUpSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-export async function POST(request: NextRequest) {
+export default async function POST(request: NextRequest) {
   const prisma = new PrismaClient();
 
   const body = await request.json();

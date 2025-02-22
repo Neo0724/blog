@@ -7,9 +7,10 @@ import { toast } from "@/components/ui/use-toast";
 import { NotificationType } from "../Enum";
 import { ToastAction } from "@radix-ui/react-toast";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { CommentType } from "../store/commentStore";
-import useComment from "../custom_hook/useCommentHook";
-import { CommentSchema } from "@/app/api/comment/create-comment/route";
+import useComment, {
+  CommentSchema,
+  CommentType,
+} from "../custom_hook/useCommentHook";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import useNotification from "../custom_hook/useNotificationHook";

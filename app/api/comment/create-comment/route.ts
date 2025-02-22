@@ -1,15 +1,9 @@
 import { getDateDifference } from "@/app/_util/getDateDifference";
+import { CommentSchema } from "@/app/post/_component/custom_hook/useCommentHook";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
-export const CommentSchema = z.object({
-  content: z.string().min(1).max(65535),
-  user_id: z.string(),
-  post_id: z.string(),
-});
-
-export async function POST(request: NextRequest) {
+export default async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 

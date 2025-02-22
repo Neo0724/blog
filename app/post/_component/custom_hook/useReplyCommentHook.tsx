@@ -2,7 +2,7 @@ import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
-import { UpdateReplyCommentType } from "../../../api/comment-reply/update-comment-reply/route";
+import { UpdateReplyCommentType } from "../EditCommentReplyDialog";
 
 export type GetBackReplyCommentType = {
   comment_reply_id: string;

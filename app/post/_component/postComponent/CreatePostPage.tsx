@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreatePostFormSchema } from "@/app/api/post/create-post/route";
 
 import {
   Form,
@@ -20,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import usePost from "../custom_hook/usePostHook";
+import usePost, { CreatePostFormSchema } from "../custom_hook/usePostHook";
 import { NotificationType, SearchPostType } from "../Enum";
 import { useFollower } from "../custom_hook/useFollowerHook";
 import useNotification from "../custom_hook/useNotificationHook";

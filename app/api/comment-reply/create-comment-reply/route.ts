@@ -2,7 +2,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-export const ReplyCommentSchema = z.object({
+const ReplyCommentSchema = z.object({
   content: z.string().min(1).max(65535),
   user_id: z.string(),
   target_user_id: z.string(),

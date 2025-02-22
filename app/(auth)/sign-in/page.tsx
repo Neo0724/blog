@@ -18,11 +18,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useState } from "react";
-import { SignInSchema } from "@/app/api/auth/sign-in/route";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useCookie from "react-use-cookie";
 import { useSearchParams } from "next/navigation";
+
+const SignInSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
 const SignInPage = () => {
   type SignInType = z.infer<typeof SignInSchema>;

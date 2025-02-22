@@ -17,11 +17,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useState } from "react";
-import { SignUpSchema } from "@/app/api/auth/sign-up/route";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type SignUpType = z.infer<typeof SignUpSchema>;
+
+export const SignUpSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
 const SignUpPage = () => {
   const form = useForm<SignUpType>({

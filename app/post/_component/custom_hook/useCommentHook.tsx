@@ -3,7 +3,6 @@ import { UserType } from "../postComponent/RenderPost";
 import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { UseFormReturn } from "react-hook-form";
-import { CommentSchema } from "@/app/api/comment/create-comment/route";
 import { z } from "zod";
 
 export type GetBackCommentType = {
@@ -13,6 +12,11 @@ export type GetBackCommentType = {
   dateDifferent: string;
   User: UserType; // User is the one who created the comment
 };
+export const CommentSchema = z.object({
+  content: z.string().min(1).max(65535),
+  user_id: z.string(),
+  post_id: z.string(),
+});
 
 export type CommentType = z.infer<typeof CommentSchema>;
 

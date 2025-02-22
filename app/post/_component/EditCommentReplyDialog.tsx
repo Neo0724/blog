@@ -1,7 +1,3 @@
-import {
-  UpdateReplyCommentType,
-  UpdateReplyCommentSchema,
-} from "@/app/api/comment-reply/update-comment-reply/route";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +22,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import useReplyComment from "./custom_hook/useReplyCommentHook";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { z } from "zod";
+
+export const UpdateReplyCommentSchema = z.object({
+  content: z.string().min(1).max(65535),
+  comment_reply_id: z.string(),
+  comment_id: z.string(),
+});
+
+export type UpdateReplyCommentType = z.infer<typeof UpdateReplyCommentSchema>;
 
 export default function EditCommentReplyDialog({
   content,

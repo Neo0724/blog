@@ -1,4 +1,3 @@
-import { CreatePostFormSchema } from "@/app/api/post/create-post/route";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,7 +23,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdEdit } from "react-icons/md";
 import { CreatePostFormType } from "./CreatePostPage";
-import usePost from "../custom_hook/usePostHook";
+import usePost, { CreatePostFormSchema } from "../custom_hook/usePostHook";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { usePathname } from "next/navigation";
 import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";

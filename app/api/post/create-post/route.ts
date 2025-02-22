@@ -1,18 +1,8 @@
 import { getDateDifference } from "@/app/_util/getDateDifference";
+import { CreatePostSchema } from "@/app/post/_component/custom_hook/usePostHook";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
-export const CreatePostSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
-  user_id: z.string(),
-});
-
-export const CreatePostFormSchema = z.object({
-  title: z.string().min(1).max(65535),
-  content: z.string().min(1).max(65535),
-});
 
 export const POST = async (request: NextRequest) => {
   try {

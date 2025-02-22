@@ -6,6 +6,11 @@ export const SignUpSchema = z.object({
   password: z.string().min(8),
 });
 
+export const SignInSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
 export const UpdateReplyCommentSchema = z.object({
   content: z.string().min(1).max(65535),
   comment_reply_id: z.string(),

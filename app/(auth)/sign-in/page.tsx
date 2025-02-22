@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,13 +21,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useCookie from "react-use-cookie";
 import { useSearchParams } from "next/navigation";
+import { SignInSchema } from "@/zod_schema/schema";
 
-const SignInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-const SignInPage = () => {
+export default function SignInPage() {
   type SignInType = z.infer<typeof SignInSchema>;
 
   const [_, saveUserId] = useLocalStorage("test-userId", null);
@@ -133,6 +128,4 @@ const SignInPage = () => {
       </p>
     </div>
   );
-};
-
-export default SignInPage;
+}

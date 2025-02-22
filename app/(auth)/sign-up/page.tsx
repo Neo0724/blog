@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +22,7 @@ import { SignUpSchema } from "@/zod_schema/schema";
 
 type SignUpType = z.infer<typeof SignUpSchema>;
 
-const SignUpPage = () => {
+export default function SignUpPage() {
   const form = useForm<SignUpType>({
     resolver: zodResolver(SignUpSchema),
   });
@@ -131,6 +130,4 @@ const SignUpPage = () => {
       </p>
     </div>
   );
-};
-
-export default SignUpPage;
+}

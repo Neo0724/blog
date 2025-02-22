@@ -17,8 +17,14 @@ import { useRouter } from "next/navigation";
 
 export function AppSidebar() {
   const router = useRouter();
-  const [userId, setUserId] = useLocalStorage<string | null>("test-userId");
-  const [_, setUsername] = useLocalStorage<string | null>("test-username");
+  const [userId, setUserId] = useLocalStorage<string | null>(
+    "test-userId",
+    undefined
+  );
+  const [_, setUsername] = useLocalStorage<string | null>(
+    "test-username",
+    undefined
+  );
   const [__, setUserToken, ___] = useCookie("userId", undefined);
 
   const handleSignOut = () => {

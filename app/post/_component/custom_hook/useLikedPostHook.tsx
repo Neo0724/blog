@@ -39,9 +39,7 @@ export default function useLikedPost(user_id: string | null) {
     userId: string,
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType,
-    postLikeCountMutate: KeyedMutator<number>,
-    postLikeCount: number
+    showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let newLikePostId: string = "";
     try {
@@ -52,11 +50,6 @@ export default function useLikedPost(user_id: string | null) {
 
       if (res.status === 200) {
         newLikePostId = res.data.postId;
-        postLikeCountMutate((prev) => (prev ?? 0) + 1, {
-          optimisticData: postLikeCount + 1,
-          revalidate: false,
-          populateCache: true,
-        });
         setIsLiked(true);
       }
     } catch (err) {
@@ -75,9 +68,7 @@ export default function useLikedPost(user_id: string | null) {
     userId: string,
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType,
-    postLikeCountMutate: KeyedMutator<number>,
-    postLikeCount: number
+    showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let removedLikePostId: string = "";
 
@@ -91,11 +82,6 @@ export default function useLikedPost(user_id: string | null) {
 
       if (res.status === 200) {
         removedLikePostId = res.data.postId;
-        postLikeCountMutate((prev) => (prev ?? 1) - 1, {
-          optimisticData: postLikeCount - 1,
-          revalidate: false,
-          populateCache: true,
-        });
         setIsLiked(false);
       }
     } catch (err) {

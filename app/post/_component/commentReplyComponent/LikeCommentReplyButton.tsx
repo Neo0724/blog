@@ -72,13 +72,7 @@ export default function LikeCommentReplyButton({
 
     // Add the like
     likedCommentReplyMutate(
-      addLikeCommentReply(
-        loggedInUserId,
-        commentReplyId,
-        setIsLiked,
-        toast,
-        replyCommentLikeCountMutate
-      ),
+      addLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
       {
         optimisticData: [...(likedReplyComment ?? []), commentReplyId],
         populateCache: true,
@@ -86,6 +80,12 @@ export default function LikeCommentReplyButton({
         rollbackOnError: true,
       }
     );
+
+    replyCommentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
   const handleDislikeCommentReply = () => {
     // User not logged in
@@ -119,13 +119,7 @@ export default function LikeCommentReplyButton({
 
     // Remove the like
     likedCommentReplyMutate(
-      removeLikeCommentReply(
-        loggedInUserId,
-        commentReplyId,
-        setIsLiked,
-        toast,
-        replyCommentLikeCountMutate
-      ),
+      removeLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
       {
         optimisticData:
           likedReplyComment?.filter(
@@ -136,6 +130,12 @@ export default function LikeCommentReplyButton({
         rollbackOnError: true,
       }
     );
+
+    replyCommentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   useEffect(() => {

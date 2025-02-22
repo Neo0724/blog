@@ -32,18 +32,18 @@ export default function LikePostButton({
   const { toast } = useToast();
   const [loggedInUserId, _] = useLocalStorage<string | null>(
     "test-userId",
-    null,
+    null
   );
   const [isLiked, setIsLiked] = useState(false);
   const { postLikeCount, postLikeCountMutate } = useLikedPostCount(postId);
   const { yourPosts } = usePost(
     getCorrectSearchPostType(usePathname()),
     "",
-    loggedInUserId ?? "",
+    loggedInUserId ?? ""
   );
 
   const { addNotification, deleteNotification } = useNotification(
-    loggedInUserId ?? "",
+    loggedInUserId ?? ""
   );
   const currentPost = yourPosts?.find((post) => post.post_id === postId);
 
@@ -87,21 +87,20 @@ export default function LikePostButton({
 
     // Add the like to the post
     likedPostMutate(
-      addLikePost(
-        loggedInUserId,
-        currentPost as PostType,
-        setIsLiked,
-        toast,
-        postLikeCountMutate,
-        postLikeCount ?? 0,
-      ),
+      addLikePost(loggedInUserId, currentPost as PostType, setIsLiked, toast),
       {
         optimisticData: [...(likedPost ?? []), postId],
         populateCache: true,
         revalidate: false,
         rollbackOnError: true,
-      },
+      }
     );
+
+    postLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   const handleUnlikePost = async () => {
@@ -139,17 +138,21 @@ export default function LikePostButton({
         loggedInUserId,
         currentPost as PostType,
         setIsLiked,
-        toast,
-        postLikeCountMutate,
-        postLikeCount ?? 1,
+        toast
       ),
       {
         optimisticData: likedPost?.filter((post_id) => post_id !== postId),
         populateCache: true,
         revalidate: false,
         rollbackOnError: true,
-      },
+      }
     );
+
+    postLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   useEffect(() => {
@@ -167,7 +170,7 @@ export default function LikePostButton({
         className,
         isLiked
           ? "hover:text-red-800 active:text-red-800"
-          : "hover:text-blue-600 active:text-blue-600",
+          : "hover:text-blue-600 active:text-blue-600"
       )}
       onClick={() => {
         isLiked ? handleUnlikePost() : handleLikePost();

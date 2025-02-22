@@ -42,8 +42,7 @@ export default function useLikedReplyComment(
     userId: string,
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType,
-    commentReplyLikeCountMutate: KeyedMutator<number>
+    showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let newLikeCommentReplyId: string = "";
     try {
@@ -54,10 +53,6 @@ export default function useLikedReplyComment(
 
       if (res.status === 200) {
         newLikeCommentReplyId = res.data.commentReplyId;
-        commentReplyLikeCountMutate((prev) => (prev ?? 0) + 1, {
-          revalidate: false,
-          populateCache: true,
-        });
         setIsLiked(true);
       }
     } catch (error) {
@@ -76,8 +71,7 @@ export default function useLikedReplyComment(
     userId: string,
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType,
-    commentReplyLikeCountMutate: KeyedMutator<number>
+    showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let removedLikeCommentReplyId: string = "";
     try {
@@ -93,10 +87,6 @@ export default function useLikedReplyComment(
 
       if (res.status === 200) {
         removedLikeCommentReplyId = res.data.commentReplyId;
-        commentReplyLikeCountMutate((prev) => (prev ?? 1) - 1, {
-          revalidate: false,
-          populateCache: true,
-        });
         setIsLiked(false);
       }
     } catch (err) {

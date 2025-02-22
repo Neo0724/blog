@@ -38,8 +38,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
     userId: string,
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType,
-    commentLikeCountMutate: KeyedMutator<number>
+    showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let newLikeCommentId: string = "";
     try {
@@ -50,10 +49,6 @@ export default function useLikedComment(user_id: string, post_id: string) {
 
       if (res.status === 200) {
         newLikeCommentId = res.data.commentId;
-        commentLikeCountMutate((prev) => (prev ?? 0) + 1, {
-          revalidate: false,
-          populateCache: true,
-        });
         setIsLiked(true);
       }
     } catch (error) {
@@ -72,8 +67,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
     userId: string,
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType,
-    commentLikeCountMutate: KeyedMutator<number>
+    showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let removedLikeCommentId: string = "";
     try {
@@ -85,12 +79,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
       });
 
       if (res.status === 200) {
-        // mutate(["/api/comment/count-like-comment", commentId]);
         removedLikeCommentId = res.data.commentId;
-        commentLikeCountMutate((prev) => (prev ?? 1) - 1, {
-          revalidate: false,
-          populateCache: true,
-        });
         setIsLiked(false);
       }
     } catch (error) {

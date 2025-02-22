@@ -39,7 +39,7 @@ export default function LikeCommentButton({
     likedCommentLoading,
   } = useLikedComment(loggedInUserId ?? "", postId);
 
-  const { commentLikeCount, fetchCommentLikeCount, commentLikeCountMutate } =
+  const { commentLikeCount, commentLikeCountMutate } =
     useLikeCommentCount(commentId);
 
   const handleLikeComment = async () => {
@@ -74,13 +74,7 @@ export default function LikeCommentButton({
 
     // Add the like
     likedCommentMutate(
-      addLikeComment(
-        loggedInUserId,
-        commentId,
-        setIsLiked,
-        toast,
-        commentLikeCountMutate
-      ),
+      addLikeComment(loggedInUserId, commentId, setIsLiked, toast),
       {
         optimisticData: [...(likedComment ?? []), commentId],
         populateCache: true,
@@ -88,6 +82,12 @@ export default function LikeCommentButton({
         rollbackOnError: true,
       }
     );
+
+    commentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   const handleDislikeComment = async () => {
@@ -121,13 +121,7 @@ export default function LikeCommentButton({
 
     // Remove the like
     likedCommentMutate(
-      removeLikeComment(
-        loggedInUserId,
-        commentId,
-        setIsLiked,
-        toast,
-        commentLikeCountMutate
-      ),
+      removeLikeComment(loggedInUserId, commentId, setIsLiked, toast),
       {
         optimisticData: likedComment?.filter(
           (comment_id) => comment_id !== commentId
@@ -137,6 +131,12 @@ export default function LikeCommentButton({
         rollbackOnError: true,
       }
     );
+
+    commentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
   };
 
   // Initialize the like button to be like or dislike

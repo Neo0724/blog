@@ -1,12 +1,7 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import SearchBar from "./searchBar";
-import dynamic from "next/dynamic";
-const NotificationDialog = dynamic(
-  () => import("../notification/NotificationDialog"),
-  {
-    ssr: false,
-  }
-);
+import NotificationDialog from "../notification/NotificationDialog";
+export const dynamic = "force-dynamic";
 
 export default function Navbar() {
   return (

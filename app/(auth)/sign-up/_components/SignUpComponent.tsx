@@ -66,7 +66,11 @@ export default function SignUpComponent() {
               <FormItem>
                 <FormLabel>Username:</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your username..." {...field} />
+                  <Input
+                    placeholder="Enter your username..."
+                    {...field}
+                    className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -80,7 +84,11 @@ export default function SignUpComponent() {
               <FormItem>
                 <FormLabel>Email:</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your email..." {...field} />
+                  <Input
+                    placeholder="Enter your email..."
+                    {...field}
+                    className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -98,6 +106,7 @@ export default function SignUpComponent() {
                     type="password"
                     placeholder="Enter your password..."
                     {...field}
+                    className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
                   />
                 </FormControl>
                 <FormMessage />

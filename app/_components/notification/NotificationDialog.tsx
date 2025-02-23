@@ -13,9 +13,9 @@ import { IoNotifications } from "react-icons/io5";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
 export default function NotificationDialog() {
-  const [userId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   const { allNotification, notViewedCount, isLoading } = useNotification(
-    userId ?? ""
+    loggedInUserId ?? ""
   );
 
   return (
@@ -49,7 +49,10 @@ export default function NotificationDialog() {
             ))}
           {/* Current user does not has any notification */}
           {!isLoading && allNotification?.length === 0 && (
-            <div>No notifications ...</div>
+            <div className="text-white">No notifications ...</div>
+          )}
+          {!loggedInUserId && (
+            <div className="text-white">Please sign in to use this feature</div>
           )}
         </div>
       </PopoverContent>

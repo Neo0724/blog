@@ -79,7 +79,11 @@ export default function SignInComponent() {
               <FormItem>
                 <FormLabel>Email:</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your email..." {...field} />
+                  <Input
+                    placeholder="Enter your email..."
+                    {...field}
+                    className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,6 +101,7 @@ export default function SignInComponent() {
                     type="password"
                     placeholder="Enter your password..."
                     {...field}
+                    className="bg-[rgb(58,59,60)] border-[rgb(58,59,60)]"
                   />
                 </FormControl>
                 <FormMessage />

@@ -42,7 +42,7 @@ export default function SignInComponent() {
     setTimeout(() => {
       setToastMessage({ msg: "", error: false });
       resolve(true);
-    }, 5000);
+    }, 2000);
   });
 
   const handleSubmit = form.handleSubmit(async (formData) => {

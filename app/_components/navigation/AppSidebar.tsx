@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
 import { FaSignOutAlt } from "react-icons/fa";
 import useCookie from "react-use-cookie";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AppSidebar() {
   const router = useRouter();
@@ -26,6 +27,17 @@ export default function AppSidebar() {
     undefined
   );
   const [__, setUserToken, ___] = useCookie("userId", undefined);
+  const { setOpenMobile, isMobile } = useSidebar();
+  const currentPathname = usePathname();
+  const availableSidebarItemSelection = [
+    "Home",
+    "Profile",
+    "Favourite post",
+    "",
+  ] as const;
+
+  const [selectedSidebarItem, setSelectedSidebarItem] =
+    useState<(typeof availableSidebarItemSelection)[number]>("");
 
   const handleSignOut = () => {
     setUserId(null);
@@ -34,7 +46,23 @@ export default function AppSidebar() {
     router.push("/sign-in");
   };
 
-  const { setOpenMobile, isMobile } = useSidebar();
+  useEffect(() => {
+    const findCorrectSelectedSidebarItem = () => {
+      let newPathname: (typeof availableSidebarItemSelection)[number] = "";
+      if (currentPathname.startsWith("/post/all-posts")) {
+        newPathname = "Home";
+      } else if (currentPathname.split("/").length - 1 === 2) {
+        newPathname = "Profile";
+      } else if (currentPathname.startsWith("/post/favourite-post")) {
+        newPathname = "Favourite post";
+      }
+
+      setSelectedSidebarItem(newPathname);
+    };
+
+    findCorrectSelectedSidebarItem();
+  }, [currentPathname]);
+
   return (
     <Sidebar className="border-r-4 border-[rgb(58,59,60)]">
       <SidebarContent className="md:mt-[5rem] bg-[rgb(36,37,38)]">
@@ -44,7 +72,8 @@ export default function AppSidebar() {
               <SidebarMenuButton
                 className={cn(
                   "text-white border-0 rounded-lg justify-start cursor-pointer my-2 w-[80%] mx-auto h-10 font-bold",
-                  userId && item.href === "/sign-up" ? "hidden" : ""
+                  userId && item.href === "/sign-up" ? "hidden" : "",
+                  item.name === selectedSidebarItem && "bg-white text-black"
                 )}
                 asChild
               >

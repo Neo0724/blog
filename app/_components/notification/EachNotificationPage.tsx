@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import React from "react";
+import { mutate } from "swr";
 
 // Verify if the notification belongs the notificationType as different notificationType has different resource object shape
 const checkNotificationType = <
@@ -91,6 +92,7 @@ export default function EachNotificationPage({
       type: NotificationType.FOLLOW,
       resourceId: loggedInUserId,
     });
+    mutate("/api/user-relation/get-following", loggedInUserId);
   };
   return (
     <div
@@ -131,7 +133,7 @@ export default function EachNotificationPage({
         ) && (
           <Button
             variant="ghost"
-            className="rounded-xl bg-[rgb(36,37,38)] border-[rgb(58,59,60)] text-white hover:text-blue-800 active:text-blue-800"
+            className="rounded-xl bg-[rgb(58,59,60)] text-white hover:text-blue-800 active:text-blue-800"
             onClick={handleFollowBack}
           >
             Follow back

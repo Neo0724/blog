@@ -36,3 +36,14 @@ export const ListOfNavItems: NavItemsType[] = [
     icon: <FaUser />,
   },
 ];
+
+export const availableSidebarItemSelection = [
+  "Home",
+  "Profile",
+  "Favourite post",
+  "Sign Up",
+  "",
+] as const;
+
+export type SidebarItemSelectionType =
+  (typeof availableSidebarItemSelection)[number];

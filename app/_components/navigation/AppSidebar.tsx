@@ -7,7 +7,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { ListOfNavItems } from "./ListOfNavItem";
+import { ListOfNavItems, SidebarItemSelectionType } from "./ListOfNavItem";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -29,15 +29,9 @@ export default function AppSidebar() {
   const [__, setUserToken, ___] = useCookie("userId", undefined);
   const { setOpenMobile, isMobile } = useSidebar();
   const currentPathname = usePathname();
-  const availableSidebarItemSelection = [
-    "Home",
-    "Profile",
-    "Favourite post",
-    "",
-  ] as const;
 
   const [selectedSidebarItem, setSelectedSidebarItem] =
-    useState<(typeof availableSidebarItemSelection)[number]>("");
+    useState<SidebarItemSelectionType>("");
 
   const handleSignOut = () => {
     setUserId(null);
@@ -48,13 +42,18 @@ export default function AppSidebar() {
 
   useEffect(() => {
     const findCorrectSelectedSidebarItem = () => {
-      let newPathname: (typeof availableSidebarItemSelection)[number] = "";
+      let newPathname: SidebarItemSelectionType = "";
       if (currentPathname.startsWith("/post/all-posts")) {
         newPathname = "Home";
       } else if (currentPathname.split("/").length - 1 === 2) {
         newPathname = "Profile";
       } else if (currentPathname.startsWith("/post/favourite-post")) {
         newPathname = "Favourite post";
+      } else if (
+        currentPathname.startsWith("/sign-up") ||
+        currentPathname.startsWith("/sign-in")
+      ) {
+        newPathname = "Sign Up";
       }
 
       setSelectedSidebarItem(newPathname);

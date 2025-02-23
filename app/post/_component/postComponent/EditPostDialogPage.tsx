@@ -42,7 +42,7 @@ export default function EditPostDialogPage({
   // Edit post dialog
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
-  const { yourPosts, mutate, updatePosts } = usePost(
+  const { yourPosts, postMutate, updatePosts } = usePost(
     getCorrectSearchPostType(usePathname()),
     "",
     loggedInUserId ?? ""
@@ -57,17 +57,19 @@ export default function EditPostDialogPage({
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
-    mutate(updatePosts(postId, formData, toast), {
-      optimisticData: yourPosts?.map((post) => {
-        if (post.post_id === postId) {
-          return {
-            ...post,
-            content: formData.content,
-            title: formData.title,
-          };
-        }
-        return post;
-      }),
+    postMutate(updatePosts(postId, formData, toast), {
+      optimisticData: yourPosts?.map((page) =>
+        page.map((post) => {
+          if (post.post_id === postId) {
+            return {
+              ...post,
+              content: formData.content,
+              title: formData.title,
+            };
+          }
+          return post;
+        })
+      ),
       rollbackOnError: true,
       populateCache: true,
       revalidate: false,

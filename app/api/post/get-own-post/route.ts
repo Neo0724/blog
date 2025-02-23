@@ -5,6 +5,8 @@ export const GET = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   const user_id = req.nextUrl.searchParams.get("user_id");
+  const skipPost = req.nextUrl.searchParams.get("skipPost");
+  const limitPost = req.nextUrl.searchParams.get("limitPost");
 
   try {
     const userPosts = await prisma.post.findMany({
@@ -27,6 +29,9 @@ export const GET = async (req: NextRequest) => {
       orderBy: {
         createdAt: "desc",
       },
+      skip:
+        parseInt(skipPost as string) ?? 0 * parseInt(limitPost as string) ?? 10,
+      take: parseInt(limitPost as string) ?? 10,
     });
 
     let userPostsWithDateDiff = userPosts?.map((post) => {

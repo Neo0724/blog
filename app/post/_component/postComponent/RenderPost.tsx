@@ -3,7 +3,7 @@
 import React from "react";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "../Enum";
-import usePost from "../custom_hook/usePostHook";
+import usePost, { POST_PAGE_SIZE } from "../custom_hook/usePostHook";
 import CreatePost from "./CreatePostPage";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import PostSkeleton from "./PostSkeleton";
@@ -48,7 +48,7 @@ export default function RenderPost({
   searchText,
   userId,
 }: GetPostProps) {
-  const { yourPosts, isLoading } = usePost(
+  const { yourPosts, isLoading, setPostSize, postSize } = usePost(
     getCorrectSearchPostType(usePathname()),
     searchText,
     userId
@@ -56,6 +56,20 @@ export default function RenderPost({
 
   const [username] = useLocalStorage<string | null>("test-username");
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const isLoadingMore =
+    isLoading ||
+    (postSize > 0 &&
+      yourPosts &&
+      typeof yourPosts[postSize - 1] === "undefined");
+
+  const isEmpty = yourPosts?.[0]?.length === 0;
+
+  const isReachingEnd =
+    isEmpty ||
+    (yourPosts && yourPosts[yourPosts.length - 1]?.length < POST_PAGE_SIZE);
+
+  const totalPosts = yourPosts ? yourPosts.flat().length : 0;
+  let prevPageSize = 0;
 
   return (
     <>
@@ -67,26 +81,35 @@ export default function RenderPost({
           userId={userId}
         />
       )}
-      {isLoading && <PostSkeleton />}
       {!isLoading &&
         yourPosts &&
-        yourPosts.map((post: PostType) => {
-          return (
-            <EachPostPage
-              key={post.post_id}
-              title={post.title}
-              content={post.content}
-              createdAt={post.createdAt}
-              author={post.User.name}
-              postId={post.post_id}
-              authorId={post.User.user_id}
-              dateDifferent={post.dateDifferent}
-            />
-          );
+        yourPosts.map((page, pageIndex) => {
+          prevPageSize += pageIndex;
+          return page.map((post, postIndex) => {
+            let currentIndex = postIndex + prevPageSize;
+            return (
+              <EachPostPage
+                key={post.post_id}
+                title={post.title}
+                content={post.content}
+                createdAt={post.createdAt}
+                author={post.User.name}
+                postId={post.post_id}
+                authorId={post.User.user_id}
+                dateDifferent={post.dateDifferent}
+                index={currentIndex}
+                totalPostsNumber={totalPosts}
+                setPostSize={setPostSize}
+              />
+            );
+          });
         })}
-      {!isLoading && !yourPosts?.length && (
+
+      {!isLoading && isEmpty && (
         <div className="max-w-[800px] w-full mx-auto">No posts found...</div>
       )}
+      {(isLoading || isLoadingMore) && !isReachingEnd && <PostSkeleton />}
+      {isReachingEnd && !isEmpty && <div>You have reached the end.</div>}
     </>
   );
 }

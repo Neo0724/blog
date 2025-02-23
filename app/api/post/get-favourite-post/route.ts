@@ -6,6 +6,8 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   const user_id = request.nextUrl.searchParams.get("user_id");
+  const skipPost = request.nextUrl.searchParams.get("skipPost");
+  const limitPost = request.nextUrl.searchParams.get("limitPost");
   try {
     const allFavouritedPost = await prisma.favouritePost.findMany({
       where: {
@@ -31,6 +33,9 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
+      skip:
+        parseInt(skipPost as string) ?? 0 * parseInt(limitPost as string) ?? 10,
+      take: parseInt(limitPost as string) ?? 10,
     });
 
     let allPostsWithDateDiff = allFavouritedPost?.map((curPost) => {

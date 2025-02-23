@@ -1,6 +1,7 @@
 "use client";
 
-import useFavourite from "@/app/post/_component/custom_hook/useFavouriteHook";
+import usePost from "@/app/post/_component/custom_hook/usePostHook";
+import { SearchPostType } from "@/app/post/_component/Enum";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/components/ui/use-toast";
@@ -26,13 +27,14 @@ export default function FavouritePostButton({
     "test-userId",
     null
   );
+
   const {
-    favouritedPost,
-    favouritePostLoading,
+    yourPosts,
+    isLoading,
     addToFavourite,
     removeFromFavourite,
-    favouritePostMutate,
-  } = useFavourite(loggedInUserId);
+    postMutate,
+  } = usePost(SearchPostType.USER_FAVOURITE_POST, "", loggedInUserId ?? "");
 
   const handleFavourite = async () => {
     // User not logged in
@@ -55,11 +57,11 @@ export default function FavouritePostButton({
       return;
     }
     if (isFavourited) {
-      favouritePostMutate(
+      postMutate(
         removeFromFavourite(loggedInUserId, postId, setIsFavourited, toast),
         {
-          optimisticData: favouritedPost?.filter(
-            (post) => post.post_id !== postId
+          optimisticData: yourPosts?.map((page) =>
+            page.filter((post) => post.post_id !== postId)
           ),
           populateCache: true,
           revalidate: false,
@@ -67,20 +69,22 @@ export default function FavouritePostButton({
         }
       );
     } else {
-      favouritePostMutate(
+      postMutate(
         addToFavourite(loggedInUserId, postId, setIsFavourited, toast)
       );
     }
   };
 
   useEffect(() => {
-    if (!favouritePostLoading && favouritedPost && favouritedPost.length > 0) {
-      const favourited = favouritedPost.find((item) => item.post_id === postId)
+    if (!isLoading && yourPosts && yourPosts.length > 0) {
+      const favourited = yourPosts.find((page) =>
+        page.find((post) => post.post_id === postId)
+      )
         ? true
         : false;
       setIsFavourited(favourited);
     }
-  }, [favouritedPost, favouritePostLoading, postId]);
+  }, [postId, isLoading, yourPosts]);
   return (
     <Button
       variant={variant}

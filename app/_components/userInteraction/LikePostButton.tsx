@@ -45,7 +45,7 @@ export default function LikePostButton({
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
-  const currentPost = yourPosts?.find((post) => post.post_id === postId);
+  const currentPost = yourPosts?.flat().find((post) => post.post_id === postId);
 
   const {
     likedPost,

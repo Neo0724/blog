@@ -69,7 +69,8 @@ export default function RenderPost({
     (yourPosts && yourPosts[yourPosts.length - 1]?.length < POST_PAGE_SIZE);
 
   const totalPosts = yourPosts ? yourPosts.flat().length : 0;
-  let prevPageSize = 0;
+  // let prevPageSize = 0;
+  let accumulatePostItem = 0;
 
   return (
     <>
@@ -84,9 +85,10 @@ export default function RenderPost({
       {!isLoading &&
         yourPosts &&
         yourPosts.map((page, pageIndex) => {
-          prevPageSize += pageIndex;
+          // prevPageSize += pageIndex;
           return page.map((post, postIndex) => {
-            let currentIndex = postIndex + prevPageSize;
+            // let currentIndex = postIndex + prevPageSize;
+            accumulatePostItem += 1;
             return (
               <EachPostPage
                 key={post.post_id}
@@ -97,7 +99,7 @@ export default function RenderPost({
                 postId={post.post_id}
                 authorId={post.User.user_id}
                 dateDifferent={post.dateDifferent}
-                index={currentIndex}
+                index={accumulatePostItem - 1}
                 totalPostsNumber={totalPosts}
                 setPostSize={setPostSize}
               />

@@ -66,8 +66,8 @@ export default function usePost(
     postId: string,
     updatedPost: CreatePostFormType,
     showToast: ToastFunctionType
-  ): Promise<(PostType[] | [])[]> => {
-    let allPostsWithUpdatedPost: (PostType[] | [])[] = [];
+  ): Promise<PostType[][] | undefined> => {
+    let allPostsWithUpdatedPost: PostType[][] | undefined;
     try {
       const res = await axios.put("/api/post/update-post", {
         ...updatedPost,
@@ -112,8 +112,8 @@ export default function usePost(
   const deletePosts = async (
     postId: string,
     showToast: ToastFunctionType
-  ): Promise<(PostType[] | [])[]> => {
-    let excludeDeletedPosts: (PostType[] | [])[] = [];
+  ): Promise<PostType[][] | undefined> => {
+    let excludeDeletedPosts: PostType[][] | undefined;
     try {
       const res = await axios.delete("/api/post/delete-post", {
         params: {
@@ -200,8 +200,8 @@ export default function usePost(
     postId: string,
     setIsFavourited: React.Dispatch<SetStateAction<boolean>>,
     showToast: ToastFunctionType
-  ): Promise<(PostType[] | [])[]> => {
-    let newAllFavouritePost: (PostType[] | [])[] = [];
+  ): Promise<PostType[][] | undefined> => {
+    let newAllFavouritePost: PostType[][] | undefined;
     try {
       const res = await axios.post("/api/post/add-favourite-post", {
         user_id: userId,
@@ -233,8 +233,8 @@ export default function usePost(
     postId: string,
     setIsFavourited: React.Dispatch<SetStateAction<boolean>>,
     showToast: ToastFunctionType
-  ): Promise<(PostType[] | [])[]> => {
-    let excludeDeletedFavourite: (PostType[] | [])[] = [];
+  ): Promise<PostType[][] | undefined> => {
+    let excludeDeletedFavourite: PostType[][] | undefined;
     try {
       const res = await axios.delete("/api/post/delete-favourite-post", {
         params: {
@@ -268,7 +268,7 @@ export default function usePost(
 
   const { data, error, isLoading, mutate, setSize, size } = useSWRInfinite<
     PostType[]
-  >(getKey, (fetchUrl) => fetchPost(fetchUrl));
+  >(getKey, fetchPost);
 
   return {
     isLoading,

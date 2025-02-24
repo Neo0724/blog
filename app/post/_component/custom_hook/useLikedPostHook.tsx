@@ -1,5 +1,5 @@
 import axios from "axios";
-import useSWR, { KeyedMutator } from "swr";
+import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { PostType } from "../postComponent/RenderPost";
 import { NewNotificationType } from "./useNotificationHook";
@@ -21,11 +21,6 @@ export default function useLikedPost(user_id: string | null) {
     }
     return returnedLikedPost;
   };
-
-  const { data, error, isLoading, mutate } = useSWR(
-    [user_id ? "/api/post/get-like-post" : null, user_id],
-    ([url, user_id]) => fetchData(user_id)
-  );
 
   const addLikePost = async (
     userId: string,
@@ -89,6 +84,11 @@ export default function useLikedPost(user_id: string | null) {
 
     return data?.filter((postId) => postId !== removedLikePostId) ?? [];
   };
+
+  const { data, error, isLoading, mutate } = useSWR(
+    [user_id ? "/api/post/get-like-post" : null, user_id],
+    ([url, user_id]) => fetchData(user_id)
+  );
 
   return {
     likedPost: data,

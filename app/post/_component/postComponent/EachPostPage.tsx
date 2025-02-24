@@ -45,6 +45,7 @@ export default function EachPostPage({
     router.push("/user/" + authorId);
   };
 
+  // Avoid duplicate fetching
   const doneUpdatingIndex = useRef<Set<number>>(new Set());
 
   const handleScrollToPost = () => {
@@ -59,6 +60,7 @@ export default function EachPostPage({
 
   const { isVisible } = useElementInView(postRef);
 
+  // Trigger load more post
   useEffect(() => {
     const indexToUpdate = Math.floor((totalPostsNumber ?? 1) / 2);
     if (
@@ -69,7 +71,7 @@ export default function EachPostPage({
       setPostSize && setPostSize((prev) => prev + 1);
       doneUpdatingIndex.current.add(indexToUpdate);
     }
-  }, [index, isVisible, setPostSize, totalPostsNumber]);
+  }, [index, isVisible, totalPostsNumber]);
 
   return (
     <div

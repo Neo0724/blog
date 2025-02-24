@@ -4,16 +4,19 @@ import { Textarea } from "@/components/ui/textarea";
 import useNotification from "./custom_hook/useNotificationHook";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useReplyComment from "./custom_hook/useReplyCommentHook";
+import useReplyComment, {
+  COMMENT_REPLY_PAGE_SIZE,
+} from "./custom_hook/useReplyCommentHook";
 import EachCommentReplyPage from "./EachCommentReplyPage";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import useComment from "./custom_hook/useCommentHook";
+import useComment, { GetBackCommentType } from "./custom_hook/useCommentHook";
 import { NotificationType } from "./Enum";
 import EditCommentDialog from "./EditCommentDialog";
 import LikeCommentButton from "./commentComponent/LikeCommentButton";
+import useElementInView from "./custom_hook/useElementInViewHook";
 
 /*
  * The page when the user click "Comment" button on the post
@@ -26,6 +29,9 @@ export default function EachCommentPage({
   post_id,
   authorId,
   dateDifferent,
+  index,
+  totalCommentNumber,
+  setCommentSize,
 }: {
   commentId: string;
   user: UserType;
@@ -33,6 +39,11 @@ export default function EachCommentPage({
   post_id: string;
   authorId: string;
   dateDifferent: string;
+  index: number;
+  totalCommentNumber: number;
+  setCommentSize: (
+    size: number | ((_size: number) => number)
+  ) => Promise<GetBackCommentType[][] | undefined>;
 }) {
   // TODO Scroll user into the specific comment id viewport if user came from notification. Use search params to get the comment id
   const router = useRouter();
@@ -44,10 +55,13 @@ export default function EachCommentPage({
   const [openUserReplyBox, setOpenUserReplyBox] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const { replyComments, isLoading, createReplyComments } = useReplyComment(
-    commentId,
-    loggedInUserId
-  );
+  const {
+    replyComments,
+    isLoading,
+    createReplyComments,
+    commentReplySize,
+    setCommentReplySize,
+  } = useReplyComment(commentId, loggedInUserId);
   const { comments, mutate, deleteComments } = useComment(
     post_id,
     loggedInUserId
@@ -55,6 +69,10 @@ export default function EachCommentPage({
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
+
+  const { isVisible } = useElementInView(commentBoxRef);
+  // Avoid duplicate fetching
+  const doneUpdatingIndex = useRef<Set<number>>(new Set());
 
   // When the user click reply on the comment, the target user would be the author of the clicked comment, and it will be under the same category with reply comment
   const handleSubmitReply = async () => {
@@ -105,8 +123,8 @@ export default function EachCommentPage({
 
     // Delete the comment
     mutate(deleteComments(commentId, toast), {
-      optimisticData: comments?.filter(
-        (comment) => comment.comment_id !== commentId
+      optimisticData: comments?.map((page) =>
+        page.filter((comment) => comment.comment_id !== commentId)
       ),
       populateCache: true,
       revalidate: false,
@@ -183,6 +201,40 @@ export default function EachCommentPage({
     }
   }, [commentId, searchParams]);
 
+  // Trigger load more comment
+  useEffect(() => {
+    const indexToUpdate = Math.floor((totalCommentNumber ?? 1) / 2);
+    if (
+      indexToUpdate === index &&
+      isVisible &&
+      !doneUpdatingIndex.current.has(indexToUpdate)
+    ) {
+      console.log(indexToUpdate);
+      setCommentSize && setCommentSize((prev) => prev + 1);
+      doneUpdatingIndex.current.add(indexToUpdate);
+    }
+  }, [index, isVisible, totalCommentNumber]);
+
+  const isLoadingMore =
+    isLoading ||
+    (commentReplySize > 0 &&
+      replyComments &&
+      typeof replyComments[commentReplySize - 1] === "undefined");
+
+  const isEmpty = replyComments?.[0]?.length === 0;
+
+  const isReachingEnd =
+    isEmpty ||
+    (replyComments &&
+      replyComments[replyComments.length - 1]?.length <
+        COMMENT_REPLY_PAGE_SIZE);
+
+  const totalCommentReplyNumber = replyComments
+    ? replyComments.flat().length
+    : 0;
+
+  let accumulateCommentReplyIndex = 0;
+
   return (
     <div className="flex flex-col ml-[7px]" ref={commentBoxRef}>
       <div className="font-bold">
@@ -253,15 +305,16 @@ export default function EachCommentPage({
       <button
         className="inline-flex items-center justify-center w-full mb-[15px] relative mt-[15px]"
         onClick={handleViewReply}
+        disabled={totalCommentReplyNumber <= 0}
       >
         <hr className="w-64 h-px bg-gray-200 border-0 dark:bg-gray-700" />
         <span className="absolute px-3 font-medium -translate-x-1/2 left-1/2  bg-[rgb(36,37,38)] text-white">
           {isLoading
             ? "Loading..."
-            : replyComments && replyComments.length > 0
+            : replyComments && totalCommentReplyNumber > 0
             ? viewReplies
               ? "Hide replies"
-              : `View replies (${replyComments.length.toString()})`
+              : `View replies (${totalCommentReplyNumber})`
             : "No replies"}
         </span>
       </button>
@@ -297,21 +350,32 @@ export default function EachCommentPage({
           {replyComments &&
             replyComments.length > 0 &&
             viewReplies &&
-            replyComments.map((c, idx) => {
-              return (
-                <EachCommentReplyPage
-                  comment_id={commentId}
-                  comment_reply_id={c.comment_reply_id}
-                  user={c.User}
-                  target_user={c.Target_user}
-                  content={c.content}
-                  key={c.comment_reply_id}
-                  authorId={authorId}
-                  dateDifferent={c.dateDifferent}
-                  setViewReplies={setViewReplies}
-                />
-              );
-            })}
+            replyComments.map((page) =>
+              page.map((c) => {
+                accumulateCommentReplyIndex += 1;
+                return (
+                  <EachCommentReplyPage
+                    comment_id={commentId}
+                    comment_reply_id={c.comment_reply_id}
+                    user={c.User}
+                    target_user={c.Target_user}
+                    content={c.content}
+                    key={c.comment_reply_id}
+                    authorId={authorId}
+                    dateDifferent={c.dateDifferent}
+                    setViewReplies={setViewReplies}
+                    index={accumulateCommentReplyIndex - 1}
+                    setCommentReplySize={setCommentReplySize}
+                    totalCommentReplyNumber={totalCommentReplyNumber}
+                  />
+                );
+              })
+            )}
+          {!isLoading && isEmpty && <div>No replies yet...</div>}
+          {(isLoading || isLoadingMore) &&
+            !isReachingEnd &&
+            "Loading replies ..."}
+          {isReachingEnd && !isEmpty && <div>You have reached the end.</div>}
         </div>
       </div>
     </div>

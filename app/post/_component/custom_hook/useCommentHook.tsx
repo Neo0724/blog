@@ -6,6 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { CommentSchema } from "@/zod_schema/schema";
 import { NewNotificationType } from "./useNotificationHook";
+import useSWRInfinite from "swr/infinite";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -15,18 +16,17 @@ export type GetBackCommentType = {
   User: UserType; // User is the one who created the comment
 };
 
+export const COMMENT_PAGE_SIZE = 5;
+
 export type CommentType = z.infer<typeof CommentSchema>;
 
 export default function useComment(post_id: string, userId: string | null) {
   const getComment = async (
-    post_id: string,
-    userId: string | null
+    apiUrl: string
   ): Promise<GetBackCommentType[] | []> => {
     let returnedComments: GetBackCommentType[] | [] = [];
     try {
-      const response = await axios.get(
-        `/api/comment/get-comment?post_id=${post_id}&user_id=${userId}`
-      );
+      const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
         returnedComments = response.data as GetBackCommentType[];
@@ -38,17 +38,12 @@ export default function useComment(post_id: string, userId: string | null) {
     return returnedComments;
   };
 
-  const { data, isLoading, error, mutate } = useSWR(
-    ["/api/comment/get-comment", post_id, userId],
-    ([url, post_id, userId]) => getComment(post_id, userId)
-  );
-
   const updateComments = async (
     commentId: string,
     updatedComments: CommentType,
     showToast: ToastFunctionType
-  ): Promise<GetBackCommentType[] | []> => {
-    let allCommentsWithUpdatedComment: GetBackCommentType[] = [];
+  ): Promise<GetBackCommentType[][] | undefined> => {
+    let allCommentsWithUpdatedComment: GetBackCommentType[][] | undefined;
     try {
       const updatedCommentsWithId = {
         ...updatedComments,
@@ -61,15 +56,17 @@ export default function useComment(post_id: string, userId: string | null) {
 
       if (res.status === 200) {
         allCommentsWithUpdatedComment =
-          data?.map((comment) => {
-            if (comment.comment_id === commentId) {
-              return {
-                ...comment,
-                content: res.data.updatedComment.content,
-              };
-            }
-            return comment;
-          }) ?? [];
+          data?.map((page) =>
+            page.map((comment) => {
+              if (comment.comment_id === commentId) {
+                return {
+                  ...comment,
+                  content: res.data.updatedComment.content,
+                };
+              }
+              return comment;
+            })
+          ) ?? [];
         showToast({
           title: "Success",
           description: "Comment has updated successfully",
@@ -95,7 +92,7 @@ export default function useComment(post_id: string, userId: string | null) {
     commentId: string,
     showToast: ToastFunctionType
   ) => {
-    let excludeDeletedComments: GetBackCommentType[] = [];
+    let excludeDeletedComments: GetBackCommentType[][] | undefined;
     try {
       const res = await axios.delete("/api/comment/delete-comment", {
         params: {
@@ -105,7 +102,9 @@ export default function useComment(post_id: string, userId: string | null) {
 
       if (res.status === 200) {
         excludeDeletedComments =
-          data?.filter((comment) => comment.comment_id !== commentId) ?? [];
+          data?.map((page) =>
+            page.filter((comment) => comment.comment_id !== commentId)
+          ) ?? [];
         showToast({
           title: "Success",
           description: "Comment has deleted successfully",
@@ -150,15 +149,30 @@ export default function useComment(post_id: string, userId: string | null) {
             resourceId: response.data.newComment.comment_id,
           });
         }
-        mutate((prevData) => {
-          return [response.data.newComment, ...(prevData ?? [])];
-        });
+        mutate(
+          data?.map((page, index) => {
+            index === 0 && page.push(response.data.newComment);
+            return page;
+          })
+        );
         form.reset({ ...newComment, content: "" });
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const getKey = (
+    pageIndex: number,
+    previousPageData: GetBackCommentType[]
+  ) => {
+    if ((previousPageData && !previousPageData.length) || !post_id) return null;
+    return `/api/comment/get-comment?skipComment=${pageIndex}&limitComment=${COMMENT_PAGE_SIZE}&post_id=${post_id}&user_id=${userId}`;
+  };
+
+  const { data, isLoading, error, mutate, size, setSize } = useSWRInfinite<
+    GetBackCommentType[]
+  >(getKey, getComment);
 
   return {
     comments: data,
@@ -168,5 +182,7 @@ export default function useComment(post_id: string, userId: string | null) {
     createComment,
     updateComments,
     deleteComments,
+    commentSize: size,
+    setCommentSize: setSize,
   };
 }

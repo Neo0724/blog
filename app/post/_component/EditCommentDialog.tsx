@@ -49,15 +49,17 @@ export default function EditCommentDialog({
 
   const onSubmit = (formData: CommentType) => {
     mutate(updateComments(commentId, formData, toast), {
-      optimisticData: comments?.map((comment) => {
-        if (comment.comment_id === commentId) {
-          return {
-            ...comment,
-            content: formData.content,
-          };
-        }
-        return comment;
-      }),
+      optimisticData: comments?.map((page) =>
+        page.map((comment) => {
+          if (comment.comment_id === commentId) {
+            return {
+              ...comment,
+              content: formData.content,
+            };
+          }
+          return comment;
+        })
+      ),
       rollbackOnError: true,
       populateCache: true,
       revalidate: false,

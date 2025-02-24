@@ -2,7 +2,7 @@
 [x] own-post pagination
 [x] favourite-post pagination
 
-[] only add notification when operation is successful
+[x] only add notification when operation is successful
 
-[] comment pagination
-[] comment-reply pagination
+[x] comment pagination
+[x] comment-reply pagination

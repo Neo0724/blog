@@ -86,23 +86,30 @@ export default function EachCommentReplyPage({
       comment_id: comment_id,
     };
 
-    // Add the reply comment
-    const commentReplyId = await createReplyComments(
-      replyData,
-      setViewReplies,
-      setReplyContent,
-      setOpenReply,
-      toast
-    );
-
     // Send the notification if the user is replying to other instead of himself
     if (user.user_id !== loggedInUserId) {
-      addNotification({
+      const newNotification = {
         fromUserId: loggedInUserId,
         targetUserId: [user.user_id],
         type: NotificationType.COMMENT_REPLY,
-        resourceId: commentReplyId,
-      });
+      };
+      createReplyComments(
+        replyData,
+        setViewReplies,
+        setReplyContent,
+        setOpenReply,
+        toast,
+        addNotification,
+        newNotification
+      );
+    } else {
+      createReplyComments(
+        replyData,
+        setViewReplies,
+        setReplyContent,
+        setOpenReply,
+        toast
+      );
     }
   };
 

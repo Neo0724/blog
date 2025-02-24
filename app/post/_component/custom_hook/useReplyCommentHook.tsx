@@ -3,6 +3,7 @@ import { UserType } from "../postComponent/RenderPost";
 import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { UpdateReplyCommentType } from "../EditCommentReplyDialog";
+import { NewNotificationType } from "./useNotificationHook";
 
 export type GetBackReplyCommentType = {
   comment_reply_id: string;
@@ -44,9 +45,10 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     setViewReplies: React.Dispatch<boolean>,
     setReplyContent: React.Dispatch<string>,
     setOpenReply: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
-  ): Promise<string> => {
-    let commentReplyId = "";
+    showToast: ToastFunctionType,
+    addNotification?: (newNotification: NewNotificationType) => void,
+    newNotification?: Omit<NewNotificationType, "resourceId">
+  ): Promise<void> => {
     try {
       const res = await axios.post(
         "/api/comment-reply/create-comment-reply",
@@ -55,7 +57,13 @@ export default function useReplyComment(comment_id: string, user_id: string) {
 
       if (res.status === 200) {
         setViewReplies(true);
-        commentReplyId = res.data.newCommentReply.comment_reply_id;
+        // Send the notification if the user is replying to other instead of himself
+        if (newNotification && addNotification) {
+          addNotification({
+            ...newNotification,
+            resourceId: res.data.newCommentReply.comment_reply_id,
+          });
+        }
         mutate([res.data.newCommentReply, ...(data ?? [])]);
       }
     } catch (err) {
@@ -67,7 +75,6 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       setReplyContent("");
       setOpenReply(false);
     }
-    return commentReplyId;
   };
 
   const deleteReplyComments = async (
@@ -77,7 +84,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     let excludedDeletedReplyComment: GetBackReplyCommentType[] = [];
     try {
       const res = await axios.delete(
-        `/api/comment-reply/delete-comment-reply/comment_reply_id=${comment_reply_id}`
+        `/api/comment-reply/delete-comment-reply?comment_reply_id=${comment_reply_id}`
       );
 
       if (res.status === 200) {

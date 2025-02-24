@@ -51,41 +51,58 @@ export default function FollowButton({
       return;
     }
 
-    // Send notification to the author that someone started following him or her
-    addNotification({
+    const newNotification = {
       fromUserId: loggedInUserId,
       targetUserId: [authorId],
       type: NotificationType.FOLLOW,
       resourceId: loggedInUserId,
-    });
+    };
 
     // Add to following
-    followingMutate(addFollowing(loggedInUserId, authorId, toast), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
+    followingMutate(
+      addFollowing(
+        loggedInUserId,
+        authorId,
+        toast,
+        addNotification,
+        newNotification
+      ),
+      {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
   };
 
   const handleUnfollow = () => {
     if (loggedInUserId) {
       // Delete the follow notification
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         targetUserId: authorId,
         type: NotificationType.FOLLOW,
         resourceId: loggedInUserId,
-      });
+      };
 
       // Remove from the following
-      followingMutate(removeFollowing(loggedInUserId, authorId, toast), {
-        optimisticData: allFollowing?.filter(
-          (following) => following.UserFollowing.user_id !== authorId
+      followingMutate(
+        removeFollowing(
+          loggedInUserId,
+          authorId,
+          toast,
+          deleteNotification,
+          notificationToDelete
         ),
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      });
+        {
+          optimisticData: allFollowing?.filter(
+            (following) => following.UserFollowing.user_id !== authorId
+          ),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
     }
   };
 

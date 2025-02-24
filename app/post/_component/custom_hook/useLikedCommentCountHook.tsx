@@ -4,11 +4,9 @@ import useSWR from "swr";
 const fetchCommentLikeCount = async (commentId: string): Promise<number> => {
   let likeCount = 0;
   try {
-    const response = await axios.get("/api/comment/count-like-comment", {
-      params: {
-        comment_id: commentId,
-      },
-    });
+    const response = await axios.get(
+      `/api/comment/count-like-comment?comment_id=${commentId}`
+    );
 
     if (response.status === 200) {
       likeCount = response.data;

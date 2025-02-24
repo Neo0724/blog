@@ -131,11 +131,19 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                     // Current user is logged in
                     // Remove the user from following
                     if (currentUserIsFollowing) {
+                      const notificationToDelete = {
+                        fromUserId: loggedInUserId,
+                        targetUserId: eachOwnerFollowing.UserFollowing.user_id,
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      };
                       followingMutate(
                         loggedInRemoveFollowing(
                           loggedInUserId,
                           eachOwnerFollowing.UserFollowing.user_id,
-                          toast
+                          toast,
+                          deleteNotification,
+                          notificationToDelete
                         ),
                         {
                           optimisticData: loggedInFollowing?.filter(
@@ -148,20 +156,24 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                           rollbackOnError: true,
                         }
                       );
-                      // Delete the follow notification
-                      deleteNotification({
-                        fromUserId: loggedInUserId,
-                        targetUserId: eachOwnerFollowing.UserFollowing.user_id,
-                        type: NotificationType.FOLLOW,
-                        resourceId: loggedInUserId,
-                      });
                     } else {
                       // Add the current user to following
+                      const newNotification = {
+                        fromUserId: loggedInUserId,
+                        targetUserId: [
+                          eachOwnerFollowing.UserFollowing.user_id,
+                        ],
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      };
+
                       followingMutate(
                         loggedInAddFollowing(
                           loggedInUserId,
                           eachOwnerFollowing.UserFollowing.user_id,
-                          toast
+                          toast,
+                          addNotification,
+                          newNotification
                         ),
                         {
                           optimisticData: [
@@ -173,15 +185,6 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                           rollbackOnError: true,
                         }
                       );
-                      // Send notification to the target user that someone started following him or her
-                      addNotification({
-                        fromUserId: loggedInUserId,
-                        targetUserId: [
-                          eachOwnerFollowing.UserFollowing.user_id,
-                        ],
-                        type: NotificationType.FOLLOW,
-                        resourceId: loggedInUserId,
-                      });
                     }
                   }}
                 >

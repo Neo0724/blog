@@ -2,18 +2,13 @@ import useSWR from "swr";
 import { PostType } from "../postComponent/RenderPost";
 import axios from "axios";
 
-const fetchSpecificPost = async (
-  fetchUrl: string,
-  postId: string
-): Promise<PostType | null> => {
+const fetchSpecificPost = async (postId: string): Promise<PostType | null> => {
   let specificPost: PostType | null = null;
 
   try {
-    const res = await axios.get(fetchUrl, {
-      params: {
-        post_id: postId,
-      },
-    });
+    const res = await axios.get(
+      `/api/post/get-specific-post?post_id=${postId}`
+    );
 
     if (res.status === 200) {
       specificPost = res.data;
@@ -25,9 +20,8 @@ const fetchSpecificPost = async (
 };
 
 export default function useSpecificPostHook(postId: string) {
-  const { data, error, isLoading } = useSWR(
-    "/api/post/get-specific-post",
-    (fetchUrl) => fetchSpecificPost(fetchUrl, postId)
+  const { data, error, isLoading } = useSWR("/api/post/get-specific-post", () =>
+    fetchSpecificPost(postId)
   );
 
   return { data, error, isLoading };

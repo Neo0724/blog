@@ -2,24 +2,16 @@ import axios from "axios";
 import useSWR, { KeyedMutator } from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { PostType } from "../postComponent/RenderPost";
+import { NewNotificationType } from "./useNotificationHook";
 
 export default function useLikedPost(user_id: string | null) {
-  const fetchData = async (
-    url: string | null,
-    user_id: string | null
-  ): Promise<string[] | []> => {
-    if (!url || !user_id) {
-      return [];
-    }
-
+  const fetchData = async (user_id: string | null): Promise<string[] | []> => {
     let returnedLikedPost: string[] | [] = [];
 
     try {
-      const response = await axios.get(url, {
-        params: {
-          user_id: user_id,
-        },
-      });
+      const response = await axios.get(
+        `/api/post/get-like-post?user_id=${user_id}`
+      );
 
       if (response.status === 200) {
         returnedLikedPost = response.data;
@@ -32,14 +24,16 @@ export default function useLikedPost(user_id: string | null) {
 
   const { data, error, isLoading, mutate } = useSWR(
     [user_id ? "/api/post/get-like-post" : null, user_id],
-    ([url, user_id]) => fetchData(url, user_id)
+    ([url, user_id]) => fetchData(user_id)
   );
 
   const addLikePost = async (
     userId: string,
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    addNotification?: (newNotification: NewNotificationType) => void,
+    newNotification?: NewNotificationType
   ): Promise<string[] | []> => {
     let newLikePostId: string = "";
     try {
@@ -50,6 +44,10 @@ export default function useLikedPost(user_id: string | null) {
 
       if (res.status === 200) {
         newLikePostId = res.data.postId;
+        // Add the notification is both value are not null or undefined
+        if (addNotification && newNotification) {
+          addNotification(newNotification);
+        }
         setIsLiked(true);
       }
     } catch (err) {
@@ -71,14 +69,10 @@ export default function useLikedPost(user_id: string | null) {
     showToast: ToastFunctionType
   ): Promise<string[] | []> => {
     let removedLikePostId: string = "";
-
     try {
-      const res = await axios.delete("/api/post/delete-like-post", {
-        params: {
-          user_id: userId,
-          post_id: post.post_id,
-        },
-      });
+      const res = await axios.delete(
+        `/api/post/delete-like-post?user_id=${userId}&post_id=${post.post_id}`
+      );
 
       if (res.status === 200) {
         removedLikePostId = res.data.postId;

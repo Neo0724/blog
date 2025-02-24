@@ -64,24 +64,39 @@ export default function LikeCommentButton({
 
     // Only send notification if the user who liked is not the author
     if (loggedInUserId !== commentOwnerId) {
-      addNotification({
+      const newNotification = {
         fromUserId: loggedInUserId,
         targetUserId: [commentOwnerId],
         type: NotificationType.LIKE_COMMENT,
         resourceId: commentId,
-      });
+      };
+      likedCommentMutate(
+        addLikeComment(
+          loggedInUserId,
+          commentId,
+          setIsLiked,
+          toast,
+          addNotification,
+          newNotification
+        ),
+        {
+          optimisticData: [...(likedComment ?? []), commentId],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      likedCommentMutate(
+        addLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+        {
+          optimisticData: [...(likedComment ?? []), commentId],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
     }
-
-    // Add the like
-    likedCommentMutate(
-      addLikeComment(loggedInUserId, commentId, setIsLiked, toast),
-      {
-        optimisticData: [...(likedComment ?? []), commentId],
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
 
     commentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
       populateCache: true,

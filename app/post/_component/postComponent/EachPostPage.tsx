@@ -18,9 +18,9 @@ type EachPostProps = {
   authorId: string;
   postId: string;
   dateDifferent: string;
-  index: number;
-  totalPostsNumber: number;
-  setPostSize: (
+  index?: number;
+  totalPostsNumber?: number;
+  setPostSize?: (
     size: number | ((_size: number) => number)
   ) => Promise<PostType[][] | undefined>;
 };
@@ -60,13 +60,13 @@ export default function EachPostPage({
   const { isVisible } = useElementInView(postRef);
 
   useEffect(() => {
-    const indexToUpdate = Math.floor(totalPostsNumber / 2);
+    const indexToUpdate = Math.floor((totalPostsNumber ?? 1) / 2);
     if (
       indexToUpdate === index &&
       isVisible &&
       !doneUpdatingIndex.current.has(indexToUpdate)
     ) {
-      setPostSize((prev) => prev + 1);
+      setPostSize && setPostSize((prev) => prev + 1);
       doneUpdatingIndex.current.add(indexToUpdate);
     }
   }, [index, isVisible, setPostSize, totalPostsNumber]);

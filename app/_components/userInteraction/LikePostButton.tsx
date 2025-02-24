@@ -75,27 +75,43 @@ export default function LikePostButton({
     }
     // User is logged in
     // Only send notification if the user who liked is not the author
-
     if (loggedInUserId !== authorId) {
-      addNotification({
+      const newNotification = {
         fromUserId: loggedInUserId,
         targetUserId: [authorId],
         type: NotificationType.LIKE_POST,
         resourceId: postId,
-      });
+      };
+      likedPostMutate(
+        addLikePost(
+          loggedInUserId,
+          currentPost as PostType,
+          setIsLiked,
+          toast,
+          addNotification,
+          newNotification
+        ),
+        {
+          optimisticData: [...(likedPost ?? []), postId],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      // Only add the like, do not add notification as the user is the author itself
+      likedPostMutate(
+        addLikePost(loggedInUserId, currentPost as PostType, setIsLiked, toast),
+        {
+          optimisticData: [...(likedPost ?? []), postId],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
     }
 
     // Add the like to the post
-    likedPostMutate(
-      addLikePost(loggedInUserId, currentPost as PostType, setIsLiked, toast),
-      {
-        optimisticData: [...(likedPost ?? []), postId],
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
-
     postLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
       populateCache: true,
       revalidate: false,

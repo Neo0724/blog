@@ -6,6 +6,8 @@ import { CreatePostFormType } from "../postComponent/CreatePostPage";
 import { UseFormReturn } from "react-hook-form";
 import { Dispatch, SetStateAction } from "react";
 import useSWRInfinite from "swr/infinite";
+import { NewNotificationType } from "./useNotificationHook";
+import { UserFollower } from "./useFollowerHook";
 
 export const POST_PAGE_SIZE = 4;
 
@@ -155,10 +157,11 @@ export default function usePost(
     }>,
     setError: Dispatch<string>,
     userId: string,
-    url: string
-  ): Promise<string> => {
+    addNotification: (newNotification: NewNotificationType) => void,
+    newNotification: Omit<NewNotificationType, "resourceId">,
+    allFollower: UserFollower[] | []
+  ): Promise<void> => {
     const newPostWithUserId = { ...newPost, user_id: userId };
-    let newPostId = "";
     try {
       const res = await axios.post("/api/post/create-post", newPostWithUserId);
 
@@ -177,7 +180,12 @@ export default function usePost(
             return page;
           })
         );
-        newPostId = res.data.newPost.post_id;
+        if (allFollower) {
+          addNotification({
+            ...newNotification,
+            resourceId: res.data.newPost.post_id,
+          });
+        }
       }
     } catch (error) {
       setError("An unexpected error occur");
@@ -185,7 +193,6 @@ export default function usePost(
         setError("");
       }, 3000);
     }
-    return newPostId;
   };
 
   const addToFavourite = async (

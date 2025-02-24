@@ -40,7 +40,7 @@ export default function CreatePost({
   const [username] = useLocalStorage<string | null>("test-username");
   const [error, setError] = useState("");
   const { toast } = useToast();
-  const { createPost, fetchUrl } = usePost(searchPostType, "", userId);
+  const { createPost } = usePost(searchPostType, "", userId);
   const { allFollower } = useFollower(userId);
   const { addNotification } = useNotification(userId);
 
@@ -53,24 +53,23 @@ export default function CreatePost({
   });
 
   const onSubmit = async (formData: CreatePostFormType) => {
-    const newPostId = await createPost(
+    const newNotification = {
+      fromUserId: userId ?? "",
+      targetUserId:
+        allFollower?.map((follower) => follower.UserFollower.user_id) ?? [],
+      type: NotificationType.POST,
+    };
+    // Add the post and notification to all its follower
+    createPost(
       formData,
       toast,
       form,
       setError,
       userId,
-      fetchUrl
+      addNotification,
+      newNotification,
+      allFollower ?? []
     );
-
-    if (newPostId) {
-      addNotification({
-        fromUserId: userId ?? "",
-        targetUserId:
-          allFollower?.map((follower) => follower.UserFollower.user_id) ?? [],
-        type: NotificationType.POST,
-        resourceId: newPostId,
-      });
-    }
   };
 
   const onInvalid = () => {

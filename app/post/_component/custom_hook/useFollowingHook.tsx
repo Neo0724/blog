@@ -2,6 +2,10 @@ import useSWR from "swr";
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import { ToastFunctionType } from "./usePostHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 
 type FollowingType = {
   UserFollowing: UserType;
@@ -11,7 +15,6 @@ type FollowingType = {
 
 export const useFollowing = (ownerId: string, queryUsername = "") => {
   const fetchFollowing = async (
-    url: string,
     ownerId: string,
     queryUsername: string
   ): Promise<FollowingType[] | []> => {
@@ -19,12 +22,9 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
 
     let following = [];
     try {
-      const res = await axios.get(url, {
-        params: {
-          owner_id: ownerId,
-          query_username: queryUsername,
-        },
-      });
+      const res = await axios.get(
+        `/api/user-relation/get-following?owner_id=${ownerId}&query_username=${queryUsername}`
+      );
 
       if (res.status === 200) {
         following = res.data;
@@ -38,7 +38,9 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
   const addFollowing = async (
     ownerId: string,
     targetId: string,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    addNotification: (newNotification: NewNotificationType) => void,
+    newNotification: NewNotificationType
   ): Promise<FollowingType[] | []> => {
     let newAllFollowing: FollowingType[] | [] = [];
     try {
@@ -49,6 +51,8 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
 
       if (res.status === 200) {
         newAllFollowing = [res.data.newFollowing, ...(data ?? [])];
+        // Send notification to the author that someone started following him or her
+        addNotification(newNotification);
       } else {
         showToast({
           title: "Error",
@@ -67,7 +71,9 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
   const removeFollowing = async (
     ownerId: string,
     targetId: string,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    removeNotification: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete: DeleteNotificationType
   ): Promise<FollowingType[] | []> => {
     let excludeDeletedFollowing: FollowingType[] | [] = [];
     try {
@@ -81,6 +87,8 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
         excludeDeletedFollowing = excludeDeletedFollowing.filter(
           (following) => following.UserFollowing.user_id !== targetId
         );
+        // Delete the follow notification
+        removeNotification(notificationToDelete);
       } else {
         showToast({
           title: "Error",
@@ -99,8 +107,7 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
 
   const { data, isLoading, error, isValidating, mutate } = useSWR(
     ownerId ? ["/api/user-relation/get-following", ownerId] : null,
-    () =>
-      fetchFollowing("/api/user-relation/get-following", ownerId, queryUsername)
+    () => fetchFollowing(ownerId, queryUsername)
   );
 
   return {

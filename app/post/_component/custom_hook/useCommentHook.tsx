@@ -5,6 +5,7 @@ import { ToastFunctionType } from "./usePostHook";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { CommentSchema } from "@/zod_schema/schema";
+import { NewNotificationType } from "./useNotificationHook";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -18,18 +19,14 @@ export type CommentType = z.infer<typeof CommentSchema>;
 
 export default function useComment(post_id: string, userId: string | null) {
   const getComment = async (
-    url: string,
     post_id: string,
     userId: string | null
   ): Promise<GetBackCommentType[] | []> => {
     let returnedComments: GetBackCommentType[] | [] = [];
     try {
-      const response = await axios.get(url, {
-        params: {
-          post_id: post_id,
-          user_id: userId ?? "",
-        },
-      });
+      const response = await axios.get(
+        `/api/comment/get-comment?post_id=${post_id}&user_id=${userId}`
+      );
 
       if (response.status === 200) {
         returnedComments = response.data as GetBackCommentType[];
@@ -43,7 +40,7 @@ export default function useComment(post_id: string, userId: string | null) {
 
   const { data, isLoading, error, mutate } = useSWR(
     ["/api/comment/get-comment", post_id, userId],
-    ([url, post_id, userId]) => getComment(url, post_id, userId)
+    ([url, post_id, userId]) => getComment(post_id, userId)
   );
 
   const updateComments = async (
@@ -136,9 +133,10 @@ export default function useComment(post_id: string, userId: string | null) {
       content: string;
       post_id: string;
       user_id: string;
-    }>
-  ): Promise<string> => {
-    let commentId = "";
+    }>,
+    addNotification?: (newNotification: NewNotificationType) => void,
+    newNotification?: Omit<NewNotificationType, "resourceId">
+  ): Promise<void> => {
     try {
       const response = await axios.post(
         "/api/comment/create-comment",
@@ -146,16 +144,20 @@ export default function useComment(post_id: string, userId: string | null) {
       );
 
       if (response.status === 200) {
+        if (addNotification && newNotification) {
+          addNotification({
+            ...newNotification,
+            resourceId: response.data.newComment.comment_id,
+          });
+        }
         mutate((prevData) => {
           return [response.data.newComment, ...(prevData ?? [])];
         });
         form.reset({ ...newComment, content: "" });
-        commentId = response.data.newComment.comment_id;
       }
     } catch (error) {
       console.log(error);
     }
-    return commentId;
   };
 
   return {

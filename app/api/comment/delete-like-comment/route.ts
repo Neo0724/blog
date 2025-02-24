@@ -1,11 +1,12 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function DELETE(request: NextRequest) {
   const user_id = request.nextUrl.searchParams.get("user_id");
   const comment_id = request.nextUrl.searchParams.get("comment_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
   try {
     const [deletedComment, likeCount] = await prisma.$transaction([
       prisma.likedComment.delete({

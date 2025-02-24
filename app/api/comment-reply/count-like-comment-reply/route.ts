@@ -1,10 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function GET(request: NextRequest) {
   const comment_reply_id = request.nextUrl.searchParams.get("comment_reply_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     const totalLikedCommentReplyCount = await prisma.likedCommentReply.count({

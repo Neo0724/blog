@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getDateDifference } from "@/app/_util/getDateDifference";
+import prismaClient from "../../getPrismaClient";
 
 export async function GET(request: NextRequest) {
   const comment_id = request.nextUrl.searchParams.get("comment_id");
   const user_id = request.nextUrl.searchParams.get("user_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     const replyCommentsByLoggedInUser = await prisma.commentReply.findMany({

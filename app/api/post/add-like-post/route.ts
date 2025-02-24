@@ -1,10 +1,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     const likedPost: Prisma.LikedPostCreateInput = {

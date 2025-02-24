@@ -1,10 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function POST(req: NextRequest) {
   const { targetUserId, fromUserId, type, resourceId } = await req.json();
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     // Check for duplicate notification

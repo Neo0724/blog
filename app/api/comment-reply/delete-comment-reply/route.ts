@@ -1,10 +1,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function DELETE(request: NextRequest) {
   const comment_reply_id = request.nextUrl.searchParams.get("comment_reply_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
   try {
     const deletedCommentReply = await prisma.commentReply.delete({
       where: {

@@ -3,6 +3,7 @@ import { CreatePostSchema } from "@/zod_schema/schema";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import prismaClient from "../../getPrismaClient";
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -15,7 +16,7 @@ export const POST = async (request: NextRequest) => {
       });
     }
 
-    const prisma = new PrismaClient();
+    const prisma = prismaClient as PrismaClient;
 
     const newPost = await prisma.post.create({
       data: {

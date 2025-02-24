@@ -1,10 +1,11 @@
 import { NotificationType, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
-const prisma = new PrismaClient();
+const prisma = prismaClient as PrismaClient;
 
 async function fetchPostIdByCommentId(
-  commentId: string,
+  commentId: string
 ): Promise<string | null> {
   let postId: string | null = null;
 
@@ -32,7 +33,7 @@ async function fetchPostIdByCommentId(
   }
 }
 async function fetchPostIdAndCommentIdByCommentReplyId(
-  commentReplyId: string,
+  commentReplyId: string
 ): Promise<{
   postId: string | null;
   commentId: string | null;
@@ -148,8 +149,9 @@ export async function GET(request: NextRequest) {
           // resourceId will be the comment reply id
           case NotificationType.COMMENT_REPLY:
           case NotificationType.LIKE_REPLY_COMMENT:
-            const result =
-              await fetchPostIdAndCommentIdByCommentReplyId(resourceId);
+            const result = await fetchPostIdAndCommentIdByCommentReplyId(
+              resourceId
+            );
             updatedNotification.resource = {
               postId: result.postId,
               commentId: result.commentId,
@@ -159,7 +161,7 @@ export async function GET(request: NextRequest) {
         }
 
         return updatedNotification;
-      }),
+      })
     );
 
     return NextResponse.json(
@@ -169,12 +171,12 @@ export async function GET(request: NextRequest) {
       },
       {
         status: 200,
-      },
+      }
     );
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch the notifications. Please try again later" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

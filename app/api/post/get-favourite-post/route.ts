@@ -1,10 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getDateDifference } from "@/app/_util/getDateDifference";
-
-const prisma = new PrismaClient();
+import prismaClient from "../../getPrismaClient";
 
 export async function GET(request: NextRequest) {
+  const prisma = prismaClient as PrismaClient;
+
   const user_id = request.nextUrl.searchParams.get("user_id");
   const skipPost = request.nextUrl.searchParams.get("skipPost");
   const limitPost = request.nextUrl.searchParams.get("limitPost");
@@ -33,9 +34,8 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
-      skip:
-        parseInt(skipPost as string) ?? 0 * parseInt(limitPost as string) ?? 10,
-      take: parseInt(limitPost as string) ?? 10,
+      skip: parseInt(skipPost as string) * parseInt(limitPost as string),
+      take: parseInt(limitPost as string),
     });
 
     let allPostsWithDateDiff = allFavouritedPost?.map((curPost) => {

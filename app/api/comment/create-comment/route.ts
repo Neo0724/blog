@@ -2,6 +2,7 @@ import { getDateDifference } from "@/app/_util/getDateDifference";
 import { CommentSchema } from "@/zod_schema/schema";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const prisma = new PrismaClient();
+    const prisma = prismaClient as PrismaClient;
 
     const newComment: Prisma.CommentCreateInput = {
       content: body.content,

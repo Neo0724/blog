@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getDateDifference } from "@/app/_util/getDateDifference";
+import prismaClient from "../../getPrismaClient";
 
 export async function GET(request: NextRequest) {
   const post_id = request.nextUrl.searchParams.get("post_id");
   const user_id = request.nextUrl.searchParams.get("user_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     // Fetch the user comment first then only the rest to put user comments on top of others

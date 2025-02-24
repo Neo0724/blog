@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   const ownerId = request.nextUrl.searchParams.get("owner_id");
   const queryUsername = request.nextUrl.searchParams.get("query_username");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     const allFollowings = await prisma.follower.findMany({

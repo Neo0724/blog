@@ -188,7 +188,6 @@ export default function EachCommentReplyPage({
       isVisible &&
       !doneUpdatingIndex.current.has(indexToUpdate)
     ) {
-      console.log(indexToUpdate);
       setCommentReplySize && setCommentReplySize((prev) => prev + 1);
       doneUpdatingIndex.current.add(indexToUpdate);
     }

@@ -2,7 +2,7 @@
 import { useFollower } from "../../post/_component/custom_hook/useFollowerHook";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { mutate } from "swr";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import SpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
 import useSearchDebounce from "./customHook/useSearchDebounce";
+import ScrollToTop from "../navigation/ScrollToTop";
 
 type FollowerTabProps = {
   pageOwnerUserId: string;
@@ -21,6 +22,8 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
+  const scrollToTopDiv = useRef<HTMLDivElement>(null);
+
   // For the page owner
   const {
     allFollower: pageOwnerFollower,
@@ -39,9 +42,11 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
   }, [newSearchVal, pageOwnerUserId]);
 
   return (
-    <>
-      {/* Search bar */}
+    <div className="w-full h-screen">
+      {/* Display scroll to top button for user */}
+      <ScrollToTop refToMonitor={scrollToTopDiv} />
       <div className="flex my-3 relative">
+        {/* Search bar */}
         <Input
           placeholder="Search"
           value={searchUsername}
@@ -59,6 +64,8 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
       </div>
       {/* Follower is fetching and loading */}
       {pageOwnerUserId && isLoading && <FollowingFollowerSkeleton />}
+      {/* Dummy div to scroll to top */}
+      <div ref={scrollToTopDiv}></div>
       {/* User has following and content has finished loading*/}
       {pageOwnerUserId &&
         pageOwnerFollower &&
@@ -112,11 +119,12 @@ export function FollowerTab({ pageOwnerUserId }: FollowerTabProps) {
             </div>
           );
         })}
+
       {/* Current user does not have followers */}
       {pageOwnerUserId &&
         !isLoading &&
         pageOwnerFollower &&
         pageOwnerFollower.length === 0 && <div>No follower</div>}
-    </>
+    </div>
   );
 }

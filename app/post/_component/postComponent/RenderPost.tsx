@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import EachPostPage from "./EachPostPage";
 import { SearchPostType } from "../Enum";
 import usePost, { POST_PAGE_SIZE } from "../custom_hook/usePostHook";
@@ -9,6 +9,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import PostSkeleton from "./PostSkeleton";
 import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";
 import { usePathname } from "next/navigation";
+import ScrollToTop from "@/app/_components/navigation/ScrollToTop";
 
 export type UserType = {
   user_id: string;
@@ -56,6 +57,7 @@ export default function RenderPost({
 
   const [username] = useLocalStorage<string | null>("test-username");
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const scrollToTopDiv = useRef<HTMLDivElement>(null);
   const isLoadingMore =
     isLoading ||
     (postSize > 0 &&
@@ -69,11 +71,12 @@ export default function RenderPost({
     (yourPosts && yourPosts[yourPosts.length - 1]?.length < POST_PAGE_SIZE);
 
   const totalPosts = yourPosts ? yourPosts.flat().length : 0;
-  // let prevPageSize = 0;
   let accumulatePostItem = 0;
 
   return (
-    <>
+    <div className="w-full h-screen">
+      {/* Display scroll to top button for user */}
+      <ScrollToTop refToMonitor={scrollToTopDiv} />
       {userId === loggedInUserId && username && searchPostType !== 4 && (
         <CreatePost
           searchPostType={
@@ -82,12 +85,12 @@ export default function RenderPost({
           userId={userId}
         />
       )}
+      {/* Dummy div to scroll to top */}
+      <div ref={scrollToTopDiv}></div>
       {!isLoading &&
         yourPosts &&
-        yourPosts.map((page, pageIndex) => {
-          // prevPageSize += pageIndex;
-          return page.map((post, postIndex) => {
-            // let currentIndex = postIndex + prevPageSize;
+        yourPosts.map((page) => {
+          return page.map((post) => {
             accumulatePostItem += 1;
             return (
               <EachPostPage
@@ -106,12 +109,11 @@ export default function RenderPost({
             );
           });
         })}
-
       {!isLoading && isEmpty && (
         <div className="max-w-[800px] w-full mx-auto">No posts found...</div>
       )}
       {(isLoading || isLoadingMore) && !isReachingEnd && <PostSkeleton />}
       {isReachingEnd && !isEmpty && <div>You have reached the end.</div>}
-    </>
+    </div>
   );
 }

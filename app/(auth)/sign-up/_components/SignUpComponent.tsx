@@ -29,20 +29,22 @@ export default function SignUpComponent() {
   const [toastMessage, setToastMessage] = useState({ msg: "", error: false });
   const router = useRouter();
 
-  const waitClearToast = new Promise((resolve, reject) => {
-    const timeOut = setTimeout(() => {
-      setToastMessage({ msg: "", error: false });
-      resolve(true);
-    }, 3000);
+  const waitClearToast = () => {
+    return new Promise((resolve) => {
+      const timeOut = setTimeout(() => {
+        setToastMessage({ msg: "", error: false });
+        resolve(true);
+      }, 2000);
 
-    () => clearTimeout(timeOut);
-  });
+      return () => clearTimeout(timeOut);
+    });
+  };
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
       await axios.post("api/auth/sign-up", formData);
       setToastMessage({ msg: "Sign up successful!", error: false });
-      await waitClearToast;
+      await waitClearToast();
       router.push("/sign-in");
     } catch (error: any) {
       console.log(error);

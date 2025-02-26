@@ -127,7 +127,8 @@ export default function NotificationDialog() {
           {!isLoading &&
             allNotViewedNotifications.length === 0 &&
             allNotification &&
-            allNotification.length > 0 && (
+            allNotification.length > 0 &&
+            notificationTab === "UNREAD" && (
               <div className="text-white">
                 All notifications have been read...
               </div>

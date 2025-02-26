@@ -38,12 +38,16 @@ export default function SignInComponent() {
 
   const [toastMessage, setToastMessage] = useState({ msg: "", error: false });
 
-  const waitClearToast = new Promise((resolve, _) => {
-    setTimeout(() => {
-      setToastMessage({ msg: "", error: false });
-      resolve(true);
-    }, 2000);
-  });
+  const waitClearToast = () => {
+    return new Promise((resolve) => {
+      const timeOut = setTimeout(() => {
+        setToastMessage({ msg: "", error: false });
+        resolve(true);
+      }, 2000);
+
+      return () => clearTimeout(timeOut);
+    });
+  };
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
@@ -52,7 +56,7 @@ export default function SignInComponent() {
       saveUserName(res.data.username);
       setUserToken(res.data.user_id);
       setToastMessage({ msg: "Sign in successful!", error: false });
-      await waitClearToast;
+      await waitClearToast();
       const newUrl = searchParams.get("redirectUrl")
         ? "/" + searchParams.get("redirectUrl") + "/" + res.data.user_id
         : "/user/" + res.data.user_id;

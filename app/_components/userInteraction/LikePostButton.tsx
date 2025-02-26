@@ -141,28 +141,45 @@ export default function LikePostButton({
     // User is logged in
     // Remove the notification if user is not the author of the post
     if (loggedInUserId !== authorId) {
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         targetUserId: authorId,
         type: NotificationType.LIKE_POST,
         resourceId: postId,
-      });
-    }
+      };
 
-    likedPostMutate(
-      removeLikePost(
-        loggedInUserId,
-        currentPost as PostType,
-        setIsLiked,
-        toast
-      ),
-      {
-        optimisticData: likedPost?.filter((post_id) => post_id !== postId),
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
+      likedPostMutate(
+        removeLikePost(
+          loggedInUserId,
+          currentPost as PostType,
+          setIsLiked,
+          toast,
+          deleteNotification,
+          notificationToDelete
+        ),
+        {
+          optimisticData: likedPost?.filter((post_id) => post_id !== postId),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      likedPostMutate(
+        removeLikePost(
+          loggedInUserId,
+          currentPost as PostType,
+          setIsLiked,
+          toast
+        ),
+        {
+          optimisticData: likedPost?.filter((post_id) => post_id !== postId),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    }
 
     postLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
       populateCache: true,

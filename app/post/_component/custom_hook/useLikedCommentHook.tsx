@@ -1,7 +1,10 @@
 import axios from "axios";
-import useSWR, { KeyedMutator } from "swr";
+import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
-import { NewNotificationType } from "./useNotificationHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 
 export default function useLikedComment(user_id: string, post_id: string) {
   const fetchData = async (
@@ -66,7 +69,9 @@ export default function useLikedComment(user_id: string, post_id: string) {
     userId: string,
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
     let removedLikeCommentId: string = "";
     try {
@@ -78,6 +83,9 @@ export default function useLikedComment(user_id: string, post_id: string) {
       });
 
       if (res.status === 200) {
+        if (notificationToDelete && deleteNotification) {
+          deleteNotification(notificationToDelete);
+        }
         removedLikeCommentId = res.data.commentId;
         setIsLiked(false);
       }

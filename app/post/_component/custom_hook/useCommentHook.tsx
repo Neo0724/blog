@@ -1,11 +1,13 @@
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
-import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { CommentSchema } from "@/zod_schema/schema";
-import { NewNotificationType } from "./useNotificationHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 import useSWRInfinite from "swr/infinite";
 
 export type GetBackCommentType = {
@@ -90,7 +92,9 @@ export default function useComment(post_id: string, userId: string | null) {
 
   const deleteComments = async (
     commentId: string,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ) => {
     let excludeDeletedComments: GetBackCommentType[][] | undefined;
     try {
@@ -105,6 +109,9 @@ export default function useComment(post_id: string, userId: string | null) {
           data?.map((page) =>
             page.filter((comment) => comment.comment_id !== commentId)
           ) ?? [];
+        if (notificationToDelete && deleteNotification) {
+          deleteNotification(notificationToDelete);
+        }
         showToast({
           title: "Success",
           description: "Comment has deleted successfully",

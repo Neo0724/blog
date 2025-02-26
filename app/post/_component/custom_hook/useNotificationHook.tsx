@@ -124,14 +124,9 @@ export default function useNotification(userId: string) {
     deleteNotification: DeleteNotificationType
   ): Promise<void> => {
     try {
-      await axios.delete("/api/notification/delete-notification", {
-        params: {
-          type: deleteNotification.type,
-          target_user_id: deleteNotification.targetUserId,
-          from_user_id: deleteNotification.fromUserId,
-          resource_id: deleteNotification.resourceId,
-        },
-      });
+      await axios.delete(
+        `/api/notification/delete-notification?type=${deleteNotification.type}&target_user_id=${deleteNotification.targetUserId}&from_user_id=${deleteNotification.fromUserId}&resource_id=${deleteNotification.resourceId}`
+      );
     } catch (err) {
       console.log(err);
     }

@@ -1,7 +1,10 @@
 import axios from "axios";
 import useSwr from "swr";
 import { ToastFunctionType } from "./usePostHook";
-import { NewNotificationType } from "./useNotificationHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 
 // Get all replied comment for a single comment
 export default function useLikedReplyComment(
@@ -71,7 +74,9 @@ export default function useLikedReplyComment(
     userId: string,
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
     let removedLikeCommentReplyId: string = "";
     try {
@@ -86,6 +91,9 @@ export default function useLikedReplyComment(
       );
 
       if (res.status === 200) {
+        if (notificationToDelete && deleteNotification) {
+          deleteNotification(notificationToDelete);
+        }
         removedLikeCommentReplyId = res.data.commentReplyId;
         setIsLiked(false);
       }

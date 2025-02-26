@@ -2,7 +2,10 @@ import axios from "axios";
 import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { PostType } from "../postComponent/RenderPost";
-import { NewNotificationType } from "./useNotificationHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 
 export default function useLikedPost(user_id: string | null) {
   const fetchData = async (user_id: string | null): Promise<string[] | []> => {
@@ -61,7 +64,9 @@ export default function useLikedPost(user_id: string | null) {
     userId: string,
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
     let removedLikePostId: string = "";
     try {
@@ -71,6 +76,9 @@ export default function useLikedPost(user_id: string | null) {
 
       if (res.status === 200) {
         removedLikePostId = res.data.postId;
+        if (deleteNotification && notificationToDelete) {
+          deleteNotification(notificationToDelete);
+        }
         setIsLiked(false);
       }
     } catch (err) {

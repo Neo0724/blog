@@ -125,27 +125,52 @@ export default function LikeCommentReplyButton({
     }
     // Remove the notification from the target user
     if (loggedInUserId !== commentReplyOwnerId) {
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         targetUserId: commentReplyOwnerId,
         type: NotificationType.LIKE_REPLY_COMMENT,
         resourceId: commentReplyId,
-      });
+      };
+      // Remove the like
+      likedCommentReplyMutate(
+        removeLikeCommentReply(
+          loggedInUserId,
+          commentReplyId,
+          setIsLiked,
+          toast,
+          deleteNotification,
+          notificationToDelete
+        ),
+        {
+          optimisticData:
+            likedReplyComment?.filter(
+              (comment_reply_id) => comment_reply_id !== commentReplyId
+            ) ?? [],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      // Remove the like
+      likedCommentReplyMutate(
+        removeLikeCommentReply(
+          loggedInUserId,
+          commentReplyId,
+          setIsLiked,
+          toast
+        ),
+        {
+          optimisticData:
+            likedReplyComment?.filter(
+              (comment_reply_id) => comment_reply_id !== commentReplyId
+            ) ?? [],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
     }
-
-    // Remove the like
-    likedCommentReplyMutate(
-      removeLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
-      {
-        optimisticData:
-          likedReplyComment?.filter(
-            (comment_reply_id) => comment_reply_id !== commentReplyId
-          ) ?? [],
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
 
     replyCommentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
       populateCache: true,

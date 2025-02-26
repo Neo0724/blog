@@ -2,7 +2,10 @@ import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import { ToastFunctionType } from "./usePostHook";
 import { UpdateReplyCommentType } from "../EditCommentReplyDialog";
-import { NewNotificationType } from "./useNotificationHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 import useSWRInfinite from "swr/infinite";
 
 export type GetBackReplyCommentType = {
@@ -84,7 +87,9 @@ export default function useReplyComment(comment_id: string, user_id: string) {
 
   const deleteReplyComments = async (
     comment_reply_id: string,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ): Promise<GetBackReplyCommentType[][] | undefined> => {
     let excludedDeletedReplyComment: GetBackReplyCommentType[][] | undefined;
     try {
@@ -97,6 +102,9 @@ export default function useReplyComment(comment_id: string, user_id: string) {
           title: "Success",
           description: "Your reply has been deleted",
         });
+        if (deleteNotification && notificationToDelete) {
+          deleteNotification(notificationToDelete);
+        }
         excludedDeletedReplyComment =
           data?.map((page) =>
             page.filter(

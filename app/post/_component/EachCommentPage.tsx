@@ -113,23 +113,41 @@ export default function EachCommentPage({
   const handleDeleteComment = () => {
     // Remove the notification if user is not the author of the post
     if (loggedInUserId !== authorId) {
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         targetUserId: authorId,
         type: NotificationType.COMMENT,
         resourceId: commentId,
+      };
+
+      // Delete the comment
+      mutate(
+        deleteComments(
+          commentId,
+          toast,
+          deleteNotification,
+          notificationToDelete
+        ),
+        {
+          optimisticData: comments?.map((page) =>
+            page.filter((comment) => comment.comment_id !== commentId)
+          ),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      // Delete the comment
+      mutate(deleteComments(commentId, toast), {
+        optimisticData: comments?.map((page) =>
+          page.filter((comment) => comment.comment_id !== commentId)
+        ),
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
       });
     }
-
-    // Delete the comment
-    mutate(deleteComments(commentId, toast), {
-      optimisticData: comments?.map((page) =>
-        page.filter((comment) => comment.comment_id !== commentId)
-      ),
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   const handleOpenReply = () => {

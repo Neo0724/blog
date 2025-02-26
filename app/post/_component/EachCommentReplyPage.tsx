@@ -130,26 +130,46 @@ export default function EachCommentReplyPage({
   const handleDeleteCommentReply = () => {
     // Remove the notification if user is not the author of the comment
     if (loggedInUserId !== target_user.user_id) {
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         // Target_user is the user that this comment is replying to
         targetUserId: target_user.user_id,
         type: NotificationType.COMMENT_REPLY,
         resourceId: comment_reply_id,
+      };
+      // Delete the reply comment
+      mutateReplyComment(
+        deleteReplyComments(
+          comment_reply_id,
+          toast,
+          deleteNotification,
+          notificationToDelete
+        ),
+        {
+          optimisticData: replyComments?.map((page) =>
+            page.filter(
+              (replyComment) =>
+                replyComment.comment_reply_id !== comment_reply_id
+            )
+          ),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      // Delete the reply comment
+      mutateReplyComment(deleteReplyComments(comment_reply_id, toast), {
+        optimisticData: replyComments?.map((page) =>
+          page.filter(
+            (replyComment) => replyComment.comment_reply_id !== comment_reply_id
+          )
+        ),
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
       });
     }
-
-    // Delete the reply comment
-    mutateReplyComment(deleteReplyComments(comment_reply_id, toast), {
-      optimisticData: replyComments?.map((page) =>
-        page.filter(
-          (replyComment) => replyComment.comment_reply_id !== comment_reply_id
-        )
-      ),
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   function handleAuthorProfileNavigation(user_id: string): void {

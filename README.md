@@ -1,8 +1,32 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+Prisma is being used in this project. You can connect to your database by following the [steps](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/connect-your-database-typescript-postgresql)
+
 ## Getting Started
 
-First, run the development server:
+### First, install all the required dependencies:
+
+```bash
+npm install
+```
+
+### Second, rename `.example.env` to `.env`
+
+### Third, edit the connection string based on your database provider.
+
+- For PosgreSQL: `postgresql://USER:PASSWORD@localhost:5432/mydb`
+
+- For MySQL: `mysql://USER:PASSWORD@localhost:3306/mydb`
+
+- More options can be found [here](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/connect-your-database-typescript-postgresql)
+
+### Fourth, sync the prisma database with your local machine database by running:
+
+```bash
+npx prisma migrate dev
+```
+
+### Lastly, run the development server:
 
 ```bash
 npm run dev
@@ -16,7 +40,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying `app/layout.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 

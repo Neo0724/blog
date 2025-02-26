@@ -119,16 +119,19 @@ export default function NotificationDialog() {
                 notification={notification}
               />
             ))}
-          {/* User want to view unread notification but all has been read */}
-          {!isLoading && allNotViewedNotifications.length === 0 && (
-            <div className="text-white">
-              All notifications have been read...
-            </div>
-          )}
           {/* Current user does not has any notification */}
           {!isLoading && allNotification?.length === 0 && (
             <div className="text-white">No notifications ...</div>
           )}
+          {/* User want to view unread notification but all has been read */}
+          {!isLoading &&
+            allNotViewedNotifications.length === 0 &&
+            allNotification &&
+            allNotification.length > 0 && (
+              <div className="text-white">
+                All notifications have been read...
+              </div>
+            )}
           {!loggedInUserId && (
             <div className="text-white">Please sign in to use this feature</div>
           )}

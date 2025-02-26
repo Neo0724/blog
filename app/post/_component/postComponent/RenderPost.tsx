@@ -113,7 +113,9 @@ export default function RenderPost({
         <div className="max-w-[800px] w-full mx-auto">No posts found...</div>
       )}
       {(isLoading || isLoadingMore) && !isReachingEnd && <PostSkeleton />}
-      {isReachingEnd && !isEmpty && <div>You have reached the end.</div>}
+      {isReachingEnd && !isEmpty && (
+        <div className="pb-5">You have reached the end.</div>
+      )}
     </div>
   );
 }

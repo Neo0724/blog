@@ -375,7 +375,9 @@ export default function EachCommentPage({
           {(isLoading || isLoadingMore) &&
             !isReachingEnd &&
             "Loading replies ..."}
-          {isReachingEnd && !isEmpty && <div>You have reached the end.</div>}
+          {isReachingEnd && !isEmpty && (
+            <div className="pb-7">You have reached the end.</div>
+          )}
         </div>
       </div>
     </div>

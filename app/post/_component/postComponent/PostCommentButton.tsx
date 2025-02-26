@@ -186,7 +186,7 @@ export default function PostCommentButton({
                 !isReachingEnd &&
                 "Loading comments ..."}
               {isReachingEnd && !isEmpty && (
-                <div>You have reached the end.</div>
+                <div className="pb-7">You have reached the end.</div>
               )}
             </div>
             <SubmitPostCommentPage

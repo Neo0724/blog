@@ -1,11 +1,15 @@
 "use client";
-import useSWR from "swr";
 import { SearchPostType } from "../Enum";
 import axios from "axios";
 import { PostType } from "../postComponent/RenderPost";
 import { CreatePostFormType } from "../postComponent/CreatePostPage";
 import { UseFormReturn } from "react-hook-form";
-import { Dispatch } from "react";
+import { Dispatch, SetStateAction } from "react";
+import useSWRInfinite from "swr/infinite";
+import { NewNotificationType } from "./useNotificationHook";
+import { UserFollower } from "./useFollowerHook";
+
+export const POST_PAGE_SIZE = 4;
 
 export type ToastFunctionType = ({ title, description }: ToastProp) => void;
 
@@ -44,7 +48,7 @@ export default function usePost(
       apiUrl = `/api/post/get-own-post?user_id=${userId}`;
       break;
     case 2:
-      apiUrl = `/api/post/get-all-post`;
+      apiUrl = `/api/post/get-all-post?`;
       break;
     case 3:
       apiUrl = `/api/post/get-search-post?searchText=${searchText}`;
@@ -53,7 +57,7 @@ export default function usePost(
       apiUrl = `/api/post/get-favourite-post?user_id=${userId}`;
       break;
     default:
-      apiUrl = `/api/post/get-all-post`;
+      apiUrl = `/api/post/get-all-post?`;
       break;
   }
 
@@ -62,8 +66,8 @@ export default function usePost(
     postId: string,
     updatedPost: CreatePostFormType,
     showToast: ToastFunctionType
-  ): Promise<PostType[] | []> => {
-    let allPostsWithUpdatedPost: PostType[] = [];
+  ): Promise<PostType[][] | undefined> => {
+    let allPostsWithUpdatedPost: PostType[][] | undefined;
     try {
       const res = await axios.put("/api/post/update-post", {
         ...updatedPost,
@@ -76,16 +80,18 @@ export default function usePost(
           description: "Post has updated successfully",
         });
         allPostsWithUpdatedPost =
-          data?.map((post) => {
-            if (post.post_id === postId) {
-              return {
-                ...post,
-                content: res.data.updatedPost.content,
-                title: res.data.updatedPost.title,
-              };
-            }
-            return post;
-          }) ?? [];
+          data?.map((page) =>
+            page.map((post) => {
+              if (post.post_id === postId) {
+                return {
+                  ...post,
+                  content: res.data.updatedPost.content,
+                  title: res.data.updatedPost.title,
+                };
+              }
+              return post;
+            })
+          ) ?? [];
       } else {
         showToast({
           title: "Error",
@@ -106,8 +112,8 @@ export default function usePost(
   const deletePosts = async (
     postId: string,
     showToast: ToastFunctionType
-  ): Promise<PostType[] | []> => {
-    let excludeDeletedPosts: PostType[] = [];
+  ): Promise<PostType[][] | undefined> => {
+    let excludeDeletedPosts: PostType[][] | undefined;
     try {
       const res = await axios.delete("/api/post/delete-post", {
         params: {
@@ -116,7 +122,9 @@ export default function usePost(
       });
       if (res.status === 200) {
         excludeDeletedPosts =
-          data?.filter((post) => post.post_id !== postId) ?? [];
+          data?.map(
+            (page) => page.filter((post) => post.post_id !== postId) ?? []
+          ) ?? [];
         showToast({
           title: "Success",
           description: "Post has deleted successfully",
@@ -149,10 +157,11 @@ export default function usePost(
     }>,
     setError: Dispatch<string>,
     userId: string,
-    url: string
-  ): Promise<string> => {
+    addNotification: (newNotification: NewNotificationType) => void,
+    newNotification: Omit<NewNotificationType, "resourceId">,
+    allFollower: UserFollower[] | []
+  ): Promise<void> => {
     const newPostWithUserId = { ...newPost, user_id: userId };
-    let newPostId = "";
     try {
       const res = await axios.post("/api/post/create-post", newPostWithUserId);
 
@@ -165,8 +174,18 @@ export default function usePost(
           title: "",
           content: "",
         });
-        mutate([res.data.newPost, ...(data ?? [])]);
-        newPostId = res.data.newPost.post_id;
+        mutate(
+          data?.map((page, index) => {
+            index === 0 && page.push(res.data.newPost);
+            return page;
+          })
+        );
+        if (allFollower) {
+          addNotification({
+            ...newNotification,
+            resourceId: res.data.newPost.post_id,
+          });
+        }
       }
     } catch (error) {
       setError("An unexpected error occur");
@@ -174,21 +193,94 @@ export default function usePost(
         setError("");
       }, 3000);
     }
-    return newPostId;
   };
 
-  const { data, error, isLoading, mutate } = useSWR(apiUrl, () =>
-    fetchPost(apiUrl)
-  );
+  const addToFavourite = async (
+    userId: string,
+    postId: string,
+    setIsFavourited: React.Dispatch<SetStateAction<boolean>>,
+    showToast: ToastFunctionType
+  ): Promise<PostType[][] | undefined> => {
+    let newAllFavouritePost: PostType[][] | undefined;
+    try {
+      const res = await axios.post("/api/post/add-favourite-post", {
+        user_id: userId,
+        post_id: postId,
+      });
+
+      if (res.status === 200) {
+        mutate(
+          data?.map((page, index) => {
+            index === 0 && page.push(res.data.newFavouritePost);
+            return page;
+          })
+        );
+        setIsFavourited(true);
+      }
+    } catch (err) {
+      console.log(err);
+      showToast({
+        title: "Error",
+        description:
+          "An error occured when adding to favourite. Please try again later",
+      });
+    }
+
+    return newAllFavouritePost;
+  };
+  const removeFromFavourite = async (
+    userId: string,
+    postId: string,
+    setIsFavourited: React.Dispatch<SetStateAction<boolean>>,
+    showToast: ToastFunctionType
+  ): Promise<PostType[][] | undefined> => {
+    let excludeDeletedFavourite: PostType[][] | undefined;
+    try {
+      const res = await axios.delete("/api/post/delete-favourite-post", {
+        params: {
+          user_id: userId,
+          post_id: postId,
+        },
+      });
+
+      if (res.status === 200) {
+        excludeDeletedFavourite =
+          data?.map((page) => page.filter((post) => post.post_id !== postId)) ??
+          [];
+        setIsFavourited(false);
+      }
+    } catch (err) {
+      console.log(err);
+      showToast({
+        title: "Error",
+        description:
+          "An error occured when removing from favourite. Please try again later",
+      });
+    }
+
+    return excludeDeletedFavourite;
+  };
+
+  const getKey = (pageIndex: number, previousPageData: PostType[]) => {
+    if (previousPageData && !previousPageData.length) return null;
+    return `${apiUrl}&skipPost=${pageIndex}&limitPost=${POST_PAGE_SIZE}`;
+  };
+
+  const { data, error, isLoading, mutate, setSize, size } = useSWRInfinite<
+    PostType[]
+  >(getKey, fetchPost);
 
   return {
     isLoading,
     error,
-    mutate,
+    postMutate: mutate,
     yourPosts: data,
     createPost,
     updatePosts,
     deletePosts,
-    fetchUrl: apiUrl,
+    setPostSize: setSize,
+    addToFavourite,
+    removeFromFavourite,
+    postSize: size,
   };
 }

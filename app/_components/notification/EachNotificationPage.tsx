@@ -85,13 +85,19 @@ export default function EachNotificationPage({
   };
 
   const handleFollowBack = () => {
-    addFollowing(loggedInUserId, notification.FromUser.user_id, toast);
-    addNotification({
+    const newNotification = {
       fromUserId: loggedInUserId,
       targetUserId: [notification.FromUser.user_id],
       type: NotificationType.FOLLOW,
       resourceId: loggedInUserId,
-    });
+    };
+    addFollowing(
+      loggedInUserId,
+      notification.FromUser.user_id,
+      toast,
+      addNotification,
+      newNotification
+    );
     mutate("/api/user-relation/get-following", loggedInUserId);
   };
   return (

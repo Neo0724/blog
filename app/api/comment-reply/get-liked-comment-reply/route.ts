@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-const prisma = new PrismaClient();
+const prisma = prismaClient as PrismaClient;
 
 export async function GET(request: NextRequest) {
   const user_id = request.nextUrl.searchParams.get("user_id");
   const comment_id = request.nextUrl.searchParams.get("comment_id");
 
   try {
-    const allLikedComment = await prisma.user.findUnique({
+    const allLikedCommentReply = await prisma.user.findUnique({
       where: {
         user_id: user_id as string,
         LikedCommentReply: {
@@ -30,16 +30,20 @@ export async function GET(request: NextRequest) {
 
     /* 
     [
-      {
-          "CommentReply_comment_reply_id": "707e91c1-f8e8-4fe5-8d50-b0a6a07468bf"
-      }
+      "707e91c1-f8e8-4fe5-8d50-b0a6a07468bf"
     ]
     
     Example output, returned output is an array of all liked reply comment id within a post
     */
-    return NextResponse.json(allLikedComment?.LikedCommentReply ?? [], {
-      status: 200,
-    });
+
+    return NextResponse.json(
+      allLikedCommentReply?.LikedCommentReply.map(
+        (likedCommentReply) => likedCommentReply.CommentReply_comment_reply_id
+      ) ?? [],
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
     console.log(error);
     return NextResponse.json(

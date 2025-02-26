@@ -1,20 +1,22 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../getPrismaClient";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const commentReplyId = request.nextUrl.searchParams.get("comment_reply_id");
+  const userId = request.nextUrl.searchParams.get("user_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
   try {
     const likedCommentReply: Prisma.LikedCommentReplyCreateInput = {
       CommentReply: {
         connect: {
-          comment_reply_id: body.comment_reply_id as string,
+          comment_reply_id: commentReplyId as string,
         },
       },
       User: {
         connect: {
-          user_id: body.user_id as string,
+          user_id: userId as string,
         },
       },
     };
@@ -23,7 +25,7 @@ export async function POST(request: NextRequest) {
       prisma.likedCommentReply.create({ data: likedCommentReply }),
       prisma.likedCommentReply.count({
         where: {
-          CommentReply_comment_reply_id: body.comment_reply_id as string,
+          CommentReply_comment_reply_id: commentReplyId as string,
         },
       }),
     ]);

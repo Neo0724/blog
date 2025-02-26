@@ -28,7 +28,7 @@ export default function PostOption({
   const menuRef = useRef<HTMLDivElement>(null);
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
 
-  const { yourPosts, mutate, deletePosts } = usePost(
+  const { yourPosts, postMutate, deletePosts } = usePost(
     getCorrectSearchPostType(usePathname()),
     "",
     loggedInUserId ?? ""
@@ -39,8 +39,10 @@ export default function PostOption({
   };
 
   const handleDeletePost = () => {
-    mutate(deletePosts(postId, toast), {
-      optimisticData: yourPosts?.filter((post) => post.post_id !== postId),
+    postMutate(deletePosts(postId, toast), {
+      optimisticData: yourPosts?.map(
+        (page) => page.filter((post) => post.post_id !== postId) ?? []
+      ),
       rollbackOnError: true,
       populateCache: true,
       revalidate: true,

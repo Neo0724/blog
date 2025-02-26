@@ -9,7 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useComment from "../custom_hook/useCommentHook";
+import useComment, { COMMENT_PAGE_SIZE } from "../custom_hook/useCommentHook";
 import EachCommentPage from "../EachCommentPage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BiComment } from "react-icons/bi";
@@ -49,7 +49,10 @@ export default function PostCommentButton({
   // Has to open the dialog if user is coming from notification and wants to view specific comment
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [userId, _] = useLocalStorage<string>("test-userId");
-  const { comments, isLoading } = useComment(postId, userId ?? null);
+  const { comments, isLoading, commentSize, setCommentSize } = useComment(
+    postId,
+    userId ?? null
+  );
 
   function handleAuthorProfileNavigation(user_id: string): void {
     router.push(`/user/${user_id}`);
@@ -77,13 +80,29 @@ export default function PostCommentButton({
     }
   }, [commentBoxRef]);
 
+  const isLoadingMore =
+    isLoading ||
+    (commentSize > 0 &&
+      comments &&
+      typeof comments[commentSize - 1] === "undefined");
+
+  const isEmpty = comments?.[0]?.length === 0;
+
+  const isReachingEnd =
+    isEmpty ||
+    (comments && comments[comments.length - 1]?.length < COMMENT_PAGE_SIZE);
+
+  const totalComment = comments ? comments.flat().length : 0;
+
+  let accumulateCommentItem = 0;
+
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
           <Button variant="ghost" className={className}>
             <BiComment />
-            Comments {comments ? comments.length.toString() : ""}{" "}
+            Comments
           </Button>
         </DialogTrigger>
         <DialogContent className="bg-[rgb(36,37,38)] text-white border-[rgb(58,59,60)]">
@@ -143,21 +162,31 @@ export default function PostCommentButton({
               {!isLoading &&
                 comments &&
                 comments.length > 0 &&
-                comments.map((c) => {
-                  return (
-                    <EachCommentPage
-                      key={c.comment_id}
-                      commentId={c.comment_id}
-                      user={c.User}
-                      content={c.content}
-                      post_id={postId}
-                      authorId={authorId}
-                      dateDifferent={c.dateDifferent}
-                    />
-                  );
+                comments.map((page) => {
+                  return page.map((c) => {
+                    accumulateCommentItem += 1;
+                    return (
+                      <EachCommentPage
+                        key={c.comment_id}
+                        commentId={c.comment_id}
+                        user={c.User}
+                        content={c.content}
+                        post_id={postId}
+                        authorId={authorId}
+                        dateDifferent={c.dateDifferent}
+                        index={accumulateCommentItem - 1}
+                        totalCommentNumber={totalComment}
+                        setCommentSize={setCommentSize}
+                      />
+                    );
+                  });
                 })}
-              {!isLoading && comments?.length === 0 && (
-                <div>No comments yet...</div>
+              {!isLoading && isEmpty && <div>No comments yet...</div>}
+              {(isLoading || isLoadingMore) &&
+                !isReachingEnd &&
+                "Loading comments ..."}
+              {isReachingEnd && !isEmpty && (
+                <div className="pb-7">You have reached the end.</div>
               )}
             </div>
             <SubmitPostCommentPage

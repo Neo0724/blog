@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
+import { SWRConfig } from "swr";
 const AppSidebar = dynamic(
   () => import("./_components/navigation/AppSidebar"),
   {
@@ -27,14 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="p-10">
       <body className={cn(inter.className, "bg-[rgb(36,37,38)]")}>
-        <SidebarProvider>
-          <Navbar />
-          <AppSidebar />
-          <main className="mt-[4rem] mx-auto text-white flex flex-col min-h-screen w-full justify-center items-center">
-            <div className="flex-1 w-full max-w-[800px]">{children}</div>
-            <Toaster />
-          </main>
-        </SidebarProvider>
+        <SWRConfig value={{ revalidateOnFocus: false }}>
+          <SidebarProvider>
+            <Navbar />
+            <AppSidebar />
+            <main className="mt-[4rem] mx-auto text-white flex flex-col min-h-screen w-full justify-center items-center">
+              <div className="flex-1 w-full max-w-[800px]">{children}</div>
+              <Toaster />
+            </main>
+          </SidebarProvider>
+        </SWRConfig>
       </body>
     </html>
   );

@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useReplyComment from "./custom_hook/useReplyCommentHook";
-import useLikedReplyComment from "./custom_hook/useLikedReplyCommentHook";
+import useReplyComment, {
+  GetBackReplyCommentType,
+} from "./custom_hook/useReplyCommentHook";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,6 +15,7 @@ import { NotificationType } from "./Enum";
 import EditCommentReplyDialog from "./EditCommentReplyDialog";
 import LikeCommentReplyButton from "./commentReplyComponent/LikeCommentReplyButton";
 import useNotification from "./custom_hook/useNotificationHook";
+import useElementInView from "./custom_hook/useElementInViewHook";
 
 export default function EachCommentReplyPage({
   content,
@@ -24,6 +26,9 @@ export default function EachCommentReplyPage({
   authorId,
   dateDifferent,
   setViewReplies,
+  index,
+  setCommentReplySize,
+  totalCommentReplyNumber,
 }: {
   content: string;
   comment_reply_id: string;
@@ -33,6 +38,11 @@ export default function EachCommentReplyPage({
   authorId: string;
   dateDifferent: string;
   setViewReplies: React.Dispatch<boolean>;
+  index: number;
+  setCommentReplySize: (
+    size: number | ((_size: number) => number)
+  ) => Promise<GetBackReplyCommentType[][] | undefined>;
+  totalCommentReplyNumber: number;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -52,6 +62,10 @@ export default function EachCommentReplyPage({
   const commentReplyBoxRef = useRef<HTMLDivElement | null>(null);
 
   const openReplyRef = useRef<HTMLDivElement | null>(null);
+
+  const { isVisible } = useElementInView(commentReplyBoxRef);
+  // Avoid duplicate fetching
+  const doneUpdatingIndex = useRef<Set<number>>(new Set());
 
   const handleOpenReply = () => {
     if (!loggedInUserId) {
@@ -86,47 +100,76 @@ export default function EachCommentReplyPage({
       comment_id: comment_id,
     };
 
-    // Add the reply comment
-    const commentReplyId = await createReplyComments(
-      replyData,
-      setViewReplies,
-      setReplyContent,
-      setOpenReply,
-      toast
-    );
-
     // Send the notification if the user is replying to other instead of himself
     if (user.user_id !== loggedInUserId) {
-      addNotification({
+      const newNotification = {
         fromUserId: loggedInUserId,
         targetUserId: [user.user_id],
         type: NotificationType.COMMENT_REPLY,
-        resourceId: commentReplyId,
-      });
+      };
+      createReplyComments(
+        replyData,
+        setViewReplies,
+        setReplyContent,
+        setOpenReply,
+        toast,
+        addNotification,
+        newNotification
+      );
+    } else {
+      createReplyComments(
+        replyData,
+        setViewReplies,
+        setReplyContent,
+        setOpenReply,
+        toast
+      );
     }
   };
 
   const handleDeleteCommentReply = () => {
     // Remove the notification if user is not the author of the comment
     if (loggedInUserId !== target_user.user_id) {
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         // Target_user is the user that this comment is replying to
         targetUserId: target_user.user_id,
         type: NotificationType.COMMENT_REPLY,
         resourceId: comment_reply_id,
+      };
+      // Delete the reply comment
+      mutateReplyComment(
+        deleteReplyComments(
+          comment_reply_id,
+          toast,
+          deleteNotification,
+          notificationToDelete
+        ),
+        {
+          optimisticData: replyComments?.map((page) =>
+            page.filter(
+              (replyComment) =>
+                replyComment.comment_reply_id !== comment_reply_id
+            )
+          ),
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      // Delete the reply comment
+      mutateReplyComment(deleteReplyComments(comment_reply_id, toast), {
+        optimisticData: replyComments?.map((page) =>
+          page.filter(
+            (replyComment) => replyComment.comment_reply_id !== comment_reply_id
+          )
+        ),
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
       });
     }
-
-    // Delete the reply comment
-    mutateReplyComment(deleteReplyComments(comment_reply_id, toast), {
-      optimisticData: replyComments?.filter(
-        (replyComment) => replyComment.comment_reply_id !== comment_reply_id
-      ),
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   function handleAuthorProfileNavigation(user_id: string): void {
@@ -156,6 +199,19 @@ export default function EachCommentReplyPage({
       });
     }
   }, [comment_reply_id, searchParams]);
+
+  // Trigger load more comment
+  useEffect(() => {
+    const indexToUpdate = Math.floor((totalCommentReplyNumber ?? 1) / 2);
+    if (
+      indexToUpdate === index &&
+      isVisible &&
+      !doneUpdatingIndex.current.has(indexToUpdate)
+    ) {
+      setCommentReplySize && setCommentReplySize((prev) => prev + 1);
+      doneUpdatingIndex.current.add(indexToUpdate);
+    }
+  }, [index, isVisible, totalCommentReplyNumber]);
 
   return (
     <div className="ml-[3px]" ref={commentReplyBoxRef}>

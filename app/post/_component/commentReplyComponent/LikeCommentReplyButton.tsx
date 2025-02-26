@@ -62,24 +62,40 @@ export default function LikeCommentReplyButton({
     }
     // Only send notification if the user who liked is not the author
     if (loggedInUserId !== commentReplyOwnerId) {
-      addNotification({
+      const newNotification = {
         fromUserId: loggedInUserId,
         targetUserId: [commentReplyOwnerId],
         type: NotificationType.LIKE_REPLY_COMMENT,
         resourceId: commentReplyId,
-      });
-    }
+      };
 
-    // Add the like
-    likedCommentReplyMutate(
-      addLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
-      {
-        optimisticData: [...(likedReplyComment ?? []), commentReplyId],
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
+      likedCommentReplyMutate(
+        addLikeCommentReply(
+          loggedInUserId,
+          commentReplyId,
+          setIsLiked,
+          toast,
+          addNotification,
+          newNotification
+        ),
+        {
+          optimisticData: [...(likedReplyComment ?? []), commentReplyId],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      likedCommentReplyMutate(
+        addLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
+        {
+          optimisticData: [...(likedReplyComment ?? []), commentReplyId],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    }
 
     replyCommentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
       populateCache: true,
@@ -109,27 +125,52 @@ export default function LikeCommentReplyButton({
     }
     // Remove the notification from the target user
     if (loggedInUserId !== commentReplyOwnerId) {
-      deleteNotification({
+      const notificationToDelete = {
         fromUserId: loggedInUserId,
         targetUserId: commentReplyOwnerId,
         type: NotificationType.LIKE_REPLY_COMMENT,
         resourceId: commentReplyId,
-      });
+      };
+      // Remove the like
+      likedCommentReplyMutate(
+        removeLikeCommentReply(
+          loggedInUserId,
+          commentReplyId,
+          setIsLiked,
+          toast,
+          deleteNotification,
+          notificationToDelete
+        ),
+        {
+          optimisticData:
+            likedReplyComment?.filter(
+              (comment_reply_id) => comment_reply_id !== commentReplyId
+            ) ?? [],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
+    } else {
+      // Remove the like
+      likedCommentReplyMutate(
+        removeLikeCommentReply(
+          loggedInUserId,
+          commentReplyId,
+          setIsLiked,
+          toast
+        ),
+        {
+          optimisticData:
+            likedReplyComment?.filter(
+              (comment_reply_id) => comment_reply_id !== commentReplyId
+            ) ?? [],
+          populateCache: true,
+          revalidate: false,
+          rollbackOnError: true,
+        }
+      );
     }
-
-    // Remove the like
-    likedCommentReplyMutate(
-      removeLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
-      {
-        optimisticData:
-          likedReplyComment?.filter(
-            (comment_reply_id) => comment_reply_id !== commentReplyId
-          ) ?? [],
-        populateCache: true,
-        revalidate: false,
-        rollbackOnError: true,
-      }
-    );
 
     replyCommentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
       populateCache: true,

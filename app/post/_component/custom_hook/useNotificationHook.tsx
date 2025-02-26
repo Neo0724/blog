@@ -52,17 +52,14 @@ export type ReturnedNotificationType = {
 
 export default function useNotification(userId: string) {
   const fetchNotification = async (
-    apiUrl: string,
     userId: string
-  ): Promise<ReturnedNotificationTypeWithNotViewedCount> => {
+  ): Promise<ReturnedNotificationTypeWithNotViewedCount | undefined> => {
     let fetchedNotification: ReturnedNotificationType[] = [];
     let notViewedCount: number = 0;
     try {
-      const res = await axios.get(apiUrl, {
-        params: {
-          user_id: userId,
-        },
-      });
+      const res = await axios.get(
+        `/api/notification/get-notification?user_id=${userId}`
+      );
 
       if (res.status === 200) {
         fetchedNotification = res.data.allNotification;
@@ -99,9 +96,9 @@ export default function useNotification(userId: string) {
       | ReturnedNotificationTypeWithNotViewedCount
       | undefined = undefined;
     try {
-      const res = await axios.put("/api/notification/read-notification", {
-        notification_id: notificationId,
-      });
+      const res = await axios.put(
+        `/api/notification/read-notification?notification_id=${notificationId}`
+      );
 
       if (res.status === 200) {
         updatedNotification = {
@@ -127,22 +124,44 @@ export default function useNotification(userId: string) {
     deleteNotification: DeleteNotificationType
   ): Promise<void> => {
     try {
-      await axios.delete("/api/notification/delete-notification", {
-        params: {
-          type: deleteNotification.type,
-          target_user_id: deleteNotification.targetUserId,
-          from_user_id: deleteNotification.fromUserId,
-          resource_id: deleteNotification.resourceId,
-        },
-      });
+      await axios.delete(
+        `/api/notification/delete-notification?type=${deleteNotification.type}&target_user_id=${deleteNotification.targetUserId}&from_user_id=${deleteNotification.fromUserId}&resource_id=${deleteNotification.resourceId}`
+      );
     } catch (err) {
       console.log(err);
     }
   };
 
+  const readAllNotification = async (
+    allUnreadNotifications: ReturnedNotificationType[]
+  ): Promise<ReturnedNotificationTypeWithNotViewedCount | undefined> => {
+    let updatedNotification:
+      | ReturnedNotificationTypeWithNotViewedCount
+      | undefined = undefined;
+    try {
+      await Promise.all(
+        allUnreadNotifications.map((unreadNotification) => {
+          return readNotification(unreadNotification.notification_id);
+        })
+      );
+
+      updatedNotification = {
+        allNotification:
+          data?.allNotification.map((notification) => ({
+            ...notification,
+            hasViewed: true,
+          })) ?? [],
+        notViewedCount: 0,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    return updatedNotification;
+  };
+
   const { data, isLoading, error, mutate } = useSWR(
     userId ? "/api/notification/get-notification" : null,
-    () => fetchNotification("/api/notification/get-notification", userId)
+    () => fetchNotification(userId)
   );
 
   return {
@@ -154,5 +173,6 @@ export default function useNotification(userId: string) {
     readNotification,
     deleteNotification,
     notificationMutate: mutate,
+    readAllNotification,
   };
 }

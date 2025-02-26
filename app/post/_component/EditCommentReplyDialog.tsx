@@ -53,13 +53,15 @@ export default function EditCommentReplyDialog({
 
   const onSubmit = (formData: UpdateReplyCommentType) => {
     mutateReplyComment(updateReplyComment(formData, toast), {
-      optimisticData: replyComments?.map((replyComment) => {
-        if (replyComment.comment_reply_id === commentReplyId) {
-          return { ...replyComment, content: formData.content };
-        }
+      optimisticData: replyComments?.map((page) =>
+        page.map((replyComment) => {
+          if (replyComment.comment_reply_id === commentReplyId) {
+            return { ...replyComment, content: formData.content };
+          }
 
-        return replyComment;
-      }),
+          return replyComment;
+        })
+      ),
       populateCache: true,
       revalidate: false,
       rollbackOnError: true,

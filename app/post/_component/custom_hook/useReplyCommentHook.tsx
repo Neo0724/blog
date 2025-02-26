@@ -1,8 +1,12 @@
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
-import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { UpdateReplyCommentType } from "../EditCommentReplyDialog";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
+import useSWRInfinite from "swr/infinite";
 
 export type GetBackReplyCommentType = {
   comment_reply_id: string;
@@ -20,15 +24,15 @@ export type ReplyData = {
   comment_id: string;
 };
 
+export const COMMENT_REPLY_PAGE_SIZE = 5;
+
 export default function useReplyComment(comment_id: string, user_id: string) {
   const getReplyComment = async (
-    comment_id: string
+    apiUrl: string
   ): Promise<GetBackReplyCommentType[] | []> => {
     let returnedReplyComments: GetBackReplyCommentType[] | [] = [];
     try {
-      const response = await axios.get(
-        `/api/comment-reply/get-comment-reply?comment_id=${comment_id}&user_id=${user_id}`
-      );
+      const response = await axios.get(apiUrl);
 
       if (response.status === 200) {
         returnedReplyComments = response.data.allCommentReply;
@@ -44,9 +48,10 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     setViewReplies: React.Dispatch<boolean>,
     setReplyContent: React.Dispatch<string>,
     setOpenReply: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
-  ): Promise<string> => {
-    let commentReplyId = "";
+    showToast: ToastFunctionType,
+    addNotification?: (newNotification: NewNotificationType) => void,
+    newNotification?: Omit<NewNotificationType, "resourceId">
+  ): Promise<void> => {
     try {
       const res = await axios.post(
         "/api/comment-reply/create-comment-reply",
@@ -55,8 +60,19 @@ export default function useReplyComment(comment_id: string, user_id: string) {
 
       if (res.status === 200) {
         setViewReplies(true);
-        commentReplyId = res.data.newCommentReply.comment_reply_id;
-        mutate([res.data.newCommentReply, ...(data ?? [])]);
+        // Send the notification if the user is replying to other instead of himself
+        if (newNotification && addNotification) {
+          addNotification({
+            ...newNotification,
+            resourceId: res.data.newCommentReply.comment_reply_id,
+          });
+        }
+        mutate(
+          data?.map((page, index) => {
+            index === 0 && page.push(res.data.newCommentReply);
+            return page;
+          })
+        );
       }
     } catch (err) {
       showToast({
@@ -67,17 +83,18 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       setReplyContent("");
       setOpenReply(false);
     }
-    return commentReplyId;
   };
 
   const deleteReplyComments = async (
     comment_reply_id: string,
-    showToast: ToastFunctionType
-  ): Promise<GetBackReplyCommentType[] | []> => {
-    let excludedDeletedReplyComment: GetBackReplyCommentType[] = [];
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
+  ): Promise<GetBackReplyCommentType[][] | undefined> => {
+    let excludedDeletedReplyComment: GetBackReplyCommentType[][] | undefined;
     try {
       const res = await axios.delete(
-        `/api/comment-reply/delete-comment-reply/comment_reply_id=${comment_reply_id}`
+        `/api/comment-reply/delete-comment-reply?comment_reply_id=${comment_reply_id}`
       );
 
       if (res.status === 200) {
@@ -85,9 +102,15 @@ export default function useReplyComment(comment_id: string, user_id: string) {
           title: "Success",
           description: "Your reply has been deleted",
         });
+        if (deleteNotification && notificationToDelete) {
+          deleteNotification(notificationToDelete);
+        }
         excludedDeletedReplyComment =
-          data?.filter(
-            (replyComment) => replyComment.comment_reply_id !== comment_reply_id
+          data?.map((page) =>
+            page.filter(
+              (replyComment) =>
+                replyComment.comment_reply_id !== comment_reply_id
+            )
           ) ?? [];
       } else {
         showToast({
@@ -109,8 +132,10 @@ export default function useReplyComment(comment_id: string, user_id: string) {
   const updateReplyComment = async (
     updatedCommentReply: UpdateReplyCommentType,
     showToast: ToastFunctionType
-  ): Promise<GetBackReplyCommentType[] | []> => {
-    let allReplyCommentWithUpdatedReplyComment: GetBackReplyCommentType[] = [];
+  ): Promise<GetBackReplyCommentType[][] | undefined> => {
+    let allReplyCommentWithUpdatedReplyComment:
+      | GetBackReplyCommentType[][]
+      | undefined;
     try {
       const res = await axios.put(
         "/api/comment-reply/update-comment-reply",
@@ -123,16 +148,21 @@ export default function useReplyComment(comment_id: string, user_id: string) {
           description: "Your reply has been updated",
         });
         allReplyCommentWithUpdatedReplyComment =
-          data?.map((commentReply) => {
-            if (
-              commentReply.comment_reply_id ===
-              updatedCommentReply.comment_reply_id
-            ) {
-              return { ...commentReply, content: updatedCommentReply.content };
-            }
+          data?.map((page) =>
+            page.map((commentReply) => {
+              if (
+                commentReply.comment_reply_id ===
+                updatedCommentReply.comment_reply_id
+              ) {
+                return {
+                  ...commentReply,
+                  content: updatedCommentReply.content,
+                };
+              }
 
-            return commentReply;
-          }) ?? [];
+              return commentReply;
+            })
+          ) ?? [];
       } else {
         showToast({
           title: "Error",
@@ -150,10 +180,18 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     return allReplyCommentWithUpdatedReplyComment;
   };
 
-  const { data, isLoading, error, mutate } = useSWR(
-    ["/api/comment-reply/get-comment-reply", comment_id],
-    ([url, comment_id]) => getReplyComment(comment_id)
-  );
+  const getKey = (
+    pageIndex: number,
+    previousPageData: GetBackReplyCommentType[]
+  ) => {
+    if ((previousPageData && !previousPageData.length) || !comment_id)
+      return null;
+    return `/api/comment-reply/get-comment-reply?skipCommentReply=${pageIndex}&limitCommentReply=${COMMENT_REPLY_PAGE_SIZE}&comment_id=${comment_id}&user_id=${user_id}`;
+  };
+
+  const { data, isLoading, error, mutate, size, setSize } = useSWRInfinite<
+    GetBackReplyCommentType[]
+  >(getKey, getReplyComment);
 
   return {
     replyComments: data,
@@ -163,5 +201,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     updateReplyComment,
     deleteReplyComments,
     mutateReplyComment: mutate,
+    commentReplySize: size,
+    setCommentReplySize: setSize,
   };
 }

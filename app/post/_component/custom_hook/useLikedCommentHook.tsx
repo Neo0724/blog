@@ -1,24 +1,21 @@
 import axios from "axios";
-import useSWR, { KeyedMutator } from "swr";
+import useSWR from "swr";
 import { ToastFunctionType } from "./usePostHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 
 export default function useLikedComment(user_id: string, post_id: string) {
   const fetchData = async (
-    url: string | null,
     user_id: string,
     post_id: string
   ): Promise<string[] | []> => {
-    if (!url) {
-      return [];
-    }
     let returnedLikedComment: string[] | [] = [];
     try {
-      const response = await axios.get(url, {
-        params: {
-          post_id: post_id,
-          user_id: user_id,
-        },
-      });
+      const response = await axios.get(
+        `/api/comment/get-liked-comment?post_id=${post_id}&user_id=${user_id}`
+      );
 
       if (response.status === 200) {
         returnedLikedComment = response.data;
@@ -31,14 +28,16 @@ export default function useLikedComment(user_id: string, post_id: string) {
 
   const { data, error, isLoading, mutate } = useSWR(
     [user_id ? "/api/comment/get-liked-comment" : null, user_id, post_id],
-    ([url, user_id, post_id]) => fetchData(url, user_id, post_id)
+    ([url, user_id, post_id]) => fetchData(user_id, post_id)
   );
 
   const addLikeComment = async (
     userId: string,
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    addNotification?: (newNotification: NewNotificationType) => void,
+    newNotification?: NewNotificationType
   ): Promise<string[] | []> => {
     let newLikeCommentId: string = "";
     try {
@@ -48,6 +47,9 @@ export default function useLikedComment(user_id: string, post_id: string) {
       });
 
       if (res.status === 200) {
+        if (addNotification && newNotification) {
+          addNotification(newNotification);
+        }
         newLikeCommentId = res.data.commentId;
         setIsLiked(true);
       }
@@ -67,7 +69,9 @@ export default function useLikedComment(user_id: string, post_id: string) {
     userId: string,
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
     let removedLikeCommentId: string = "";
     try {
@@ -79,6 +83,9 @@ export default function useLikedComment(user_id: string, post_id: string) {
       });
 
       if (res.status === 200) {
+        if (notificationToDelete && deleteNotification) {
+          deleteNotification(notificationToDelete);
+        }
         removedLikeCommentId = res.data.commentId;
         setIsLiked(false);
       }

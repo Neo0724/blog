@@ -1,6 +1,10 @@
 import axios from "axios";
-import useSwr, { KeyedMutator } from "swr";
+import useSwr from "swr";
 import { ToastFunctionType } from "./usePostHook";
+import {
+  DeleteNotificationType,
+  NewNotificationType,
+} from "./useNotificationHook";
 
 // Get all replied comment for a single comment
 export default function useLikedReplyComment(
@@ -20,13 +24,7 @@ export default function useLikedReplyComment(
 
     try {
       const response = await axios.get(
-        "/api/comment-reply/get-liked-comment-reply",
-        {
-          params: {
-            comment_id: comment_id,
-            user_id: user_id,
-          },
-        }
+        `/api/comment-reply/get-liked-comment-reply?comment_id=${comment_id}&user_id=${user_id}`
       );
 
       if (response.status === 200) {
@@ -42,16 +40,21 @@ export default function useLikedReplyComment(
     userId: string,
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    addNotification?: (newNotification: NewNotificationType) => void,
+    newNotification?: NewNotificationType
   ): Promise<string[] | []> => {
     let newLikeCommentReplyId: string = "";
     try {
-      const res = await axios.post("/api/add-like-replycomment", {
-        user_id: userId,
-        comment_reply_id: commentReplyId,
-      });
+      const res = await axios.post(
+        `/api/add-like-replycomment?user_id=${userId}&comment_reply_id=${commentReplyId}`
+      );
 
       if (res.status === 200) {
+        // Add the notification is both value are not null or undefined
+        if (addNotification && newNotification) {
+          addNotification(newNotification);
+        }
         newLikeCommentReplyId = res.data.commentReplyId;
         setIsLiked(true);
       }
@@ -71,7 +74,9 @@ export default function useLikedReplyComment(
     userId: string,
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
-    showToast: ToastFunctionType
+    showToast: ToastFunctionType,
+    deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
+    notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
     let removedLikeCommentReplyId: string = "";
     try {
@@ -86,6 +91,9 @@ export default function useLikedReplyComment(
       );
 
       if (res.status === 200) {
+        if (notificationToDelete && deleteNotification) {
+          deleteNotification(notificationToDelete);
+        }
         removedLikeCommentReplyId = res.data.commentReplyId;
         setIsLiked(false);
       }

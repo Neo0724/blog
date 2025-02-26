@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-const prisma = new PrismaClient();
+import prismaClient from "../../getPrismaClient";
 
 export async function GET(request: NextRequest) {
+  const prisma = prismaClient as PrismaClient;
   const user_id = request.nextUrl.searchParams.get("user_id");
   const post_id = request.nextUrl.searchParams.get("post_id");
 

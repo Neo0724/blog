@@ -55,18 +55,17 @@ export default function SubmitPostCommentPage({
         ),
       });
     } else {
-      // Add the comment
-      const commentId = await createComment(formData, form);
-
       // Send notification to the author of the post
       // Only send notification if the user who comments is not the author
       if (userId !== authorId) {
-        addNotification({
+        const newNotification = {
           fromUserId: userId,
           targetUserId: [authorId],
           type: NotificationType.COMMENT,
-          resourceId: commentId,
-        });
+        };
+        createComment(formData, form, addNotification, newNotification);
+      } else {
+        createComment(formData, form);
       }
 
       commentBoxRef.current?.scrollIntoView({

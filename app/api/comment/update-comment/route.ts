@@ -1,11 +1,12 @@
 import { getDateDifference } from "@/app/_util/getDateDifference";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function PUT(request: NextRequest) {
   const { comment_id, content } = await request.json();
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     const updatedComment = await prisma.comment.update({

@@ -4,7 +4,7 @@ import { genSaltSync, hashSync } from "bcrypt-ts";
 import { SignUpSchema } from "@/zod_schema/schema";
 
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   const body = await request.json();
   const validation = SignUpSchema.safeParse(body);

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import useNotification from "@/app/post/_component/custom_hook/useNotificationHook";
 import EachNotificationPage from "./EachNotificationPage";
 import {
@@ -11,12 +11,40 @@ import {
 import { Button } from "@/components/ui/button";
 import { IoNotifications } from "react-icons/io5";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { cn } from "@/lib/utils";
 
 export default function NotificationDialog() {
   const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
-  const { allNotification, notViewedCount, isLoading } = useNotification(
-    loggedInUserId ?? ""
+  const [notificationTab, setNotificationTab] = useState<"ALL" | "UNREAD">(
+    "ALL"
   );
+  const {
+    allNotification,
+    notViewedCount,
+    isLoading,
+    readAllNotification,
+    notificationMutate,
+  } = useNotification(loggedInUserId ?? "");
+  const allNotViewedNotifications =
+    allNotification?.filter(
+      (notification) => notification.hasViewed === false
+    ) ?? [];
+
+  const handleReadAllNotification = () => {
+    notificationMutate(readAllNotification(allNotViewedNotifications), {
+      optimisticData: {
+        allNotification:
+          allNotification?.map((notification) => ({
+            ...notification,
+            hasViewed: true,
+          })) ?? [],
+        notViewedCount: 0,
+      },
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+  };
 
   return (
     <Popover>
@@ -37,16 +65,66 @@ export default function NotificationDialog() {
       </PopoverTrigger>
       <PopoverContent className="overflow-y-scroll max-h-[400px] max-w-[400px] w-full bg-[rgb(36,37,38)] border-[rgb(58,59,60)]">
         <div className="flex flex-col gap-3">
+          <div className="flex gap-5">
+            <Button
+              className={cn(
+                "rounded-xl bg-[rgb(58,59,60)] hover:text-blue-800 active:text-blue-800 text-white",
+                notificationTab === "ALL" && "bg-white text-black"
+              )}
+              variant="ghost"
+              onClick={() => setNotificationTab("ALL")}
+            >
+              All
+            </Button>
+            <Button
+              className={cn(
+                "rounded-xl bg-[rgb(58,59,60)] hover:text-blue-800 active:text-blue-800 text-white",
+                notificationTab === "UNREAD" && "bg-white text-black"
+              )}
+              variant="ghost"
+              onClick={() => setNotificationTab("UNREAD")}
+            >
+              Unread
+            </Button>
+          </div>
           {/* Notification is loading */}
           {isLoading && <div>Loading ...</div>}
+          {/* Displays when user has notifications that have not been viewed */}
           {!isLoading &&
             allNotification &&
+            allNotViewedNotifications.length > 0 && (
+              <Button
+                onClick={handleReadAllNotification}
+                className="rounded-xl bg-[rgb(58,59,60)] hover:text-blue-800 active:text-blue-800 text-white"
+              >
+                Mark all as read
+              </Button>
+            )}
+          {!isLoading &&
+            allNotification &&
+            notificationTab === "ALL" &&
             allNotification.map((notification) => (
               <EachNotificationPage
                 key={notification.notification_id}
                 notification={notification}
               />
             ))}
+
+          {!isLoading &&
+            allNotViewedNotifications &&
+            notificationTab === "UNREAD" &&
+            allNotViewedNotifications.map((notification) => (
+              <EachNotificationPage
+                key={notification.notification_id}
+                notification={notification}
+              />
+            ))}
+          {/* User want to view unread notification but all has been read */}
+          {!isLoading && allNotViewedNotifications.length === 0 && (
+            <div className="text-white">
+              All notifications have been read...
+            </div>
+          )}
           {/* Current user does not has any notification */}
           {!isLoading && allNotification?.length === 0 && (
             <div className="text-white">No notifications ...</div>

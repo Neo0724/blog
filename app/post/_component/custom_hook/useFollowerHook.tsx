@@ -3,7 +3,7 @@ import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import { ToastFunctionType } from "./usePostHook";
 
-type UserFollower = {
+export type UserFollower = {
   UserFollower: UserType;
   UserFollowing: UserType;
   createdAt: string;
@@ -11,18 +11,14 @@ type UserFollower = {
 
 export const useFollower = (targetId: string, queryUsername = "") => {
   const fetchFollower = async (
-    url: string,
     targetId: string,
     queryUsername: string
   ): Promise<UserFollower[] | []> => {
     let follower = [];
     try {
-      const res = await axios.get(url, {
-        params: {
-          target_id: targetId,
-          query_username: queryUsername,
-        },
-      });
+      const res = await axios.get(
+        `/api/user-relation/get-follower?target_id=${targetId}&query_username=${queryUsername}`
+      );
 
       if (res.status === 200) {
         follower = res.data;
@@ -69,8 +65,7 @@ export const useFollower = (targetId: string, queryUsername = "") => {
 
   const { data, isLoading, error, isValidating, mutate } = useSWR(
     targetId ? ["/api/user-relation/get-follower", targetId] : null,
-    () =>
-      fetchFollower("/api/user-relation/get-follower", targetId, queryUsername)
+    () => fetchFollower(targetId, queryUsername)
   );
 
   return {

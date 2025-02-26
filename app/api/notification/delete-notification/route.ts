@@ -1,5 +1,6 @@
 import { NotificationType, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function DELETE(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
@@ -7,7 +8,7 @@ export async function DELETE(request: NextRequest) {
   const fromUserId = request.nextUrl.searchParams.get("from_user_id");
   const resourceId = request.nextUrl.searchParams.get("resource_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
   try {
     const targetNotification = await prisma.notification.findFirst({
       where: {
@@ -21,11 +22,15 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    const deletedNotification = await prisma.notification.delete({
-      where: {
-        notification_id: targetNotification?.notification_id,
-      },
-    });
+    let deletedNotification = undefined;
+
+    if (targetNotification) {
+      deletedNotification = await prisma.notification.delete({
+        where: {
+          notification_id: targetNotification?.notification_id,
+        },
+      });
+    }
 
     return NextResponse.json(deletedNotification, { status: 200 });
   } catch (error) {

@@ -5,7 +5,7 @@ export async function DELETE(request: NextRequest) {
   const ownerId = request.nextUrl.searchParams.get("owner_id");
   const targetId = request.nextUrl.searchParams.get("target_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
   try {
     const deletedFollowing = await prisma.follower.delete({
       where: {

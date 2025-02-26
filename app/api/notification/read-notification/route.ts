@@ -1,15 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prismaClient from "../../getPrismaClient";
 
 export async function PUT(request: NextRequest) {
-  const { notification_id } = await request.json();
+  const notificationId = request.nextUrl.searchParams.get("notification_id");
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
+  console.log(notificationId);
   try {
     const updatedNotification = await prisma.notification.update({
       where: {
-        notification_id: notification_id,
+        notification_id: notificationId as string,
       },
       data: {
         hasViewed: true,

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useFollowing } from "../../post/_component/custom_hook/useFollowingHook";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { mutate } from "swr";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@uidotdev/usehooks";
@@ -13,6 +13,7 @@ import { NotificationType } from "@/app/post/_component/Enum";
 import useSearchDebounce from "./customHook/useSearchDebounce";
 import SpinnerSkeleton from "./SpinnerSkeleton";
 import FollowingFollowerSkeleton from "./FollowingFollowerSkeleton";
+import ScrollToTop from "../navigation/ScrollToTop";
 
 type FollowingTabProps = {
   pageOwnerUserId: string;
@@ -27,6 +28,7 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );
+  const scrollToTopDiv = useRef<HTMLDivElement>(null);
 
   // For the page owner
   const {
@@ -52,7 +54,9 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   }, [newSearchVal, pageOwnerUserId]);
 
   return (
-    <>
+    <div className="w-full h-screen">
+      {/* Display scroll to top button for user */}
+      <ScrollToTop refToMonitor={scrollToTopDiv} />
       {/* Search bar */}
       <div className="flex my-3 relative bg-[rgb(58,59,60)]">
         <Input
@@ -72,6 +76,8 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
       </div>
       {/* Following is fetching and loading */}
       {pageOwnerUserId && isLoading && <FollowingFollowerSkeleton />}
+      {/* Dummy div to scroll to top */}
+      <div ref={scrollToTopDiv}></div>
       {/* Page owner has following and content has finished loading*/}
       {pageOwnerUserId &&
         !isLoading &&
@@ -131,11 +137,19 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                     // Current user is logged in
                     // Remove the user from following
                     if (currentUserIsFollowing) {
+                      const notificationToDelete = {
+                        fromUserId: loggedInUserId,
+                        targetUserId: eachOwnerFollowing.UserFollowing.user_id,
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      };
                       followingMutate(
                         loggedInRemoveFollowing(
                           loggedInUserId,
                           eachOwnerFollowing.UserFollowing.user_id,
-                          toast
+                          toast,
+                          deleteNotification,
+                          notificationToDelete
                         ),
                         {
                           optimisticData: loggedInFollowing?.filter(
@@ -148,20 +162,24 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                           rollbackOnError: true,
                         }
                       );
-                      // Delete the follow notification
-                      deleteNotification({
-                        fromUserId: loggedInUserId,
-                        targetUserId: eachOwnerFollowing.UserFollowing.user_id,
-                        type: NotificationType.FOLLOW,
-                        resourceId: loggedInUserId,
-                      });
                     } else {
                       // Add the current user to following
+                      const newNotification = {
+                        fromUserId: loggedInUserId,
+                        targetUserId: [
+                          eachOwnerFollowing.UserFollowing.user_id,
+                        ],
+                        type: NotificationType.FOLLOW,
+                        resourceId: loggedInUserId,
+                      };
+
                       followingMutate(
                         loggedInAddFollowing(
                           loggedInUserId,
                           eachOwnerFollowing.UserFollowing.user_id,
-                          toast
+                          toast,
+                          addNotification,
+                          newNotification
                         ),
                         {
                           optimisticData: [
@@ -173,15 +191,6 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
                           rollbackOnError: true,
                         }
                       );
-                      // Send notification to the target user that someone started following him or her
-                      addNotification({
-                        fromUserId: loggedInUserId,
-                        targetUserId: [
-                          eachOwnerFollowing.UserFollowing.user_id,
-                        ],
-                        type: NotificationType.FOLLOW,
-                        resourceId: loggedInUserId,
-                      });
                     }
                   }}
                 >
@@ -198,6 +207,6 @@ export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
         !isLoading &&
         pageOwnerFollowing &&
         pageOwnerFollowing.length === 0 && <div>No following</div>}
-    </>
+    </div>
   );
 }

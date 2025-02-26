@@ -1,6 +1,7 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import prismaClient from "../../getPrismaClient";
 
 const ReplyCommentSchema = z.object({
   content: z.string().min(1).max(65535),
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const prisma = new PrismaClient();
+    const prisma = prismaClient as PrismaClient;
 
     const newCommentReply: Prisma.CommentReplyCreateInput = {
       content: body.content,

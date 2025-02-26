@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import PostCommentButton from "./PostCommentButton";
 import PostOption from "./PostOption";
 import { useRouter } from "next/navigation";
@@ -7,6 +7,8 @@ import LikePostButton from "@/app/_components/userInteraction/LikePostButton";
 import FavouritePostButton from "@/app/_components/userInteraction/FavouritePostButton";
 import FollowButton from "@/app/_components/userInteraction/FollowButton";
 import PostContent from "./PostContent";
+import useElementInView from "../custom_hook/useElementInViewHook";
+import { PostType } from "./RenderPost";
 
 type EachPostProps = {
   title: string;
@@ -16,6 +18,11 @@ type EachPostProps = {
   authorId: string;
   postId: string;
   dateDifferent: string;
+  index?: number;
+  totalPostsNumber?: number;
+  setPostSize?: (
+    size: number | ((_size: number) => number)
+  ) => Promise<PostType[][] | undefined>;
 };
 
 export default function EachPostPage({
@@ -26,6 +33,9 @@ export default function EachPostPage({
   author,
   postId,
   authorId,
+  index,
+  totalPostsNumber,
+  setPostSize,
 }: EachPostProps) {
   const router = useRouter();
 
@@ -34,6 +44,9 @@ export default function EachPostPage({
   const handleAuthorProfileNavigation = (authorId: string) => {
     router.push("/user/" + authorId);
   };
+
+  // Avoid duplicate fetching
+  const doneUpdatingIndex = useRef<Set<number>>(new Set());
 
   const handleScrollToPost = () => {
     if (postRef.current) {
@@ -44,6 +57,21 @@ export default function EachPostPage({
       });
     }
   };
+
+  const { isVisible } = useElementInView(postRef);
+
+  // Trigger load more post
+  useEffect(() => {
+    const indexToUpdate = Math.floor((totalPostsNumber ?? 1) / 2);
+    if (
+      indexToUpdate === index &&
+      isVisible &&
+      !doneUpdatingIndex.current.has(indexToUpdate)
+    ) {
+      setPostSize && setPostSize((prev) => prev + 1);
+      doneUpdatingIndex.current.add(indexToUpdate);
+    }
+  }, [index, isVisible, totalPostsNumber]);
 
   return (
     <div

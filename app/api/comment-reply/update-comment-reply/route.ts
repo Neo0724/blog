@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PUT(request: NextRequest) {
   const replyComment = await request.json();
 
-  const prisma = new PrismaClient();
+  const prisma = prismaClient as PrismaClient;
 
   try {
     const updatedCommentReply = await prisma.commentReply.update({

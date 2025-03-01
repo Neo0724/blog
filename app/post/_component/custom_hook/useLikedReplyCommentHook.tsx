@@ -1,5 +1,5 @@
 import axios from "axios";
-import useSwr from "swr";
+import useSwr, { KeyedMutator } from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import {
   DeleteNotificationType,
@@ -41,6 +41,7 @@ export default function useLikedReplyComment(
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
+    replyCommentLikeCountMutate: KeyedMutator<number>,
     addNotification?: (newNotification: NewNotificationType) => void,
     newNotification?: NewNotificationType
   ): Promise<string[] | []> => {
@@ -56,9 +57,15 @@ export default function useLikedReplyComment(
           addNotification(newNotification);
         }
         newLikeCommentReplyId = res.data.commentReplyId;
-        setIsLiked(true);
       }
     } catch (error) {
+      // Revert changes
+      setIsLiked(false);
+      replyCommentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
       console.error(error);
       showToast({
         title: "Error",
@@ -75,6 +82,7 @@ export default function useLikedReplyComment(
     commentReplyId: string,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
+    replyCommentLikeCountMutate: KeyedMutator<number>,
     deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
     notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
@@ -95,9 +103,15 @@ export default function useLikedReplyComment(
           deleteNotification(notificationToDelete);
         }
         removedLikeCommentReplyId = res.data.commentReplyId;
-        setIsLiked(false);
       }
     } catch (err) {
+      // Revert changes
+      setIsLiked(true);
+      replyCommentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
       console.log(err);
       showToast({
         title: "Error",

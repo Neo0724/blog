@@ -1,5 +1,5 @@
 import axios from "axios";
-import useSWR from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import {
   DeleteNotificationType,
@@ -36,6 +36,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
+    commentLikeCountMutate: KeyedMutator<number>,
     addNotification?: (newNotification: NewNotificationType) => void,
     newNotification?: NewNotificationType
   ): Promise<string[] | []> => {
@@ -51,9 +52,15 @@ export default function useLikedComment(user_id: string, post_id: string) {
           addNotification(newNotification);
         }
         newLikeCommentId = res.data.commentId;
-        setIsLiked(true);
       }
     } catch (error) {
+      // Revert the changes
+      setIsLiked(true);
+      commentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
       console.error(error);
       showToast({
         title: "Error",
@@ -70,6 +77,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
     commentId: string,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
+    commentLikeCountMutate: KeyedMutator<number>,
     deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
     notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
@@ -87,9 +95,15 @@ export default function useLikedComment(user_id: string, post_id: string) {
           deleteNotification(notificationToDelete);
         }
         removedLikeCommentId = res.data.commentId;
-        setIsLiked(false);
       }
     } catch (error) {
+      // Revert changes
+      setIsLiked(true);
+      commentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
       console.error(error);
       showToast({
         title: "Error",

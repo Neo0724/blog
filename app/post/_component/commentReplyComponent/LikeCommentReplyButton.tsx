@@ -60,6 +60,16 @@ export default function LikeCommentReplyButton({
 
       return;
     }
+    // Set is liked to true
+    setIsLiked(true);
+
+    // Increment like count
+    replyCommentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+
     // Only send notification if the user who liked is not the author
     if (loggedInUserId !== commentReplyOwnerId) {
       const newNotification = {
@@ -75,6 +85,7 @@ export default function LikeCommentReplyButton({
           commentReplyId,
           setIsLiked,
           toast,
+          replyCommentLikeCountMutate,
           addNotification,
           newNotification
         ),
@@ -87,7 +98,13 @@ export default function LikeCommentReplyButton({
       );
     } else {
       likedCommentReplyMutate(
-        addLikeCommentReply(loggedInUserId, commentReplyId, setIsLiked, toast),
+        addLikeCommentReply(
+          loggedInUserId,
+          commentReplyId,
+          setIsLiked,
+          toast,
+          replyCommentLikeCountMutate
+        ),
         {
           optimisticData: [...(likedReplyComment ?? []), commentReplyId],
           populateCache: true,
@@ -96,12 +113,6 @@ export default function LikeCommentReplyButton({
         }
       );
     }
-
-    replyCommentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
   const handleDislikeCommentReply = () => {
     // User not logged in
@@ -123,6 +134,17 @@ export default function LikeCommentReplyButton({
 
       return;
     }
+
+    // Set is liked to false
+    setIsLiked(false);
+
+    // Decrement the like count
+    replyCommentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+
     // Remove the notification from the target user
     if (loggedInUserId !== commentReplyOwnerId) {
       const notificationToDelete = {
@@ -138,6 +160,7 @@ export default function LikeCommentReplyButton({
           commentReplyId,
           setIsLiked,
           toast,
+          replyCommentLikeCountMutate,
           deleteNotification,
           notificationToDelete
         ),
@@ -158,7 +181,8 @@ export default function LikeCommentReplyButton({
           loggedInUserId,
           commentReplyId,
           setIsLiked,
-          toast
+          toast,
+          replyCommentLikeCountMutate
         ),
         {
           optimisticData:
@@ -171,12 +195,6 @@ export default function LikeCommentReplyButton({
         }
       );
     }
-
-    replyCommentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   useEffect(() => {

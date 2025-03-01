@@ -62,6 +62,16 @@ export default function LikeCommentButton({
       return;
     }
 
+    // Set the liked to true
+    setIsLiked(true);
+
+    // Increment the like count
+    commentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+
     // Only send notification if the user who liked is not the author
     if (loggedInUserId !== commentOwnerId) {
       const newNotification = {
@@ -76,6 +86,7 @@ export default function LikeCommentButton({
           commentId,
           setIsLiked,
           toast,
+          commentLikeCountMutate,
           addNotification,
           newNotification
         ),
@@ -88,7 +99,13 @@ export default function LikeCommentButton({
       );
     } else {
       likedCommentMutate(
-        addLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+        addLikeComment(
+          loggedInUserId,
+          commentId,
+          setIsLiked,
+          toast,
+          commentLikeCountMutate
+        ),
         {
           optimisticData: [...(likedComment ?? []), commentId],
           populateCache: true,
@@ -97,12 +114,6 @@ export default function LikeCommentButton({
         }
       );
     }
-
-    commentLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   const handleDislikeComment = async () => {
@@ -124,6 +135,17 @@ export default function LikeCommentButton({
       });
       return;
     }
+
+    // Set liked to false
+    setIsLiked(false);
+
+    // Decrement the like count
+    commentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+
     // Remove the notification from the target user
     if (loggedInUserId !== commentOwnerId) {
       const notificationToDelete = {
@@ -139,6 +161,7 @@ export default function LikeCommentButton({
           commentId,
           setIsLiked,
           toast,
+          commentLikeCountMutate,
           deleteNotification,
           notificationToDelete
         ),
@@ -154,7 +177,13 @@ export default function LikeCommentButton({
     } else {
       // Remove the like
       likedCommentMutate(
-        removeLikeComment(loggedInUserId, commentId, setIsLiked, toast),
+        removeLikeComment(
+          loggedInUserId,
+          commentId,
+          setIsLiked,
+          toast,
+          commentLikeCountMutate
+        ),
         {
           optimisticData: likedComment?.filter(
             (comment_id) => comment_id !== commentId
@@ -165,12 +194,6 @@ export default function LikeCommentButton({
         }
       );
     }
-
-    commentLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   // Initialize the like button to be like or dislike

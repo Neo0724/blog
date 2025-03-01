@@ -71,7 +71,7 @@ export default function EachPostPage({
       setPostSize && setPostSize((prev) => prev + 1);
       doneUpdatingIndex.current.add(indexToUpdate);
     }
-  }, [index, isVisible, totalPostsNumber]);
+  }, [index, isVisible, setPostSize, totalPostsNumber]);
 
   return (
     <div

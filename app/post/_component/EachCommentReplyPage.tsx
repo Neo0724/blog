@@ -211,7 +211,7 @@ export default function EachCommentReplyPage({
       setCommentReplySize && setCommentReplySize((prev) => prev + 1);
       doneUpdatingIndex.current.add(indexToUpdate);
     }
-  }, [index, isVisible, totalCommentReplyNumber]);
+  }, [index, isVisible, setCommentReplySize, totalCommentReplyNumber]);
 
   return (
     <div className="ml-[3px]" ref={commentReplyBoxRef}>

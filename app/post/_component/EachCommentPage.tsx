@@ -231,7 +231,7 @@ export default function EachCommentPage({
       setCommentSize && setCommentSize((prev) => prev + 1);
       doneUpdatingIndex.current.add(indexToUpdate);
     }
-  }, [index, isVisible, totalCommentNumber]);
+  }, [index, isVisible, setCommentSize, totalCommentNumber]);
 
   const isLoadingMore =
     isLoading ||

@@ -73,6 +73,17 @@ export default function LikePostButton({
       });
       return;
     }
+
+    // Set the like is true
+    setIsLiked(true);
+
+    // Increment the like count
+    postLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+
     // User is logged in
     // Only send notification if the user who liked is not the author
     if (loggedInUserId !== authorId) {
@@ -88,6 +99,7 @@ export default function LikePostButton({
           currentPost as PostType,
           setIsLiked,
           toast,
+          postLikeCountMutate,
           addNotification,
           newNotification
         ),
@@ -101,7 +113,13 @@ export default function LikePostButton({
     } else {
       // Only add the like, do not add notification as the user is the author itself
       likedPostMutate(
-        addLikePost(loggedInUserId, currentPost as PostType, setIsLiked, toast),
+        addLikePost(
+          loggedInUserId,
+          currentPost as PostType,
+          setIsLiked,
+          toast,
+          postLikeCountMutate
+        ),
         {
           optimisticData: [...(likedPost ?? []), postId],
           populateCache: true,
@@ -110,13 +128,6 @@ export default function LikePostButton({
         }
       );
     }
-
-    // Add the like to the post
-    postLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   const handleUnlikePost = async () => {
@@ -138,6 +149,17 @@ export default function LikePostButton({
       });
       return;
     }
+
+    // Set like to false
+    setIsLiked(false);
+
+    // Decrement the like count
+    postLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+      populateCache: true,
+      revalidate: false,
+      rollbackOnError: true,
+    });
+
     // User is logged in
     // Remove the notification if user is not the author of the post
     if (loggedInUserId !== authorId) {
@@ -154,6 +176,7 @@ export default function LikePostButton({
           currentPost as PostType,
           setIsLiked,
           toast,
+          postLikeCountMutate,
           deleteNotification,
           notificationToDelete
         ),
@@ -170,7 +193,8 @@ export default function LikePostButton({
           loggedInUserId,
           currentPost as PostType,
           setIsLiked,
-          toast
+          toast,
+          postLikeCountMutate
         ),
         {
           optimisticData: likedPost?.filter((post_id) => post_id !== postId),
@@ -180,12 +204,6 @@ export default function LikePostButton({
         }
       );
     }
-
-    postLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
-      populateCache: true,
-      revalidate: false,
-      rollbackOnError: true,
-    });
   };
 
   useEffect(() => {

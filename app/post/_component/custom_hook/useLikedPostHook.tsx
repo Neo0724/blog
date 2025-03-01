@@ -1,5 +1,5 @@
 import axios from "axios";
-import useSWR from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import { PostType } from "../postComponent/RenderPost";
 import {
@@ -30,6 +30,7 @@ export default function useLikedPost(user_id: string | null) {
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
+    postLikeCountMutate: KeyedMutator<number>,
     addNotification?: (newNotification: NewNotificationType) => void,
     newNotification?: NewNotificationType
   ): Promise<string[] | []> => {
@@ -46,9 +47,17 @@ export default function useLikedPost(user_id: string | null) {
         if (addNotification && newNotification) {
           addNotification(newNotification);
         }
-        setIsLiked(true);
+      } else {
+        console.log("Not 200");
       }
     } catch (err) {
+      // Revert the changes
+      setIsLiked(false);
+      postLikeCountMutate((prev) => (prev ? prev - 1 : 0), {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
       console.log(err);
       showToast({
         title: "Error",
@@ -65,6 +74,7 @@ export default function useLikedPost(user_id: string | null) {
     post: PostType,
     setIsLiked: React.Dispatch<boolean>,
     showToast: ToastFunctionType,
+    postLikeCountMutate: KeyedMutator<number>,
     deleteNotification?: (notificationToDelete: DeleteNotificationType) => void,
     notificationToDelete?: DeleteNotificationType
   ): Promise<string[] | []> => {
@@ -79,9 +89,17 @@ export default function useLikedPost(user_id: string | null) {
         if (deleteNotification && notificationToDelete) {
           deleteNotification(notificationToDelete);
         }
-        setIsLiked(false);
+      } else {
+        console.log("Not 200");
       }
     } catch (err) {
+      // Revert changes
+      setIsLiked(true);
+      postLikeCountMutate((prev) => (prev ? prev + 1 : 1), {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      });
       console.log(err);
       showToast({
         title: "Error",

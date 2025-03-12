@@ -6,6 +6,8 @@ import prismaClient from "../../getPrismaClient";
 export const GET = async (req: NextRequest) => {
   const prisma = prismaClient as PrismaClient;
   const searchText = req.nextUrl.searchParams.get("searchText");
+  const skipPost = req.nextUrl.searchParams.get("skipPost");
+  const limitPost = req.nextUrl.searchParams.get("limitPost");
 
   try {
     const allPosts = await prisma.post.findMany({
@@ -28,6 +30,11 @@ export const GET = async (req: NextRequest) => {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: parseInt(skipPost as string) * parseInt(limitPost as string),
+      take: parseInt(limitPost as string),
     });
 
     let allPostsWithDateDiff = allPosts?.map((post) => {

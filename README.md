@@ -1,60 +1,100 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js + Prisma Project
 
-Prisma is being used in this project. You can connect to your database by following the [steps](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/connect-your-database-typescript-postgresql)
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), and uses [Prisma](https://www.prisma.io/) as the ORM.
 
-## Getting Started
+## 🔧 Getting Started (Locally without Docker)
 
-### First, install all the required dependencies:
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Second, rename `.example.env` to `.env`
+### 2. Configure Environment
 
-### Third, edit the connection string based on your database provider.
+Rename `.example.env` to `.env` and update the database connection string:
 
-- For PosgreSQL: `postgresql://USER:PASSWORD@localhost:5432/mydb`
-
-- For MySQL: `mysql://USER:PASSWORD@localhost:3306/mydb`
-
-- More options can be found [here](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/connect-your-database-typescript-postgresql)
-
-### Fourth, sync the prisma database with your local machine database by running:
-
-```bash
-npx prisma migrate dev
+```env
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/YOUR_DATABASE_NAME
 ```
 
-### Lastly, run the development server:
+- For PostgreSQL: `postgresql://USER:PASSWORD@localhost:5432/YOUR_DATABASE_NAME`
+- For MySQL: `mysql://USER:PASSWORD@localhost:3306/YOUR_DATABASE_NAME`
+
+More options: [Prisma connection strings](https://www.prisma.io/docs/reference/database-reference/connection-urls)
+
+### 3. Migrate Database
+
+```bash
+npm run db:deploy
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/layout.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 🐳 Getting Started with Docker
 
-## Learn More
+### 1. Build the Docker Images
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker compose build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Run the Application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```bash
+docker compose up
+```
 
-## Deploy on Vercel
+The app will be available at [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## ⚙️ Environment Variables
+
+Ensure your `.env` file contains the required values:
+
+```env
+DATABASE_USERNAME=YOUR_DATABASE_USERNAME
+DATABASE_PASSWORD=YOUR_DATABASE_PASSWORD
+DATABASE_NAME=YOUR_PREFERED_DATABASE_NAME
+DATABASE_URL=postgresql://YOUR_DATABASE_USERNAME:YOUR_DATABASE_PASSWORD@postgres:5432/YOUR_PREFERED_DATABASE_NAME
+```
+
+Note:
+
+- `postgres` is the hostname of the database container (not `localhost`).
+- Replace all the value with your prefered choice
+
+---
+
+## 📁 Project Structure
+
+```
+app/              # Next.js app directory
+prisma/           # Prisma schema and migrations
+Dockerfile        # Docker build file for Next.js app
+docker-compose.yml
+.env              # Environment variables
+```
+
+---
+
+## 🚀 Deploy on Vercel
+
+The easiest way to deploy your Next.js app is with [Vercel](https://vercel.com). See [Next.js deployment docs](https://nextjs.org/docs/deployment).
+
+---
+
+## 📚 Resources
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Docker for Node.js](https://nodejs.org/en/docs/guides/nodejs-docker-webapp)

@@ -10,7 +10,7 @@ services:
       - '3000:3000'
     env_file: ./.env 
     environment:
-      - DATABASE_URL=postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgres:5432/Local_Blog
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - postgres 
 
@@ -22,8 +22,13 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_USER: ${DATABASE_USERNAME} 
       POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     command: -p 5432
+
+volumes:
+  pgdata:
 
 

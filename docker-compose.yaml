@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: frontend 
+    ports:
+      - '3000:3000'
+    env_file: ./.env 
+    environment:
+      - DATABASE_URL=postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgres:5432/Local_Blog
+    depends_on:
+      - postgres 
+
+  postgres:
+    image: postgres:17
+    container_name: postgresql_server
+    env_file: ./.env
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USERNAME} 
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - '5432:5432'
+    command: -p 5432
+
+

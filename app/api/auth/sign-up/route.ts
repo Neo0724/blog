@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 import { SignUpSchema } from "@/zod_schema/schema";
+import prismaClient from "../../getPrismaClient";
 
 export async function POST(request: NextRequest) {
   const prisma = prismaClient as PrismaClient;

@@ -2,6 +2,19 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), and uses [Prisma](https://www.prisma.io/) as the ORM.
 
+---
+
+## ✨ Features
+
+- **User Authentication**: Sign up, sign in, and sign out functionality with secure password hashing.
+- **Post Management**: Create, edit, and delete blog posts.
+- **Comment System**: Add comments to posts, reply to comments, edit and delete comments and replies.
+- **Like System**: Like and unlike posts, comments, and comment replies.
+- **Favourites**: Mark posts as favourites and view your favourite posts.
+- **Follow System**: Follow and unfollow other users.
+- **Notifications**: Receive notifications for likes, comments, replies, follows, and new posts from the author that you followed.
+- **Profile Page**: View your own and other authors' profiles.
+
 ## 🔧 Getting Started (Locally without Docker)
 
 ### 1. Install Dependencies

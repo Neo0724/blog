@@ -32,7 +32,8 @@ export default function EachNotificationPage({
     addNotification,
     notificationMutate,
   } = useNotification(loggedInUserId);
-  const { allFollowing, addFollowing } = useFollowing(loggedInUserId);
+  const { allFollowing, addFollowing, followingMutate } =
+    useFollowing(loggedInUserId);
   const { toast } = useToast();
 
   const handleViewNotification = async () => {
@@ -91,14 +92,22 @@ export default function EachNotificationPage({
       type: NotificationType.FOLLOW,
       resourceId: loggedInUserId,
     };
-    addFollowing(
-      loggedInUserId,
-      notification.FromUser.user_id,
-      toast,
-      addNotification,
-      newNotification
+
+    // Add to following
+    followingMutate(
+      addFollowing(
+        loggedInUserId,
+        notification.FromUser.user_id,
+        toast,
+        addNotification,
+        newNotification
+      ),
+      {
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
     );
-    mutate("/api/user-relation/get-following", loggedInUserId);
   };
   return (
     <div

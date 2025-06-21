@@ -64,7 +64,7 @@ export default function AppSidebar() {
 
   return (
     <Sidebar className="border-r-4 border-[rgb(58,59,60)]">
-      <SidebarContent className="md:mt-[5rem] bg-[rgb(36,37,38)]">
+      <SidebarContent className="md:pt-[6rem] bg-[rgb(36,37,38)] pt-10">
         <SidebarMenu>
           {ListOfNavItems.map((item) => (
             <SidebarMenuItem key={item.name}>

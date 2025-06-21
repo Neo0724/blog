@@ -24,7 +24,7 @@ export default function ScrollToTop<T extends React.RefObject<HTMLElement>>({
         <Button
           onClick={() => window.scrollTo(0, 0)}
           variant="ghost"
-          className="fixed inset-x-0 top-[6rem] mx-auto w-[min-content] left-[20rem] flex flex-col h-[3rem] rounded-xl bg-[rgb(58,59,60)] z-[51]"
+          className="fixed bottom-[2rem] right-5 mx-auto w-[min-content] flex flex-col h-[3rem] rounded-xl bg-[rgb(58,59,60)] z-[51]"
         >
           <span>
             <FaArrowUp />

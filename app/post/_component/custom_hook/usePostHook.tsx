@@ -46,7 +46,7 @@ export default function usePost(
   let apiUrl = "";
   switch (searchPostType) {
     case 1:
-      apiUrl = `/api/post/get-own-post?user_id=${userId}`;
+      apiUrl = userId ? `/api/post/get-own-post?user_id=${userId}` : "";
       break;
     case 2:
       apiUrl = `/api/post/get-all-post?`;
@@ -55,7 +55,7 @@ export default function usePost(
       apiUrl = `/api/post/get-search-post?searchText=${searchText}`;
       break;
     case 4:
-      apiUrl = `/api/post/get-favourite-post?user_id=${userId}`;
+      apiUrl = userId ? `/api/post/get-favourite-post?user_id=${userId}` : "";
       break;
     default:
       apiUrl = `/api/post/get-all-post?`;
@@ -263,8 +263,14 @@ export default function usePost(
   };
 
   const getKey = (pageIndex: number, previousPageData: PostType[]) => {
-    if (previousPageData && !previousPageData.length) return null;
-    return `${apiUrl}&skipPost=${pageIndex}&limitPost=${POST_PAGE_SIZE}`;
+    if (
+      (previousPageData && !previousPageData.length) ||
+      (searchPostType === SearchPostType.USER_FAVOURITE_POST && !userId) ||
+      (searchPostType === SearchPostType.USER_POST && !userId)
+    )
+      return null;
+    const fetchUrl = `${apiUrl}&skipPost=${pageIndex}&limitPost=${POST_PAGE_SIZE}`;
+    return fetchUrl;
   };
 
   const { data, error, isLoading, mutate, setSize, size } = useSWRInfinite<

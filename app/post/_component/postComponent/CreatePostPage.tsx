@@ -24,6 +24,8 @@ import { CreatePostFormSchema } from "@/zod_schema/schema";
 import { NotificationType, SearchPostType } from "../Enum";
 import { useFollower } from "../custom_hook/useFollowerHook";
 import useNotification from "../custom_hook/useNotificationHook";
+import getCorrectSearchPostType from "@/app/_util/getCorrectSearchPostType";
+import { usePathname } from "next/navigation";
 
 export type CreatePostFormType = z.infer<typeof CreatePostFormSchema>;
 
@@ -40,7 +42,11 @@ export default function CreatePost({
   const [username] = useLocalStorage<string | null>("test-username");
   const [error, setError] = useState("");
   const { toast } = useToast();
-  const { createPost } = usePost(searchPostType, "", userId);
+  const { createPost } = usePost(
+    getCorrectSearchPostType(usePathname()),
+    "",
+    userId
+  );
   const { allFollower } = useFollower(userId);
   const { addNotification } = useNotification(userId);
 

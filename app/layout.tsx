@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="p-10">
       <body className={cn(inter.className, "bg-[rgb(36,37,38)]")}>
-        <SWRConfig value={{ revalidateOnFocus: false }}>
+        <SWRConfig value={{ revalidateOnFocus: false, dedupingInterval: 3000 }}>
           <SidebarProvider>
             <Navbar />
             <AppSidebar />

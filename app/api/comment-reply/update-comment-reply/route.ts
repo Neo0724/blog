@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function PUT(request: NextRequest) {
+export const PUT = checkToken(async (request: NextRequest) => {
   const replyComment = await request.json();
 
   const prisma = prismaClient as PrismaClient;
@@ -42,4 +43,4 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

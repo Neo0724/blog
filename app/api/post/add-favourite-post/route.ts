@@ -1,8 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prismaClient from "../../getPrismaClient";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function POST(request: NextRequest) {
+export const POST = checkToken(async (request: NextRequest) => {
   const body = await request.json();
 
   const prisma = prismaClient as PrismaClient;
@@ -50,4 +51,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+})

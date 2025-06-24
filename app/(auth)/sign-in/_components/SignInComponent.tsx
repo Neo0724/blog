@@ -26,9 +26,8 @@ import { SignInSchema } from "@/zod_schema/schema";
 export default function SignInComponent() {
   type SignInType = z.infer<typeof SignInSchema>;
 
-  const [_, saveUserId] = useLocalStorage("test-userId", null);
+  const [_, saveUserId] = useLocalStorage("userId", null);
   const [__, saveUserName] = useLocalStorage("test-username", null);
-  const [userToken, setUserToken, ___] = useCookie("userId", undefined);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -52,14 +51,16 @@ export default function SignInComponent() {
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
       const res = await axios.post("/api/auth/sign-in", formData);
+
       saveUserId(res.data.user_id);
       saveUserName(res.data.username);
-      setUserToken(res.data.user_id);
       setToastMessage({ msg: "Sign in successful!", error: false });
       await waitClearToast();
       const newUrl = searchParams.get("redirectUrl")
-        ? "/" + searchParams.get("redirectUrl") + "/" + res.data.user_id
-        : "/user/" + res.data.user_id;
+        ? // Redirect to a certain path
+          "/" + searchParams.get("redirectUrl") + "/" + res.data.user_id
+        : // Redirect to user's profile page
+          "/user/" + res.data.user_id;
       router.push(newUrl);
     } catch (error: any) {
       console.log(error);

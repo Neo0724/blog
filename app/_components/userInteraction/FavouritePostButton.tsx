@@ -23,10 +23,7 @@ export default function FavouritePostButton({
   variant,
 }: FavouritePostButtonProps) {
   const [isFavourited, setIsFavourited] = useState(false);
-  const [loggedInUserId, _] = useLocalStorage<string | null>(
-    "test-userId",
-    null
-  );
+  const [loggedInUserId, _] = useLocalStorage<string | null>("userId", null);
 
   const {
     yourPosts,
@@ -77,14 +74,14 @@ export default function FavouritePostButton({
 
   useEffect(() => {
     if (!isLoading && yourPosts && yourPosts.length > 0) {
-      const favourited = yourPosts.find((page) =>
-        page.find((post) => post.post_id === postId)
+      const favourited = yourPosts.find(
+        (page) => page && page.find((post) => post.post_id === postId)
       )
         ? true
         : false;
       setIsFavourited(favourited);
     }
-  }, [postId, isLoading, yourPosts]);
+  }, [postId, isLoading]);
   return (
     <Button
       variant={variant}

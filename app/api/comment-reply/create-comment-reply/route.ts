@@ -2,6 +2,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prismaClient from "../../getPrismaClient";
+import { checkToken } from "../../jwt/checkToken";
 
 const ReplyCommentSchema = z.object({
   content: z.string().min(1).max(65535),
@@ -11,7 +12,7 @@ const ReplyCommentSchema = z.object({
   comment_reply_id: z.string().optional(),
 });
 
-export async function POST(request: NextRequest) {
+export const POST = checkToken(async (request: NextRequest) => {
   try {
     const body: z.infer<typeof ReplyCommentSchema> = await request.json();
 
@@ -78,4 +79,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+})

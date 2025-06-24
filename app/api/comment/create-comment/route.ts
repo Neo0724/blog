@@ -3,8 +3,9 @@ import { CommentSchema } from "@/zod_schema/schema";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prismaClient from "../../getPrismaClient";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function POST(request: NextRequest) {
+export const POST = checkToken(async (request: NextRequest) => {
   try {
     const body = await request.json();
 
@@ -63,4 +64,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

@@ -1,8 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prismaClient from "../getPrismaClient";
+import { checkToken } from "../jwt/checkToken";
 
-export async function POST(request: NextRequest) {
+export const POST = checkToken(async (request: NextRequest) => {
   const commentReplyId = request.nextUrl.searchParams.get("comment_reply_id");
   const userId = request.nextUrl.searchParams.get("user_id");
 
@@ -43,4 +44,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

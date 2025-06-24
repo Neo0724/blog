@@ -1,7 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = checkToken(async (request: NextRequest) => {
   // The owner that want to remove the follower
   const ownerId = request.nextUrl.searchParams.get("owner_id");
   // The user that the owner wanted to remove
@@ -27,4 +28,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+})

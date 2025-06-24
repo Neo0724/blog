@@ -1,26 +1,29 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-  let cookie = request.cookies.get("userId");
+export async function middleware(request: NextRequest) {
+  // Home page is set to /post/all-posts
+  if (request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/post/all-posts", request.url));
+  }
 
-  console.log(request.nextUrl.pathname);
+  // Retrieve token from cookies
+  let access_token = request.cookies.get("access_token")?.value;
+  let refresh_token = request.cookies.get("refresh_token")?.value;
 
-  if (!cookie || cookie?.value === "") {
+  // User is not signed in
+  if (!refresh_token && !access_token) {
     if (request.nextUrl.pathname.startsWith("/post/favourite-post")) {
       return NextResponse.redirect(
         new URL("/sign-in?redirectUrl=post/favourite-post", request.url)
       );
     } else if (request.nextUrl.pathname.startsWith("/user")) {
-      console.log("Inside");
       return NextResponse.redirect(
         new URL("/sign-in?redirectUrl=user", request.url)
       );
+    } else {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
-  }
-
-  if (request.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/post/all-posts", request.url));
   }
 }
 

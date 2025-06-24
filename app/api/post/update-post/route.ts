@@ -2,8 +2,9 @@ import { getDateDifference } from "@/app/_util/getDateDifference";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prismaClient from "../../getPrismaClient";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function PUT(request: NextRequest) {
+export const PUT = checkToken(async (request: NextRequest) => {
   const { postId, title, content } = await request.json();
 
   const prisma = prismaClient as PrismaClient;
@@ -46,4 +47,4 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

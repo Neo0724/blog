@@ -2,19 +2,39 @@ import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getDateDifference } from "@/app/_util/getDateDifference";
 import prismaClient from "../../getPrismaClient";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function GET(request: NextRequest) {
+export const GET = checkToken(async (request: NextRequest) => {
   const prisma = prismaClient as PrismaClient;
 
   const user_id = request.nextUrl.searchParams.get("user_id");
   const skipPost = request.nextUrl.searchParams.get("skipPost");
   const limitPost = request.nextUrl.searchParams.get("limitPost");
+
   try {
+    // Add validation for required parameters
+    if (!user_id) {
+      return NextResponse.json(
+        { error: "user_id is required" },
+        { status: 400 }
+      );
+    }
+
+    // Set default values and validate numeric parameters
+    const skip = skipPost ? parseInt(skipPost) : 0;
+    const limit = limitPost ? parseInt(limitPost) : 10;
+
+    if (isNaN(skip) || isNaN(limit) || skip < 0 || limit <= 0) {
+      return NextResponse.json(
+        { error: "Invalid skip or limit parameters" },
+        { status: 400 }
+      );
+    }
+
     const allFavouritedPost = await prisma.favouritePost.findMany({
       where: {
-        User_user_id: user_id as string,
+        User_user_id: user_id,
       },
-
       select: {
         Post: {
           select: {
@@ -34,39 +54,32 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
-      skip: parseInt(skipPost as string) * parseInt(limitPost as string),
-      take: parseInt(limitPost as string),
+      skip: skip * limit, // Fixed calculation
+      take: limit,
     });
 
-    let allPostsWithDateDiff = allFavouritedPost?.map((curPost) => {
-      let dateDiff = getDateDifference(curPost.Post.createdAt);
-
-      return { Post: { ...curPost.Post, dateDifferent: dateDiff } };
-    });
-    /* 
-   [
-    {
-        "title": "Coding help",
-        "content": "Can someone help me in next js?",
-        "createdAt": "2024-10-17T10:16:52.627Z",
-        "post_id": "20ee24c5-9d2f-440e-aab6-da49de8bc92e",
-        "User": {
-            "name": "Alan",
-            "user_id": "3b043e4d-3d8d-414d-8dd8-b2ce0be44c25"
-        },
-        "dateDifferent": "30 minutes ago"
+    // Handle case where no posts are found
+    if (!allFavouritedPost || allFavouritedPost.length === 0) {
+      return NextResponse.json([], { status: 200 });
     }
-] 
-    Example output, returned output is an array of all favourited post 
-    */
-    return NextResponse.json(
-      allPostsWithDateDiff.map((allPost) => allPost.Post) ?? [],
-      { status: 200 }
-    );
+
+    const allPostsWithDateDiff = allFavouritedPost.map((curPost) => {
+      const dateDiff = getDateDifference(curPost.Post.createdAt);
+      return {
+        ...curPost.Post,
+        dateDifferent: dateDiff,
+      };
+    });
+
+    return NextResponse.json(allPostsWithDateDiff, { status: 200 });
   } catch (error) {
+    console.error("Error fetching favourited posts:", error);
     return NextResponse.json(
-      { error: "An unexpected error occur!" },
+      { error: "An unexpected error occurred!" },
       { status: 500 }
     );
   }
-}
+});
+
+// export async function GET(request: NextRequest) {
+// }

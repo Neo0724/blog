@@ -1,8 +1,9 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prismaClient from "../../getPrismaClient";
+import { checkToken } from "../../jwt/checkToken";
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = checkToken(async (request: NextRequest) => {
   const post_id = request.nextUrl.searchParams.get("post_id");
 
   const prisma = prismaClient as PrismaClient;
@@ -33,4 +34,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

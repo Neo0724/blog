@@ -1,10 +1,13 @@
+import customAxios from "@/lib/custom-axios";
 import axios from "axios";
 import useSWR from "swr";
 
 const fetchPostLikeCount = async (postId: string): Promise<number> => {
   let fetchedLikeCount = 0;
   try {
-    const res = await axios.get(`/api/post/count-like-post?post_id=${postId}`);
+    const res = await customAxios.get(
+      `/api/post/count-like-post?post_id=${postId}`
+    );
 
     if (res.status === 200) {
       fetchedLikeCount = res.data;

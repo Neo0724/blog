@@ -15,29 +15,33 @@ import useCookie from "react-use-cookie";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import customAxios from "@/lib/custom-axios";
 
 export default function AppSidebar() {
   const router = useRouter();
   const [userId, setUserId] = useLocalStorage<string | null>(
-    "test-userId",
+    "userId",
     undefined
   );
   const [_, setUsername] = useLocalStorage<string | null>(
     "test-username",
     undefined
   );
-  const [__, setUserToken, ___] = useCookie("userId", undefined);
   const { setOpenMobile, isMobile } = useSidebar();
   const currentPathname = usePathname();
 
   const [selectedSidebarItem, setSelectedSidebarItem] =
     useState<SidebarItemSelectionType>("");
 
-  const handleSignOut = () => {
-    setUserId(null);
-    setUsername(null);
-    setUserToken("");
-    router.push("/sign-in");
+  const handleSignOut = async () => {
+    try {
+      setUserId(null);
+      setUsername(null);
+      await customAxios.delete("/api/jwt");
+      router.push("/sign-in");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

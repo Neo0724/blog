@@ -48,7 +48,7 @@ export default function PostCommentButton({
   const searchParams = useSearchParams();
   // Has to open the dialog if user is coming from notification and wants to view specific comment
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [userId, _] = useLocalStorage<string>("test-userId");
+  const [userId, _] = useLocalStorage<string>("userId");
   const { comments, isLoading, commentSize, setCommentSize } = useComment(
     postId,
     userId ?? null

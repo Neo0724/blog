@@ -1,10 +1,10 @@
-import axios from "axios";
 import useSWR, { KeyedMutator } from "swr";
 import { ToastFunctionType } from "./usePostHook";
 import {
   DeleteNotificationType,
   NewNotificationType,
 } from "./useNotificationHook";
+import customAxios from "@/lib/custom-axios";
 
 export default function useLikedComment(user_id: string, post_id: string) {
   const fetchData = async (
@@ -13,7 +13,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
   ): Promise<string[] | []> => {
     let returnedLikedComment: string[] | [] = [];
     try {
-      const response = await axios.get(
+      const response = await customAxios.get(
         `/api/comment/get-liked-comment?post_id=${post_id}&user_id=${user_id}`
       );
 
@@ -42,7 +42,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
   ): Promise<string[] | []> => {
     let newLikeCommentId: string = "";
     try {
-      const res = await axios.post("/api/comment/add-like-comment", {
+      const res = await customAxios.post("/api/comment/add-like-comment", {
         user_id: userId,
         comment_id: commentId,
       });
@@ -83,7 +83,7 @@ export default function useLikedComment(user_id: string, post_id: string) {
   ): Promise<string[] | []> => {
     let removedLikeCommentId: string = "";
     try {
-      const res = await axios.delete("/api/comment/delete-like-comment", {
+      const res = await customAxios.delete("/api/comment/delete-like-comment", {
         params: {
           user_id: userId,
           comment_id: commentId,

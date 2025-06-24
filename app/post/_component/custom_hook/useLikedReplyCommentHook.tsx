@@ -5,6 +5,7 @@ import {
   DeleteNotificationType,
   NewNotificationType,
 } from "./useNotificationHook";
+import customAxios from "@/lib/custom-axios";
 
 // Get all replied comment for a single comment
 export default function useLikedReplyComment(
@@ -23,7 +24,7 @@ export default function useLikedReplyComment(
     let returnedLikedReplyComment: string[] | [] = [];
 
     try {
-      const response = await axios.get(
+      const response = await customAxios.get(
         `/api/comment-reply/get-liked-comment-reply?comment_id=${comment_id}&user_id=${user_id}`
       );
 
@@ -47,7 +48,7 @@ export default function useLikedReplyComment(
   ): Promise<string[] | []> => {
     let newLikeCommentReplyId: string = "";
     try {
-      const res = await axios.post(
+      const res = await customAxios.post(
         `/api/add-like-replycomment?user_id=${userId}&comment_reply_id=${commentReplyId}`
       );
 
@@ -88,7 +89,7 @@ export default function useLikedReplyComment(
   ): Promise<string[] | []> => {
     let removedLikeCommentReplyId: string = "";
     try {
-      const res = await axios.delete(
+      const res = await customAxios.delete(
         "/api/comment-reply/delete-like-comment-reply",
         {
           params: {

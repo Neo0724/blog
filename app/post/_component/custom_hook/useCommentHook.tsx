@@ -9,6 +9,7 @@ import {
   NewNotificationType,
 } from "./useNotificationHook";
 import useSWRInfinite from "swr/infinite";
+import customAxios from "@/lib/custom-axios";
 
 export type GetBackCommentType = {
   comment_id: string;
@@ -28,7 +29,7 @@ export default function useComment(post_id: string, userId: string | null) {
   ): Promise<GetBackCommentType[] | []> => {
     let returnedComments: GetBackCommentType[] | [] = [];
     try {
-      const response = await axios.get(apiUrl);
+      const response = await customAxios.get(apiUrl);
 
       if (response.status === 200) {
         returnedComments = response.data as GetBackCommentType[];
@@ -51,7 +52,7 @@ export default function useComment(post_id: string, userId: string | null) {
         ...updatedComments,
         comment_id: commentId,
       };
-      const res = await axios.put(
+      const res = await customAxios.put(
         "/api/comment/update-comment",
         updatedCommentsWithId
       );
@@ -98,7 +99,7 @@ export default function useComment(post_id: string, userId: string | null) {
   ) => {
     let excludeDeletedComments: GetBackCommentType[][] | undefined;
     try {
-      const res = await axios.delete("/api/comment/delete-comment", {
+      const res = await customAxios.delete("/api/comment/delete-comment", {
         params: {
           comment_id: commentId,
         },
@@ -144,7 +145,7 @@ export default function useComment(post_id: string, userId: string | null) {
     newNotification?: Omit<NewNotificationType, "resourceId">
   ): Promise<void> => {
     try {
-      const response = await axios.post(
+      const response = await customAxios.post(
         "/api/comment/create-comment",
         newComment
       );

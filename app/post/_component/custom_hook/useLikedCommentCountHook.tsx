@@ -1,10 +1,10 @@
-import axios from "axios";
+import customAxios from "@/lib/custom-axios";
 import useSWR from "swr";
 
 const fetchCommentLikeCount = async (commentId: string): Promise<number> => {
   let likeCount = 0;
   try {
-    const response = await axios.get(
+    const response = await customAxios.get(
       `/api/comment/count-like-comment?comment_id=${commentId}`
     );
 

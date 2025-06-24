@@ -6,6 +6,7 @@ import {
   DeleteNotificationType,
   NewNotificationType,
 } from "./useNotificationHook";
+import customAxios from "@/lib/custom-axios";
 
 type FollowingType = {
   UserFollowing: UserType;
@@ -22,7 +23,7 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
 
     let following = [];
     try {
-      const res = await axios.get(
+      const res = await customAxios.get(
         `/api/user-relation/get-following?owner_id=${ownerId}&query_username=${queryUsername}`
       );
 
@@ -44,7 +45,7 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
   ): Promise<FollowingType[] | []> => {
     let newAllFollowing: FollowingType[] | [] = [];
     try {
-      const res = await axios.post("/api/user-relation/add-following", {
+      const res = await customAxios.post("/api/user-relation/add-following", {
         ownerId,
         targetId,
       });
@@ -77,7 +78,7 @@ export const useFollowing = (ownerId: string, queryUsername = "") => {
   ): Promise<FollowingType[] | []> => {
     let excludeDeletedFollowing: FollowingType[] | [] = [];
     try {
-      const res = await axios.delete("/api/user-relation/delete-following", {
+      const res = await customAxios.delete("/api/user-relation/delete-following", {
         params: {
           owner_id: ownerId,
           target_id: targetId,

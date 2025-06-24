@@ -2,6 +2,7 @@ import useSWR from "swr";
 import axios from "axios";
 import { UserType } from "../postComponent/RenderPost";
 import { ToastFunctionType } from "./usePostHook";
+import customAxios from "@/lib/custom-axios";
 
 export type UserFollower = {
   UserFollower: UserType;
@@ -16,7 +17,7 @@ export const useFollower = (targetId: string, queryUsername = "") => {
   ): Promise<UserFollower[] | []> => {
     let follower = [];
     try {
-      const res = await axios.get(
+      const res = await customAxios.get(
         `/api/user-relation/get-follower?target_id=${targetId}&query_username=${queryUsername}`
       );
 
@@ -36,12 +37,15 @@ export const useFollower = (targetId: string, queryUsername = "") => {
   ): Promise<UserFollower[] | []> => {
     let excludeDeletedFollower: UserFollower[] | [] = [];
     try {
-      const res = await axios.delete("/api/user-relation/delete-follower", {
-        params: {
-          owner_id: ownerId,
-          follower_id: followerId,
-        },
-      });
+      const res = await customAxios.delete(
+        "/api/user-relation/delete-follower",
+        {
+          params: {
+            owner_id: ownerId,
+            follower_id: followerId,
+          },
+        }
+      );
       if (res.status === 200) {
         excludeDeletedFollower =
           data?.filter(

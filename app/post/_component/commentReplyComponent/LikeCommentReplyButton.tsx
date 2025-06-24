@@ -26,7 +26,7 @@ export default function LikeCommentReplyButton({
   commentId,
 }: LikeCommentReplyButtonProps) {
   const { toast } = useToast();
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""

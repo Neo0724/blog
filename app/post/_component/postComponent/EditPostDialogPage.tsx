@@ -41,7 +41,7 @@ export default function EditPostDialogPage({
   const { toast } = useToast();
   // Edit post dialog
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
   const { yourPosts, postMutate, updatePosts } = usePost(
     getCorrectSearchPostType(usePathname()),
     "",

@@ -14,7 +14,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utils";
 
 export default function NotificationDialog() {
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
   const [notificationTab, setNotificationTab] = useState<"ALL" | "UNREAD">(
     "ALL"
   );

@@ -6,13 +6,14 @@ import {
   DeleteNotificationType,
   NewNotificationType,
 } from "./useNotificationHook";
+import customAxios from "@/lib/custom-axios";
 
 export default function useLikedPost(user_id: string | null) {
   const fetchData = async (user_id: string | null): Promise<string[] | []> => {
     let returnedLikedPost: string[] | [] = [];
 
     try {
-      const response = await axios.get(
+      const response = await customAxios.get(
         `/api/post/get-like-post?user_id=${user_id}`
       );
 
@@ -36,7 +37,7 @@ export default function useLikedPost(user_id: string | null) {
   ): Promise<string[] | []> => {
     let newLikePostId: string = "";
     try {
-      const res = await axios.post("/api/post/add-like-post", {
+      const res = await customAxios.post("/api/post/add-like-post", {
         user_id: userId,
         post_id: post.post_id,
       });
@@ -80,7 +81,7 @@ export default function useLikedPost(user_id: string | null) {
   ): Promise<string[] | []> => {
     let removedLikePostId: string = "";
     try {
-      const res = await axios.delete(
+      const res = await customAxios.delete(
         `/api/post/delete-like-post?user_id=${userId}&post_id=${post.post_id}`
       );
 

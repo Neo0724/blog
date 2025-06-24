@@ -19,6 +19,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SignUpSchema } from "@/zod_schema/schema";
+import customAxios from "@/lib/custom-axios";
 type SignUpType = z.infer<typeof SignUpSchema>;
 
 export default function SignUpComponent() {
@@ -42,7 +43,7 @@ export default function SignUpComponent() {
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
-      await axios.post("api/auth/sign-up", formData);
+      await customAxios.post("api/auth/sign-up", formData);
       setToastMessage({ msg: "Sign up successful!", error: false });
       await waitClearToast();
       router.push("/sign-in");

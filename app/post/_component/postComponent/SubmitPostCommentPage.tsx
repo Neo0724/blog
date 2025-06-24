@@ -25,7 +25,7 @@ export default function SubmitPostCommentPage({
   postId,
   commentBoxRef,
 }: SubmitPostCommentPageProps) {
-  const [userId, _] = useLocalStorage<string | null>("test-userId", null);
+  const [userId, _] = useLocalStorage<string | null>("userId", null);
   const { createComment } = useComment(postId, userId);
   const { addNotification } = useNotification(userId ?? "");
 

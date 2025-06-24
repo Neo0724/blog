@@ -24,7 +24,7 @@ export default function EachNotificationPage({
 }: {
   notification: ReturnedNotificationType;
 }) {
-  const [loggedInUserId] = useLocalStorage<string>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string>("userId");
   const {
     notViewedCount: notificationNotViewedCount,
     allNotification: allUserNotification,

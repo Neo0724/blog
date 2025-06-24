@@ -26,7 +26,7 @@ export default function PostOption({
   const [toolbar, setToolbar] = useState(false);
   const { toast } = useToast();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
 
   const { yourPosts, postMutate, deletePosts } = usePost(
     getCorrectSearchPostType(usePathname()),

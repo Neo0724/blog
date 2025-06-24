@@ -7,6 +7,7 @@ import {
   NewNotificationType,
 } from "./useNotificationHook";
 import useSWRInfinite from "swr/infinite";
+import customAxios from "@/lib/custom-axios";
 
 export type GetBackReplyCommentType = {
   comment_reply_id: string;
@@ -32,7 +33,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
   ): Promise<GetBackReplyCommentType[] | []> => {
     let returnedReplyComments: GetBackReplyCommentType[] | [] = [];
     try {
-      const response = await axios.get(apiUrl);
+      const response = await customAxios.get(apiUrl);
 
       if (response.status === 200) {
         returnedReplyComments = response.data.allCommentReply;
@@ -53,7 +54,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
     newNotification?: Omit<NewNotificationType, "resourceId">
   ): Promise<void> => {
     try {
-      const res = await axios.post(
+      const res = await customAxios.post(
         "/api/comment-reply/create-comment-reply",
         replyData
       );
@@ -93,7 +94,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
   ): Promise<GetBackReplyCommentType[][] | undefined> => {
     let excludedDeletedReplyComment: GetBackReplyCommentType[][] | undefined;
     try {
-      const res = await axios.delete(
+      const res = await customAxios.delete(
         `/api/comment-reply/delete-comment-reply?comment_reply_id=${comment_reply_id}`
       );
 
@@ -137,7 +138,7 @@ export default function useReplyComment(comment_id: string, user_id: string) {
       | GetBackReplyCommentType[][]
       | undefined;
     try {
-      const res = await axios.put(
+      const res = await customAxios.put(
         "/api/comment-reply/update-comment-reply",
         updatedCommentReply
       );

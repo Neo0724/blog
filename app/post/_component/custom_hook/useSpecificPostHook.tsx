@@ -1,12 +1,12 @@
 import useSWR from "swr";
 import { PostType } from "../postComponent/RenderPost";
-import axios from "axios";
+import customAxios from "@/lib/custom-axios";
 
 const fetchSpecificPost = async (postId: string): Promise<PostType | null> => {
   let specificPost: PostType | null = null;
 
   try {
-    const res = await axios.get(
+    const res = await customAxios.get(
       `/api/post/get-specific-post?post_id=${postId}`
     );
 

@@ -7,7 +7,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { NavItemsType } from "./ListOfNavItem";
 
 export default function Navitem({ name, href, active, icon }: NavItemsType) {
-  const [userId, _] = useLocalStorage<string | null>("test-userId");
+  const [userId, _] = useLocalStorage<string | null>("userId");
 
   if (
     (!userId || userId.length === 0 || userId === null) &&
@@ -18,14 +18,13 @@ export default function Navitem({ name, href, active, icon }: NavItemsType) {
 
   return (
     <>
-      {/* Vertical line */}
-      {/* <div className="hidden md:block bg-white w-[1px] h-10"></div> */}
       {/* Link button */}
       <Button
         variant="ghost"
         asChild
         className={cn(
           "w-[11.5rem] text-white border-0 rounded-lg justify-start cursor-pointer",
+          /* Hide the sign up btn if user is signed in */
           userId && href === "/sign-up" ? "hidden" : "",
           name === "Home" && "mt-[1.7rem]"
         )}

@@ -27,7 +27,7 @@ export default function LikeCommentButton({
   postId,
 }: LikeCommentButtonProps) {
   const [isLiked, setIsLiked] = useState<boolean>();
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
   const { addNotification, deleteNotification } = useNotification(
     loggedInUserId ?? ""
   );

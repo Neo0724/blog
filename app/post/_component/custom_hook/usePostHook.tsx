@@ -23,6 +23,7 @@ export type ToastProp = {
   description: string;
 };
 
+/* Fetch for SWR infinite will only fetch post for one single page at once */
 const fetchPost = async (apiUrl: string): Promise<PostType[] | []> => {
   let returnedPosts: PostType[] | [] = [];
   try {

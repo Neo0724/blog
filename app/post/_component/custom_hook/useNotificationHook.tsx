@@ -3,6 +3,7 @@ import useSWR from "swr";
 import axios from "axios";
 import { NotificationType } from "../Enum";
 import { UserType } from "./usePostHook";
+import customAxios from "@/lib/custom-axios";
 
 type ReturnedNotificationTypeWithNotViewedCount = {
   allNotification: ReturnedNotificationType[];
@@ -57,7 +58,7 @@ export default function useNotification(userId: string) {
     let fetchedNotification: ReturnedNotificationType[] = [];
     let notViewedCount: number = 0;
     try {
-      const res = await axios.get(
+      const res = await customAxios.get(
         `/api/notification/get-notification?user_id=${userId}`
       );
 
@@ -78,7 +79,7 @@ export default function useNotification(userId: string) {
       await Promise.all([
         newNotification.targetUserId.map(
           async (userId) =>
-            await axios.post("/api/notification/add-notification", {
+            await customAxios.post("/api/notification/add-notification", {
               ...newNotification,
               targetUserId: userId,
             })
@@ -96,7 +97,7 @@ export default function useNotification(userId: string) {
       | ReturnedNotificationTypeWithNotViewedCount
       | undefined = undefined;
     try {
-      const res = await axios.put(
+      const res = await customAxios.put(
         `/api/notification/read-notification?notification_id=${notificationId}`
       );
 
@@ -124,7 +125,7 @@ export default function useNotification(userId: string) {
     deleteNotification: DeleteNotificationType
   ): Promise<void> => {
     try {
-      await axios.delete(
+      await customAxios.delete(
         `/api/notification/delete-notification?type=${deleteNotification.type}&target_user_id=${deleteNotification.targetUserId}&from_user_id=${deleteNotification.fromUserId}&resource_id=${deleteNotification.resourceId}`
       );
     } catch (err) {

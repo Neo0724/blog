@@ -51,7 +51,7 @@ export default function EachCommentPage({
   const commentBoxRef = useRef<HTMLDivElement | null>(null);
   const viewRepliesRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
-  const [loggedInUserId, _] = useLocalStorage("test-userId", "");
+  const [loggedInUserId, _] = useLocalStorage("userId", "");
   const [openUserReplyBox, setOpenUserReplyBox] = useState(false);
   const [viewReplies, setViewReplies] = useState(false);
   const [replyContent, setReplyContent] = useState("");

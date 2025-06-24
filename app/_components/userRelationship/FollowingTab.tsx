@@ -22,7 +22,7 @@ type FollowingTabProps = {
 export function FollowingTab({ pageOwnerUserId }: FollowingTabProps) {
   const { toast } = useToast();
   const router = useRouter();
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
   const [searchUsername, setSearchUsername] = useState("");
   const newSearchVal = useSearchDebounce(searchUsername, 500);
   const { addNotification, deleteNotification } = useNotification(

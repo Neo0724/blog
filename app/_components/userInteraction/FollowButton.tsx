@@ -21,10 +21,7 @@ export default function FollowButton({
   variant,
 }: FollowButtonProps) {
   const { toast } = useToast();
-  const [loggedInUserId, _] = useLocalStorage<string | null>(
-    "test-userId",
-    null
-  );
+  const [loggedInUserId, _] = useLocalStorage<string | null>("userId", null);
   const { allFollowing, addFollowing, removeFollowing, followingMutate } =
     useFollowing(loggedInUserId ?? "");
   const { addNotification, deleteNotification } = useNotification(

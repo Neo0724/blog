@@ -56,7 +56,7 @@ export default function RenderPost({
   );
 
   const [username] = useLocalStorage<string | null>("test-username");
-  const [loggedInUserId] = useLocalStorage<string | null>("test-userId");
+  const [loggedInUserId] = useLocalStorage<string | null>("userId");
   const scrollToTopDiv = useRef<HTMLDivElement>(null);
   const isLoadingMore =
     isLoading ||

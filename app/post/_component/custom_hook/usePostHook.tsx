@@ -267,8 +267,9 @@ export default function usePost(
       (previousPageData && !previousPageData.length) ||
       (searchPostType === SearchPostType.USER_FAVOURITE_POST && !userId) ||
       (searchPostType === SearchPostType.USER_POST && !userId)
-    )
+    ) {
       return null;
+    }
     const fetchUrl = `${apiUrl}&skipPost=${pageIndex}&limitPost=${POST_PAGE_SIZE}`;
     return fetchUrl;
   };

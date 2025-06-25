@@ -24,7 +24,7 @@ export default function AppSidebar() {
     undefined
   );
   const [_, setUsername] = useLocalStorage<string | null>(
-    "test-username",
+    "username",
     undefined
   );
   const { setOpenMobile, isMobile } = useSidebar();

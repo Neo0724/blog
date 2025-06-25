@@ -19,7 +19,6 @@ import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import useCookie from "react-use-cookie";
 import { useSearchParams } from "next/navigation";
 import { SignInSchema } from "@/zod_schema/schema";
 
@@ -27,7 +26,7 @@ export default function SignInComponent() {
   type SignInType = z.infer<typeof SignInSchema>;
 
   const [_, saveUserId] = useLocalStorage("userId", null);
-  const [__, saveUserName] = useLocalStorage("test-username", null);
+  const [__, saveUserName] = useLocalStorage("username", null);
   const searchParams = useSearchParams();
   const router = useRouter();
 

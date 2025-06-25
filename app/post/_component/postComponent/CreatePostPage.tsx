@@ -39,7 +39,7 @@ export default function CreatePost({
   searchPostType: SearchPostType.ALL_POST | SearchPostType.USER_POST;
   userId: string;
 }) {
-  const [username] = useLocalStorage<string | null>("test-username");
+  const [username] = useLocalStorage<string | null>("username");
   const [error, setError] = useState("");
   const { toast } = useToast();
   const { createPost } = usePost(

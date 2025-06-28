@@ -6,7 +6,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## ✨ Features
 
-- **User Authentication**: Sign up, sign in, and sign out functionality with secure password hashing.
+- **User Authentication**: Sign up, sign in, and sign out functionality with secure password hashing and JWT-based authorization
 - **Post Management**: Create, edit, and delete blog posts.
 - **Comment System**: Add comments to posts, reply to comments, edit and delete comments and replies.
 - **Like System**: Like and unlike posts, comments, and comment replies.

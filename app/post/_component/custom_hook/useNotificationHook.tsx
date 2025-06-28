@@ -1,6 +1,5 @@
 "use client";
 import useSWR from "swr";
-import axios from "axios";
 import { NotificationType } from "../Enum";
 import { UserType } from "./usePostHook";
 import customAxios from "@/lib/custom-axios";
@@ -162,7 +161,11 @@ export default function useNotification(userId: string) {
 
   const { data, isLoading, error, mutate } = useSWR(
     userId ? "/api/notification/get-notification" : null,
-    () => fetchNotification(userId)
+    () => fetchNotification(userId),
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 10_000,
+    }
   );
 
   return {

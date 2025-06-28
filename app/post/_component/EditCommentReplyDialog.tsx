@@ -37,7 +37,7 @@ export default function EditCommentReplyDialog({
   commentId: string;
 }) {
   const { toast } = useToast();
-  const [loggedInUserId, _] = useLocalStorage<string>("userId", "");
+  const [loggedInUserId] = useLocalStorage<string>("userId", "");
 
   const { updateReplyComment, replyComments, mutateReplyComment } =
     useReplyComment(commentId, loggedInUserId);

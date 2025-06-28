@@ -30,7 +30,7 @@ export default function LikePostButton({
   variant,
 }: LikePostButtonProps) {
   const { toast } = useToast();
-  const [loggedInUserId, _] = useLocalStorage<string | null>("userId", null);
+  const [loggedInUserId] = useLocalStorage<string | null>("userId", null);
   const [isLiked, setIsLiked] = useState(false);
   const { postLikeCount, postLikeCountMutate } = useLikedPostCount(postId);
   const { yourPosts } = usePost(

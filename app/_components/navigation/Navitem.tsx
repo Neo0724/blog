@@ -7,7 +7,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { NavItemsType } from "./ListOfNavItem";
 
 export default function Navitem({ name, href, active, icon }: NavItemsType) {
-  const [userId, _] = useLocalStorage<string | null>("userId");
+  const [userId] = useLocalStorage<string | null>("userId");
 
   if (
     (!userId || userId.length === 0 || userId === null) &&

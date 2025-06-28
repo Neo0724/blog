@@ -47,7 +47,7 @@ export default function EachCommentReplyPage({
   const router = useRouter();
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  const [loggedInUserId, _] = useLocalStorage("userId", "");
+  const [loggedInUserId] = useLocalStorage("userId", "");
   const [openReply, setOpenReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const {

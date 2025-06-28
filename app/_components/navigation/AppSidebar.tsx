@@ -11,7 +11,6 @@ import { ListOfNavItems, SidebarItemSelectionType } from "./ListOfNavItem";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { FaSignOutAlt } from "react-icons/fa";
-import useCookie from "react-use-cookie";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
